@@ -21,7 +21,7 @@ def foward(power:int, time:int):
 
 
 def test3():
-    speed4 = Speed(25)
+    speed4 = fc.Speed(25)
     speed4.start()
     # time.sleep(2)
     fc.forward(100)
