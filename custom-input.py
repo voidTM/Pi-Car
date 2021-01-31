@@ -1,4 +1,7 @@
 import picar_4wd as fc
+from picar_4wd.speed import Speed
+
+
 import sys
 import tty
 import termios
@@ -10,11 +13,11 @@ key = 'status'
 print("If you want to quit.Please press q")
 
 
-def foward(power:int, time:int):
+def foward(power:int, t:int):
     try:
         fc.forward(power)
-        time.sleep(time)
-    except ValueError:
+        time.sleep(t)
+    except:
         print("move failed")
     
     fc.stop()
@@ -83,7 +86,8 @@ def Keyborad_control():
         else:
             fc.stop()
         if key=='q':
-            print("quit")  
+            print("quit")
+            fc.stop()  
             break  
 if __name__ == '__main__':
     Keyborad_control()
