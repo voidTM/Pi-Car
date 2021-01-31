@@ -3,7 +3,7 @@ import sys
 import tty
 import termios
 import asyncio
-
+import time
 
 power_val = 50
 key = 'status'
@@ -11,8 +11,12 @@ print("If you want to quit.Please press q")
 
 
 def foward(power:int, time:int):
-    fc.forward(power)
-    time.sleep(time)
+    try:
+        fc.forward(power)
+        time.sleep(time)
+    except ValueError:
+        print("move failed")
+    
     fc.stop()
 
 
