@@ -1,6 +1,8 @@
-import picar_4wd as fc
 from picar_4wd.speed import Speed
-
+import RPi.GPIO as GPIO
+import time, math
+import threading
+import picar_4wd as fc
 
 import sys
 import tty
@@ -23,13 +25,43 @@ def foward(power:int, t:int):
     fc.stop()
 
 
+
+def test1():
+    # import fwd as nc 
+    fc.forward(100)
+
+    speed3 = Speed(25)
+    speed4 = Speed(4) 
+    speed3.start()
+    speed4.start()
+    try:
+        # nc.stop()
+        while 1:
+            # speed_counter 
+            # = 0
+            print(speed3())
+            print(speed4())
+            print(" ") 
+            time.sleep(0.5)
+    finally:
+        speed3.deinit()
+        speed4.deinit()
+        fc.stop() 
+
+def test2():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(25, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    while True:
+        print(GPIO.input(12))
+        time.sleep(0.001) 
+
 def test3():
-    speed4 = fc.Speed(25)
+    speed4 = Speed(25)
     speed4.start()
     # time.sleep(2)
-    fc.forward(100)
+    fc.forward(10)
     x = 0
-    for i in range(20):
+    for i in range(2):
         time.sleep(0.1)
         speed = speed4()
         x += speed * 0.1
@@ -38,6 +70,15 @@ def test3():
     speed4.deinit()
     fc.stop()
 
+# test scanner
+def ultrasonic_test():
+    #scan_list = fc.scan_step(35)
+
+    #tmp = scan_list[3:7]
+    #print(scan_list)
+
+    distance = fc.get_distance_at(0)
+    print(distance) # should be in cm
 
 
 def readchar():
@@ -81,8 +122,14 @@ def Keyborad_control():
             fc.backward(power_val)
         elif key=='d':
             fc.turn_right(power_val)
+        elif key == "1":
+            test1()
+        elif key=="2":
+            test2()
         elif key=="3":
             test3()
+        elif key == "5":
+            ultrasonic_test()
         else:
             fc.stop()
         if key=='q':
@@ -90,7 +137,10 @@ def Keyborad_control():
             fc.stop()  
             break  
 if __name__ == '__main__':
-    Keyborad_control()
+    try: 
+        Keyborad_control()
+    finally:
+        fc.stop()
 
 
 
