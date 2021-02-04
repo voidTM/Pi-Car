@@ -32,6 +32,7 @@ def backup(speed):
 def turn(speed):
     blocked = True
     while blocked:
+        
         fc.turn_right(speed)
 
 if __name__ == "__main__":

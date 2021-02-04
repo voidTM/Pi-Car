@@ -80,6 +80,15 @@ def ultrasonic_test():
     distance = fc.get_distance_at(0)
     print(distance) # should be in cm
 
+def scan_test(step_size:int, ref:int):
+    scan_list = []
+    current_angle = -90
+    while(current_angle < 90):
+        status = get_status_at(current_angle, ref1=ref)
+        current_angle += step_size
+        scan_list.append([status, current_angle])
+
+    print(scan_list)
 
 def readchar():
     fd = sys.stdin.fileno()
@@ -106,14 +115,6 @@ def Keyborad_control():
     while True:
         global power_val
         key=readkey()
-        if key=='6':
-            if power_val <=90:
-                power_val += 10
-                print("power_val:",power_val)
-        elif key=='4':
-            if power_val >=10:
-                power_val -= 10
-                print("power_val:",power_val)
         if key=='w':
             foward(power_val, 1)
         elif key=='a':
@@ -128,6 +129,8 @@ def Keyborad_control():
             test2()
         elif key=="3":
             test3()
+        elif key=="4":
+            scan_test(60, 35)
         elif key == "5":
             ultrasonic_test()
         else:
