@@ -30,7 +30,9 @@ def backup(speed):
 
 # find new direction
 def turn(speed):
-    fc.turn_right(speed)
+    blocked = True
+    while blocked:
+        fc.turn_right(speed)
 
 if __name__ == "__main__":
     try: 
