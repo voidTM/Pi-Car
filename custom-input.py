@@ -80,15 +80,34 @@ def ultrasonic_test():
     distance = fc.get_distance_at(0)
     print(distance) # should be in cm
 
-def scan_test(step_size:int, ref:int):
-    scan_list = []
-    current_angle = -90
-    while(current_angle < 90):
-        status = get_status_at(current_angle, ref1=ref)
-        current_angle += step_size
-        scan_list.append([status, current_angle])
+def scan_test():
+    best = [fc.get_distance_at(0), 0]
+    step_size = 10
 
-    print(scan_list)
+    for current_angle in range(-90, 90, step_size):
+        dist = fc.get_distance_at(current_angle)
+        if dist > best[0]:
+    
+            best = [dist, current_angle]
+
+
+    fc.get_distance_at(0)
+
+    print(best)
+    return best
+
+def turn_test():
+    distance, move_to_angle = scan_test()
+    turn_speed = 10
+
+    while(fc.get_status_at(0, ref1 = distance, ref2 = distance * 0.9)  < 1):
+        if move_to_angle < 0:
+
+            fc.turn_right(turn_speed)
+        else:
+            fc.turn_left(turn_speed)
+    
+    fc.stop()
 
 def readchar():
     fd = sys.stdin.fileno()
@@ -126,13 +145,13 @@ def Keyborad_control():
         elif key == "1":
             test1()
         elif key=="2":
-            test2()
+            print(fc.get_distance_at(-90))
         elif key=="3":
             test3()
         elif key=="4":
-            scan_test(60, 35)
+            scan_test()
         elif key == "5":
-            ultrasonic_test()
+            turn_test()
         else:
             fc.stop()
         if key=='q':
