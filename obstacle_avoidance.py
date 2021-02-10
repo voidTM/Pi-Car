@@ -62,15 +62,26 @@ def full_scan():
 
 def drive():
     
-    go = True
-    current_angle = 0
-    
-    while go:
+    go = 2
+    scan_angles = [0, -20, 0, 20]
+    while go > 2:
         #scan
-        fc.forward(speed)
+        next_angle = 0
 
+        # drive forward
+        fc.forward(30)
 
-
+        while(fc.get_status_at(next_angle, 35, 10) > 1):
+            next_angle = (next_angle + 1) % 4
+        
+        fc.backward(10)
+        while(fc.get_status_at(next_angle, ref1 = 35) < 2):
+            next_angle = (next_angle + 1) % 4
+        
+        fc.turn_right()
+        while(fc.get_status_at(next_angle, ref1 = 50) < 2):
+             next_angle = (next_angle + 1) % 4
+        
 
 
 def drive2():
@@ -87,7 +98,7 @@ def drive2():
             scan_dist = 50
             speed = 10
             
-            
+
             fc.turn_right(speed)
         else:
             scan_dist = 20
