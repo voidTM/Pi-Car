@@ -28,7 +28,7 @@ scan_status = {}
 scan_dist = {}
 
 # each bit on the map should be 5 cm
-bit_map = np.zeros((20, 20))
+bit_map = np.zeros((100, 100))
 current_pos = (50,0)
 relative_map = np.zeros((100,100,100))
 
@@ -69,8 +69,10 @@ def fill_map(map, x_bounds, y_bounds, value = 1):
     print("x bounds", x_bounds)
     print('y bounds', y_bounds)
 
-    lower_x = x_bounds[0]
-    x = np.arange(x_bounds[0], x_bounds[1])
+    lower_x = max(x_bounds[0], 0)
+    upper_x = min(x_bounds[1], 99)
+
+    x = np.arange(lower_x, upper_x)
     y = np.interp(x, x_bounds, y_bounds)
 
     print(x)
