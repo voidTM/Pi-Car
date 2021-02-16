@@ -11,16 +11,18 @@ import asyncio
 import time
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 # 60 degree is about the closest servos
+# think of arks
 #scanning
 ANGLE_RANGE = 180
-STEP = 18
+STEP = 10
 us_step = STEP
 angle_distance = [0,0]
 current_angle = 0
-max_angle = 60
-min_angle = -60
+max_angle = 90
+min_angle = -90
 step_count = ANGLE_RANGE//STEP
 
 # degrees are from max -> min        
@@ -36,7 +38,7 @@ def full_scan(ref1, ref2):
     global current_angle, us_step, scan_status,  scan_dist
     
     scan_status = {}
-    for angle in range(min_angle, max_angle + 1, 12):
+    for angle in range(min_angle, max_angle + 1, 10):
         scan_status[angle] = fc.get_status_at(angle, ref1, ref2)
         scan_dist[angle] = fc.get_distance_at(angle)
     
@@ -62,9 +64,7 @@ def my_step_scan(ref1 = 10, ref2 = 35):
     #scan_list[i] = status
     return (current_angle, status)
 
-
-
-def fill_map(map, x_bounds, y_bounds, value = 1):
+def fill_map(map, x_bounds, y_bounds, value = 10):
 
     # bind the x range between 0 and 99
     lower_x = max(x_bounds[0], 0)
@@ -80,14 +80,24 @@ def fill_map(map, x_bounds, y_bounds, value = 1):
 
     print(x)
     print(y)
+    """
     xy = np.array([x,y])
     print(xy.shape)
     print(xy)
-    xy
     # fill in 1 column by column
     for i in range(len(y)):
         continue
+    """
 
+def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
+    if theta >= 0:
+        outputX = vehicleX - obstacleX
+    else:
+        outputX = vehicleX + obstacleX
+
+    outputY = (vehicleY * 2) + obstacleY
+    
+    return outputX, outputY
     
 
 
@@ -98,6 +108,7 @@ def map_dist():
     prev_point = [0,0]     
     x_bounds = [0,0]
     y_bounds = [0,0] 
+    obstacle_locations = []
     for angle in scan_dist:
         rad_angle = np.radians(angle)
         dist = scan_dist[angle]
@@ -115,7 +126,16 @@ def map_dist():
         print(prev_point[0], prev_point[1])
         fill_map(bit_map, x_bounds, y_bounds, 1)
         prev_point = [x,y]
+        obstacle_locations.append(prev_point)
 
+    obstacles = np.array(obstacle_locations)
+    obstacles = obstacles.reshape(2,-1)
+    plt.plot(obstacles[0], obstacles[1], 'o')
+
+    print(obstacles)
+    print("displaying points")
+    plt.show()
+    
 
 if __name__ == "__main__":
     try: 
