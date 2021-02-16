@@ -64,6 +64,18 @@ def my_step_scan(ref1 = 10, ref2 = 35):
     #scan_list[i] = status
     return (current_angle, status)
 
+
+def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
+    if theta >= 0:
+        outputX = vehicleX - obstacleX
+    else:
+        outputX = vehicleX + obstacleX
+
+    outputY = (vehicleY * 2) + obstacleY
+    
+    return outputX, outputY
+
+
 def fill_map(map, x_bounds, y_bounds, value = 10):
 
     # bind the x range between 0 and 99
@@ -89,15 +101,6 @@ def fill_map(map, x_bounds, y_bounds, value = 10):
         continue
     """
 
-def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
-    if theta >= 0:
-        outputX = vehicleX - obstacleX
-    else:
-        outputX = vehicleX + obstacleX
-
-    outputY = (vehicleY * 2) + obstacleY
-    
-    return outputX, outputY
     
 
 
@@ -123,17 +126,17 @@ def map_dist():
             x_bounds = np.array([x, prev_point[0]])
             y_bounds = np.array([y, prev_point[1]])
         print(x,y)
-        print(prev_point[0], prev_point[1])
-        fill_map(bit_map, x_bounds, y_bounds, 1)
+        #fill_map(bit_map, x_bounds, y_bounds, 1)
         prev_point = [x,y]
-        obstacle_locations.append(prev_point)
+        obstacle_locations.append([x,y])
 
     obstacles = np.array(obstacle_locations)
-    obstacles = obstacles.reshape(2,-1)
-    plt.plot(obstacles[0], obstacles[1], 'o')
-
     print(obstacles)
-    print("displaying points")
+    obstacles = obstacles.T
+
+    x = plt.plot(obstacles[0], obstacles[1], 'o')
+
+    print(list(obstacles))
     plt.show()
     
 
