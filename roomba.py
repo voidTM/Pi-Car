@@ -72,100 +72,9 @@ def drive():
 
 
 
+# drive and stop
+
 def drive2():
-    
-    speed = 30
-    scan_dist = 20
-    
-    while True:
-        scan_list = fc.scan_step(scan_dist)
-        if not scan_list:
-            continue
-
-        tmp = scan_list[3:7]
-        print(scan_list)
-        print(tmp)
-        #nearby objects
-        if(min(tmp) < 2):
-            
-            fc.stop()
-            speed = 10
-            
-
-            time.sleep(10)
-            fc.turn_right(speed)
-        else:
-            speed = 30
-            fc.forward(speed)
-
-
-# aka don't follow me
-def drive3():
-    speed = 30
-
-    fc.forward(speed) 
-
-    while True:
-        scan_list = fc.scan_step(35)
-
-
-        if not scan_list:
-            continue
-        print(scan_list)
-        ahead = scan_list[3:7]
-        # coast clear full speed ahead        
-        if min(ahead) > 1:
-            print("Coast Clear")
-            fc.forward(speed)
-            continue
-
-        print("need to stop")
-
-        while(fc.get_distance_at(0) < 30):
-            fc.backward(2)
-
-        fc.stop()
-        time.sleep(5)
-        str_scan = "".join([str(i) for i in scan_list])
-
-        paths = [u for x in str_scan.split("0") for u in (x, "0")]
-
-        print(paths)
-
-        #get index to largest group
-
-        i = paths.index(max(paths))
-        print("paths ", paths)
-        print(i)
-            
-        pos = str_scan.index(paths[i])
-
-        # look for mid?
-        pos += (len(paths[i]) - 1) / 2
-            # pos = int(pos)
-        delta = len(str_scan) / 3
-            # delta *= us_step/abs(us_step)
-
-        print(pos, delta)
-
-            # turn away from obstacles
-
-        if pos < delta:
-            print("turning left")
-            fc.turn_left(10)
-        elif pos > 2 * delta:
-            print("turning right")
-            fc.turn_right(10)
-        else:
-            if int(str_scan[len(str_scan)//2-1]) < 2:
-                    
-                fc.backward(1)
-            else:
-                fc.forward(speed)
-            
-
-
-def drive4():
     speed = 30
     scan_dist = 35
     
@@ -174,10 +83,10 @@ def drive4():
         if not scanned:
             continue
         print(scanned)
-        if(min(scanned) == 0):
+        if(min(scanned) < 1):
             fc.stop()
         
-def drive5():
+def drive3():
     speed = 30
 
     fc.forward(speed) 
