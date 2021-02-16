@@ -83,7 +83,7 @@ def drive2():
             continue
 
         tmp = scan_list[3:7]
-        
+        print(scan_list)
         print(tmp)
         #nearby objects
         if(min(tmp) < 2):
@@ -91,7 +91,7 @@ def drive2():
             fc.stop()
             speed = 10
             
-            
+
             time.sleep(10)
             fc.turn_right(speed)
         else:
@@ -103,30 +103,30 @@ def drive2():
 def drive3():
     speed = 30
 
+    fc.forward(speed) 
+
     while True:
         scan_list = fc.scan_step(35)
 
 
         if not scan_list:
             continue
-        
+        print(scan_list)
         ahead = scan_list[3:7]
         # coast clear full speed ahead        
-        if min(scan_list) > 1:
+        if min(ahead) > 1:
             print("Coast Clear")
+            fc.forward(speed)
             continue
-        elif min(scan_list) == 1:
-            print("objects nearby")
-            fc.forward(2) 
-            
+
         print("need to stop")
 
-        fc.backward(speed)
-        time.sleep(1)
-        fc.stop()
+        while(fc.get_distance_at(0) < 30):
+            fc.backward(2)
 
-        str_scan = [str(i) for i in scan_list]
-        str_scan = "".join(str_scan)
+        fc.stop()
+        time.sleep(5)
+        str_scan = "".join([str(i) for i in scan_list])
 
         paths = [u for x in str_scan.split("0") for u in (x, "0")]
 
@@ -150,17 +150,16 @@ def drive3():
 
             # turn away from obstacles
 
-        time.sleep(10)   
         if pos < delta:
             print("turning left")
-            fc.turn_left(speed // 2)
+            fc.turn_left(10)
         elif pos > 2 * delta:
             print("turning right")
-            fc.turn_right(speed // 2)
+            fc.turn_right(10)
         else:
-            if str_scan[int(len(str_scan)/2-1)] == "0":
+            if int(str_scan[len(str_scan)//2-1]) < 2:
                     
-                fc.backward(5)
+                fc.backward(1)
             else:
                 fc.forward(speed)
             
@@ -178,13 +177,59 @@ def drive4():
         if(min(scanned) == 0):
             fc.stop()
         
+def drive5():
+    speed = 30
+
+    fc.forward(speed) 
+
+    while True:
+        scan_list = fc.scan_step(35)
+
+
+        if not scan_list:
+            continue
+        print(scan_list)
+        ahead = scan_list[2:8]
+        # coast clear full speed ahead        
+        if min(ahead) > 1:
+            print("Coast Clear")
+            fc.forward(speed)
+            continue
+
+        print("need to stop")
+
+        fc.stop()
+
+        left = scan_list[:5]
+        right = scan_list[5:]
+
+        # -1 = turn left, 0 forward, 1 turn right
+        direction = 0
+        print(left, right)
+        if(sum(left) > sum(right)):
+            direction = -1
+        elif(sum(left) < sum(right)):
+            direction = 1
+        else:
+            direction = 0
+
+
+        if direction  == -1:
+            print("turning left")
+            fc.turn_left(10)
+        elif direction  == 1:
+            print("turning right")
+            fc.turn_right(10)
+        else:
+            while(fc.get_distance_at(0) < 50):
+                fc.backward(2)
 
         
 
 
 if __name__ == "__main__":
     try: 
-        drive2()
+        drive5()
     finally: 
         fc.get_distance_at(0)
         fc.stop()

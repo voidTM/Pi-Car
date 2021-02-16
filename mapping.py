@@ -28,7 +28,7 @@ scan_status = {}
 scan_dist = {}
 
 # each bit on the map should be 5 cm
-bit_map = np.zeros((100, 100))
+bit_map = np.zeros((101, 101))
 current_pos = (50,0)
 relative_map = np.zeros((100,100,100))
 
@@ -66,20 +66,27 @@ def my_step_scan(ref1 = 10, ref2 = 35):
 
 def fill_map(map, x_bounds, y_bounds, value = 1):
 
-    print("x bounds", x_bounds)
-    print('y bounds', y_bounds)
-
+    # bind the x range between 0 and 99
     lower_x = max(x_bounds[0], 0)
     upper_x = min(x_bounds[1], 99)
 
     x = np.arange(lower_x, upper_x)
+
+    if(x.size == 0):
+        print("x is out of map bounds")
+        return 
+
     y = np.interp(x, x_bounds, y_bounds)
 
     print(x)
     print(y)
-    
-
-    
+    xy = np.array([x,y])
+    print(xy.shape)
+    print(xy)
+    xy
+    # fill in 1 column by column
+    for i in range(len(y)):
+        continue
 
     
 
@@ -94,8 +101,9 @@ def map_dist():
     for angle in scan_dist:
         rad_angle = np.radians(angle)
         dist = scan_dist[angle]
-        x = int(dist * np.sin(rad_angle) - current_pos[0])
-        y = int(dist * np.cos(rad_angle) - current_pos[1])
+        
+        x =  50 + int(dist * np.sin(rad_angle))
+        y = int(dist * np.cos(rad_angle))
 
         if(prev_point[0] < x):
             x_bounds = np.array([prev_point[0], x])
