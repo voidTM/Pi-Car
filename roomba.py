@@ -88,9 +88,11 @@ def drive2():
         #nearby objects
         if(min(tmp) < 2):
             
+            fc.stop()
             speed = 10
             
-
+            
+            time.sleep(10)
             fc.turn_right(speed)
         else:
             speed = 30

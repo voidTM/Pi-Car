@@ -11,6 +11,8 @@ import asyncio
 import time
 
 import numpy as np
+from scipy import interpolate
+
 # 60 degree is about the closest servos
 #scanning
 ANGLE_RANGE = 180
@@ -28,7 +30,7 @@ scan_dist = {}
 
 # each bit on the map should be 5 cm
 bit_map = np.zeros((20, 20))
-current_pos = [50,0]
+current_pos = (50,0)
 relative_map = np.zeroes((100,100,100))
 
 def full_scan(ref1, ref2):
@@ -64,13 +66,25 @@ def my_step_scan(ref1 = 10, ref2 = 35):
 
 
 def fiil_map(map, pointA, pointB, value = 1):
-    
+    print(pointA)
+    print(pointB)
+    x_arr = [pointA[0], pointB[0]]
+    y_arr = [pointA[1], pointB[1]]
+    f = interpolate.interp1d(x_arr, y_arr)
+
+    print(x_arr, y_arr)
+
+    inbetween = np.arange(pointA[0], pointB[0])
+    print(inbetween)
+
+
 
 
 # adds scanned information to map\s?
 def map_dist():
 
-    global bit_map, scan_dist       
+    global bit_map, scan_dist
+    prev_point = (50,99)      
     print(scan_dist)
     for angle in scan_dist:
         rad_angle = np.radians(angle)
@@ -78,9 +92,7 @@ def map_dist():
         x = int(dist * np.sin(rad_angle) - current_pos[0]) // 10
         y = int(dist * np.cos(rad_angle) - current_pos[1]) // 10
         print(x,y)
-        if abs(x) < 100 and abs(y) < 100:
-
-            bit_map[x][y] = 1
+        fill_map(bit_map, prev_point, (x,y), 1)
     
     for row in bit_map:
         print(row)        
