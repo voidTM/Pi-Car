@@ -11,7 +11,6 @@ import asyncio
 import time
 
 import numpy as np
-from scipy import interpolate
 
 # 60 degree is about the closest servos
 #scanning
@@ -31,7 +30,7 @@ scan_dist = {}
 # each bit on the map should be 5 cm
 bit_map = np.zeros((20, 20))
 current_pos = (50,0)
-relative_map = np.zeroes((100,100,100))
+relative_map = np.zeros((100,100,100))
 
 def full_scan(ref1, ref2):
     global current_angle, us_step, scan_status,  scan_dist
@@ -65,37 +64,47 @@ def my_step_scan(ref1 = 10, ref2 = 35):
 
 
 
-def fiil_map(map, pointA, pointB, value = 1):
-    print(pointA)
-    print(pointB)
-    x_arr = [pointA[0], pointB[0]]
-    y_arr = [pointA[1], pointB[1]]
-    f = interpolate.interp1d(x_arr, y_arr)
+def fill_map(map, x_bounds, y_bounds, value = 1):
 
-    print(x_arr, y_arr)
+    print("x bounds", x_bounds)
+    print('y bounds', y_bounds)
 
-    inbetween = np.arange(pointA[0], pointB[0])
-    print(inbetween)
+    lower_x = x_bounds[0]
+    x = np.arange(x_bounds[0], x_bounds[1])
+    y = np.interp(x, x_bounds, y_bounds)
 
+    print(x)
+    print(y)
+    
 
+    
+
+    
 
 
 # adds scanned information to map\s?
 def map_dist():
 
     global bit_map, scan_dist
-    prev_point = (50,99)      
-    print(scan_dist)
+    prev_point = [0,0]     
+    x_bounds = [0,0]
+    y_bounds = [0,0] 
     for angle in scan_dist:
         rad_angle = np.radians(angle)
         dist = scan_dist[angle]
-        x = int(dist * np.sin(rad_angle) - current_pos[0]) // 10
-        y = int(dist * np.cos(rad_angle) - current_pos[1]) // 10
+        x = int(dist * np.sin(rad_angle) - current_pos[0])
+        y = int(dist * np.cos(rad_angle) - current_pos[1])
+
+        if(prev_point[0] < x):
+            x_bounds = np.array([prev_point[0], x])
+            y_bounds = np.array([prev_point[1], y])
+        else:
+            x_bounds = np.array([x, prev_point[0]])
+            y_bounds = np.array([y, prev_point[1]])
         print(x,y)
-        fill_map(bit_map, prev_point, (x,y), 1)
-    
-    for row in bit_map:
-        print(row)        
+        print(prev_point[0], prev_point[1])
+        fill_map(bit_map, x_bounds, y_bounds, 1)
+        prev_point = [x,y]
 
 
 if __name__ == "__main__":
