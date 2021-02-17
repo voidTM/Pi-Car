@@ -76,6 +76,26 @@ def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
     return outputX, outputY
 
 
+# finds the relative locations of an object
+# and returns a numpy array of coordinates
+def find_obstacles(carX = 0, carY = 0):
+    global scan_dist
+    
+    # find the location assuming car is (0,0)
+    relativeLocations = []
+
+    for angle in scan_dist:
+        # convert to radians
+        radAngle = np.radians(angle)
+        distFromCar = scan_dist[angle]
+        x = int(dist * np.sin(rad_angle))        
+        y = int(dist * np.cos(rad_angle))
+        relativeLocations.append(x,y)
+
+    return np.arrayy(relativeLocations)
+
+
+
 def fill_map(map, x_bounds, y_bounds, value = 10):
 
     # bind the x range between 0 and 99
@@ -136,15 +156,14 @@ def map_dist():
 
     x = plt.plot(obstacles[0], obstacles[1], 'o')
 
-    print(list(obstacles))
-    plt.show()
+
+np.savetxt('bitmap.txt', x, delimiter=' ')
     
 
 if __name__ == "__main__":
     try: 
         full_scan(35, 10)
-        map_dist()
-        
+        map_dist()    
     finally: 
         fc.get_distance_at(0)
         fc.stop()
