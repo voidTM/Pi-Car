@@ -34,11 +34,15 @@ bit_map = np.zeros((101, 101))
 current_pos = (50,0)
 relative_map = np.zeros((100,100,100))
 
+
+# note ultrasonic are waves and thus not entirely accurate
 def full_scan(ref1, ref2):
     global current_angle, us_step, scan_status,  scan_dist
-    
+    fc.get_status_at(min_angle)
+    time.sleep(1)
     scan_status = {}
     for angle in range(min_angle, max_angle + 1, 10):
+        time.sleep(1)
         scan_status[angle] = fc.get_status_at(angle, ref1, ref2)
         scan_dist[angle] = fc.get_distance_at(angle)
     
@@ -87,15 +91,15 @@ def find_obstacles(carX = 0, carY = 0):
     for angle in scan_dist:
         # convert to radians
         radAngle = np.radians(angle)
-        distFromCar = scan_dist[angle]
-        x = int(dist * np.sin(rad_angle))        
-        y = int(dist * np.cos(rad_angle))
-        relativeLocations.append(x,y)
+        dist = scan_dist[angle]
+        x = int(dist * np.sin(radAngle))        
+        y = int(dist * np.cos(radAngle))
+        relativeLocations.append([x,y])
 
     
-    l = np.arrayy(relativeLocations).T
+    l = np.array(relativeLocations).T
     print(list(l))
-    return np.arrayy(relativeLocations)
+    return l
 
 
 
@@ -160,7 +164,7 @@ def map_dist():
     x = plt.plot(obstacles[0], obstacles[1], 'o')
 
 
-np.savetxt('front_bitmap.txt', x, delimiter=' ')
+    np.savetxt('front_bitmap.txt', x, delimiter=' ')
     
 
 if __name__ == "__main__":
