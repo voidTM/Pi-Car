@@ -27,7 +27,7 @@ step_count = ANGLE_RANGE//STEP
 
 # degrees are from max -> min        
 scan_status = {}
-scan_dist = {}
+scan_dist = []
 
 # each bit on the map should be 5 cm
 bit_map = np.zeros((101, 101))
@@ -67,6 +67,32 @@ def my_step_scan(ref1 = 10, ref2 = 35):
 
     #scan_list[i] = status
     return (current_angle, status)
+
+
+# step_scan but returns the distance instead
+def step_scan_dist():
+    global scan_dist, current_angle, us_step
+    current_angle += us_step
+    if current_angle >= max_angle:
+        current_angle = max_angle
+        us_step = -STEP
+    elif current_angle <= min_angle:
+        current_angle = min_angle
+        us_step = STEP
+
+    dist = fc.get_distance_at(current_angle)
+
+    scan_dist.append(status)
+    if current_angle == min_angle or current_angle == max_angle:
+        if us_step < 0:
+            # print("reverse")
+            scan_dist.reverse()
+        # print(scan_list)
+        tmp = scan_dist.copy()
+        scan_dist = []
+        return tmp
+    else:
+        return False
 
 
 def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta = -1):

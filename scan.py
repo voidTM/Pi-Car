@@ -23,6 +23,12 @@ import asyncio
 import time
 
 
+# Init Ultrasonic
+#us = Ultrasonic(Pin('D8'), Pin('D9'))
+
+class Scanner(Ultrasonic):
+    def __init__(self, pin):
+
 ANGLE_RANGE = 180
 STEP = 20
 us_step = STEP
