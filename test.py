@@ -41,14 +41,19 @@ def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
     return outputX, outputY
 
 
+# returns a list of data points 
+def b_interp(x1,y1, x2, y2):
+    xRange = np.arrange(x1, x2)
+    yRange = np.interp(xRange,[x1,x2], [y1,y2])
+    results = np.array([xRange,yRange])
+
+    return results.T
+
+
 def fill_map( x, y, value = 255):
     
     bit_map = np.zeros((100, 100))
-
-
     xy = np.zeros(100)
-
-
     for i in range(len(x)):
         
         x_offset = x[i] + 50
@@ -74,7 +79,23 @@ def fill_map( x, y, value = 255):
     #i = Image.fromarray(bit_map, mode='1')
     #i.save('maps/test_map.png')
 
+
+
+def fill_map2( x, y, value = 255):
+    
+    bitMap = np.zeros((100, 100))
+    obstaclePoints = np.array([x,y])
+
+    xy = np.array([x,y]).T
+
+    print(xy)
+        
+    plt.imshow(bit_map, interpolation='none', origin = "lower")
+    plt.show()
+
 plt.plot(x4, y4)
 plt.show()
 
-fill_map(x4, y4)
+#fill_map(x4, y4)
+
+fill_map2(x4,y4)
