@@ -18,7 +18,19 @@ y2 = [ 0, 11, 22, 32, 42, 51, 68, 73, 76, 66, 64, 32, 28, 25, 20, 16, 11,
         6,  0]
 
 
+x3 = [-18, -60, -19, -16, -14, -11,  -9,  -6,  -3,   0,  13,  11,  16,
+        20,  25,  30,  -1,  -1,  66]
+y3 = [ 0, 10,  7,  9, 11, 14, 15, 17, 19, 78, 77, 32, 28, 24, 21, 17,  0,
+        0,  0]
+
+x4 = [-20, -20, -19, -17, -15, -13, -11,  -8,  -4,   0,   4,   7,  10,
+        13,  16,  19,  22,  -1,  -2]
+y4 = [ 0,  3,  7, 10, 12, 16, 20, 24, 24, 24, 25, 20, 18, 16, 13, 11,  8,
+        0,  0]
+
+# should be cars angle?
 def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
+    # angle in radians?
     if theta >= 0:
         outputX = vehicleX - obstacleX
     else:
@@ -39,7 +51,7 @@ def fill_map( x, y, value = 255):
 
     for i in range(len(x)):
         
-        x_offset = x[i] #+ 50
+        x_offset = x[i] + 50
         # check to see if value is in range
         if x_offset > 99 or x_offset < 0: 
             continue
@@ -55,13 +67,14 @@ def fill_map( x, y, value = 255):
     plt.show()
 
     x100 = np.arange(0,100)
+    x = np.array(x) + 50
     y100 = np.interp(x100, x, y)
     plt.plot(x100, y100)
     plt.show()
     #i = Image.fromarray(bit_map, mode='1')
     #i.save('maps/test_map.png')
 
-plt.plot(x, y)
+plt.plot(x4, y4)
 plt.show()
 
-fill_map(x,y)
+fill_map(x4, y4)
