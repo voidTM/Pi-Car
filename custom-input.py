@@ -28,19 +28,20 @@ def foward(power:int, t:int):
 
 def test1():
     # import fwd as nc 
-    fc.forward(100)
 
     speed3 = Speed(25)
     speed4 = Speed(4) 
     speed3.start()
     speed4.start()
+    fc.turn_left(10)
+
     try:
         # nc.stop()
-        while 1:
+        for i in range(20):
             # speed_counter 
             # = 0
-            print(speed3())
-            print(speed4())
+            print(speed3(), speed4())
+            print(speed3.speed_counter, speed4.speed_counter)
             print(" ") 
             time.sleep(0.5)
     finally:
@@ -50,7 +51,8 @@ def test1():
 
 def test2():
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(25, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup( 12, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    counter = 0
     while True:
         print(GPIO.input(12))
         time.sleep(0.001) 
@@ -60,7 +62,7 @@ def test3():
     speed4.start()
     # time.sleep(2)
     fc.forward(10)
-    x = 0
+    x = 0 # distance traveled
     for i in range(2):
         time.sleep(0.1)
         speed = speed4()
@@ -96,17 +98,20 @@ def scan_test():
     print(best)
     return best
 
-def turn_test():
-    distance, move_to_angle = scan_test()
-    turn_speed = 10
 
-    while(fc.get_status_at(0, ref1 = distance, ref2 = distance * 0.9)  < 1):
-        if move_to_angle < 0:
-
-            fc.turn_right(turn_speed)
-        else:
-            fc.turn_left(turn_speed)
-    
+# close to a 90 right turn on average
+def turn_right(degrees):
+    speed4 = Speed(4)
+    speed4.start()
+    dist = 0
+    fc.turn_right(10)
+    while(dist < 25):
+        time.sleep(0.1)
+        speed = speed4()
+        dist += speed * 0.1
+        print("%smm/s"%speed)
+    print(dist)
+    speed4.deinit()
     fc.stop()
 
 def readchar():
@@ -134,18 +139,10 @@ def Keyborad_control():
     while True:
         global power_val
         key=readkey()
-        if key=='w':
-            foward(power_val, 1)
-        elif key=='a':
-            fc.turn_left(power_val)
-        elif key=='s':
-            fc.backward(power_val)
-        elif key=='d':
-            fc.turn_right(power_val)
-        elif key == "1":
+        if key == "1":
             test1()
         elif key=="2":
-            print(fc.get_distance_at(-90))
+            test2()
         elif key=="3":
             test3()
         elif key=="4":
