@@ -9,8 +9,9 @@ import math
 
 from RPi import GPIO
 
-# based code from Frank Blechschmidt and Matt Williamson 
+# based on code from Frank Blechschmidt and Matt Williamson 
 class Duodometer(object):
+
     """Calculates the travelled distance based on the car's photo interrupters.
 
     The PiCar-4WD uses a photo interrupter in combination with black wheels
@@ -30,9 +31,10 @@ class Duodometer(object):
     # Amount of transitions from from hole to non-hole (and vice versa) that
     # represent one full wheel revolution
     transitions_per_revolution = 20
-    # Diameter of the actual wheel
-    wheel_diameter = 3.3
+    # diameter of the actual wheel in CM
+    wheel_diameter = 6.6
 
+    # slippage is around 1.7-2 on carpet
     def __init__(self, pin1: int, pin2: int, slippage_multiplier: float = 1.0):
         """Initialize attributes and set up GPIO interaction.
 
@@ -62,12 +64,13 @@ class Duodometer(object):
         avg_wheel_revolutions = (
             self.counter / self.divisor / self.transitions_per_revolution
         )
-        wheel_circumference = 2 * self.wheel_diameter * math.pi
+        wheel_circumference = self.wheel_diameter * math.pi
         return wheel_circumference * avg_wheel_revolutions * self.multiplier
 
     def start(self):
         """Register for GPIO events of the photo interrupter."""
         GPIO.add_event_detect(
+            #self.pin1, GPIO.BOTH, callback=self._gpio_callback,
             self.pin1, GPIO.BOTH, callback=self._gpio_callback,
         )
         GPIO.add_event_detect(
@@ -94,3 +97,5 @@ class Duodometer(object):
 
     def __del__(self):
         self.stop()
+
+

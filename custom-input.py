@@ -64,20 +64,31 @@ def test2():
     odometer.stop()
 
 
-def test3():
-    speed4 = Speed(25)
-    speed4.start()
-    # time.sleep(2)
-    fc.forward(10)
-    x = 0 # distance traveled
-    for i in range(2):
+
+# calculates the relative distance moved
+def distance_moved(prev_dist):
+    #ultrasonic reading2 - ultrasonic reading1   
+    curr_dist = fc.get_distance_at(0)
+    
+    return curr_dist - prev_dist
+
+def test4():
+    odometer = Duodometer(4, 24, 2)
+
+    odometer.start()
+    
+    initial_dist = fc.get_distance_at(0)
+    fc.forward(5)
+    while(odometer.distance < 100):
         time.sleep(0.1)
-        speed = speed4()
-        x += speed * 0.1
-        print("%smm/s"%speed)
-    print("%smm"%x)
-    speed4.deinit()
+        print(odometer.distance)
+
     fc.stop()
+    final_dist = fc.get_distance_at(0)
+
+    print(final_dist - initial_dist)
+    print(odometer.counter, odometer.divisor, odometer.transitions_per_revolution)
+    odometer.stop()
 
 # test scanner
 def ultrasonic_test():
@@ -153,9 +164,9 @@ def Keyborad_control():
         elif key=="3":
             test3()
         elif key=="4":
-            scan_test()
+            test4()
         elif key == "5":
-            turn_test()
+            scan_test()
         else:
             fc.stop()
         if key=='q':
