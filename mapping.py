@@ -4,14 +4,11 @@ import time, math
 import threading
 import picar_4wd as fc
 
-import sys
-import tty
-import termios
-import asyncio
-import time
 
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy as sc
+
 
 # 60 degree is about the closest servos
 # think of arks
@@ -51,49 +48,13 @@ def full_scan(ref1, ref2):
     return scan_status
 
 
-# scans the next angle
-def my_step_scan(ref1 = 10, ref2 = 35):
-    global scan_list, current_angle, us_step
-    current_angle += us_step
-    # switches directions for angle
-    if current_angle >= max_angle:
-        current_angle = max_angle
-        us_step = -STEP
-    elif current_angle <= min_angle:
-        current_angle = min_angle
-        us_step = STEP
-    
-    #dist = get_distance_at(current_angle)
-    status = get_status_at(current_angle, ref1=ref1, ref2= ref2)#ref1
+def pol2cart(angle, dist):
+    rad_angle = np.radians(angle)
+        
+    x = dist * np.sin(rad_angle)
+    y = dist * np.cos(rad_angle)
+    return (x, y)
 
-    #scan_list[i] = status
-    return (current_angle, status)
-
-
-# step_scan but returns the distance instead
-def step_scan_dist():
-    global scan_dist, current_angle, us_step
-    current_angle += us_step
-    if current_angle >= max_angle:
-        current_angle = max_angle
-        us_step = -STEP
-    elif current_angle <= min_angle:
-        current_angle = min_angle
-        us_step = STEP
-
-    dist = fc.get_distance_at(current_angle)
-
-    scan_dist.append(status)
-    if current_angle == min_angle or current_angle == max_angle:
-        if us_step < 0:
-            # print("reverse")
-            scan_dist.reverse()
-        # print(scan_list)
-        tmp = scan_dist.copy()
-        scan_dist = []
-        return tmp
-    else:
-        return False
 
 
 def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta = -1):
@@ -167,11 +128,7 @@ def map_dist():
     y_bounds = [0,0] 
     obstacle_locations = []
     for angle in scan_dist:
-        rad_angle = np.radians(angle)
-        dist = scan_dist[angle]
-        
-        x =  50 + int(dist * np.sin(rad_angle))
-        y = int(dist * np.cos(rad_angle))
+        x, y = pol2cart(angle, scan_dist[angle])
 
         if(prev_point[0] < x):
             x_bounds = np.array([prev_point[0], x])
