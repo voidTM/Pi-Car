@@ -27,7 +27,7 @@ step_count = ANGLE_RANGE//STEP
 
 # degrees are from max -> min        
 scan_status = {}
-scan_dist = []
+scan_dist = {}
 
 # each bit on the map should be 5 cm
 bit_map = np.zeros((101, 101))
@@ -45,7 +45,8 @@ def full_scan(ref1, ref2):
         time.sleep(1)
         scan_status[angle] = fc.get_status_at(angle, ref1, ref2)
         scan_dist[angle] = fc.get_distance_at(angle)
-    
+        print(angle, scan_dist[angle])
+
     print(scan_dist)
     return scan_status
 

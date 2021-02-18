@@ -93,8 +93,9 @@ def drive2():
 
         fc.stop()
 
-        left = scan_list[:5]
-        right = scan_list[5:]
+        # cap at 200
+        left = [0 if x< 0 else 200 if x> 200 else x for x in  scan_list[:5]] 
+        right = [0 if x< 0 else 200 if x> 200 else x for x in  scan_list[5:]] 
 
         # -1 = turn left, 0 forward, 1 turn right
         direction = 0
@@ -122,7 +123,7 @@ def drive2():
 
 if __name__ == "__main__":
     try: 
-        drive2()
+        drive()
     finally: 
         fc.get_distance_at(0)
         fc.stop()
