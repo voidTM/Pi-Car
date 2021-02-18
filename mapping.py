@@ -1,9 +1,7 @@
-from picar_4wd.speed import Speed
-import RPi.GPIO as GPIO
 import time, math
 import threading
 import picar_4wd as fc
-
+from odometer import Duodometer
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,28 +22,26 @@ step_count = ANGLE_RANGE//STEP
 
 # degrees are from max -> min        
 scan_status = {}
-scan_dist = {}
 
 # each bit on the map should be 5 cm
-bit_map = np.zeros((101, 101))
+bit_map = np.zeros((200, 200))
 current_pos = (50,0)
-relative_map = np.zeros((100,100,100))
+relative_map = np.zeros((100,200,200))
 
 
 # note ultrasonic are waves and thus not entirely accurate
-def full_scan(ref1, ref2):
-    global current_angle, us_step, scan_status,  scan_dist
+def mapping_scan():
+    global current_angle, us_step, min_angle, max_angle
     fc.get_status_at(min_angle)
     time.sleep(1)
-    scan_status = {}
-    for angle in range(min_angle, max_angle + 1, 10):
-        time.sleep(1)
-        scan_status[angle] = fc.get_status_at(angle, ref1, ref2)
-        scan_dist[angle] = fc.get_distance_at(angle)
-        print(angle, scan_dist[angle])
-
-    print(scan_dist)
-    return scan_status
+    scan_dist = []
+    for angle in range(min_angle, max_angle + 1, 5):
+        # give time for settling
+        time.sleep(0.1)
+        scan_dist.append([angle, fc.get_distance_at(angle)])
+ 
+    #print(scan_dist)
+    return np.array(scan_dist)
 
 
 def pol2cart(angle, dist):
@@ -117,7 +113,8 @@ def fill_map(map, x_bounds, y_bounds, value = 10):
     """
 
     
-
+# set 1 grid cell to be 5 cm
+# 2 datapointa are 3 or fewer datapoints away join them?
 
 # adds scanned information to map\s?
 def map_dist():
@@ -151,10 +148,30 @@ def map_dist():
     np.savetxt('front_bitmap.txt', x, delimiter=' ')
     
 
+
+
 if __name__ == "__main__":
     try: 
-        full_scan(35, 10)
-        find_obstacles()    
+        
+        meter = Duodometer(4,24)
+        theta = 0
+        meter.start()
+        prevDistance = 0
+        for i in range(0, 4):
+            currObstacles = mapping_scan()
+            currDistance = meter.distance
+            
+
+
+            print(meter.distance, theta)
+            print(currObstacles)
+
+            fc.turn_right(10)
+            while meter.distance < 14:
+                continue
+            #find new location
+            meter.reset()
+            fc.stop()
     finally: 
         fc.get_distance_at(0)
         fc.stop()

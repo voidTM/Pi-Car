@@ -24,3 +24,21 @@ def distance_moved(prev_dist):
     curr_dist = fc.get_distance_at(0)
     
     return curr_dist - prev_dist
+
+
+
+def rotation(curr_theta, start_dist, end_dist):
+
+    # distance between front wheels ia about 14cm    
+    d = 14 
+    r = 7
+    circumference = d * math.pi 
+    
+    radians  = (end_dist - start_dist) / r
+
+
+    # convert to degrees
+    deg = radians * (180 / pi)
+
+    return  int(curr_theta + deg) % 360
+
