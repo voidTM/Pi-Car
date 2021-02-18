@@ -3,82 +3,94 @@ import time, math
 import threading
 import picar_4wd as fc
 
-class Duodometer():
-    def __init__(self, pin1, pin2):
-        self.tick_cm = 1.0
-        self.tick_counter = 0
+"""A helper module to calculate the distance travelled of the PiCar-4WD."""
+
+import math
+
+from RPi import GPIO
+
+# based code from Frank Blechschmidt and Matt Williamson 
+class Duodometer(object):
+    """Calculates the travelled distance based on the car's photo interrupters.
+
+    The PiCar-4WD uses a photo interrupter in combination with black wheels
+    with punched holes as mechanism to measure distance.
+    Counting the transitions from hole to non-hole (and vice versa) provides an
+    approximation of the car's travelled distance.
+
+    Attributes:
+        counter: An integer count of the observed transitions.
+        pin1: An integer for the first GPIO pin of the photo interrupter.
+        pin2: An integer for the second GPIO pin of the photo interrupter.
+        slippage_multiplier: An optional multiplier to account for slippage.
+    """
+
+    # Divisor for the counter representing: 2 pins * 2 transition types
+    divisor = 4
+    # Amount of transitions from from hole to non-hole (and vice versa) that
+    # represent one full wheel revolution
+    transitions_per_revolution = 20
+    # Diameter of the actual wheel
+    wheel_diameter = 3.3
+
+    def __init__(self, pin1: int, pin2: int, slippage_multiplier: float = 1.0):
+        """Initialize attributes and set up GPIO interaction.
+
+        Args:
+            pin1:
+                An integer for the first GPIO pin of the photo interrupter.
+            pin2:
+                An integer for the second GPIO pin of the photo interrupter.
+            pin2:
+                An optional multiplier to account for slippage.
+        """
+        self.counter = 0
         self.pin1 = pin1
         self.pin2 = pin2
+        self.multiplier = slippage_multiplier
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+    @property
+    def distance(self):
+        """Return current distance based on counted GPIO transitions.
+
+        Returns:
+            A float representing the travelled distance in cm.
+        """
+        avg_wheel_revolutions = (
+            self.counter / self.divisor / self.transitions_per_revolution
+        )
+        wheel_circumference = 2 * self.wheel_diameter * math.pi
+        return wheel_circumference * avg_wheel_revolutions * self.multiplier
+
     def start(self):
-        GPIO.add_event_detect(self.pin1, GPIO.RISING, callback=self.gpio_callback)
-        GPIO.add_event_detect(self.pin2, GPIO.RISING, callback=self.gpio_callback)
+        """Register for GPIO events of the photo interrupter."""
+        GPIO.add_event_detect(
+            self.pin1, GPIO.BOTH, callback=self._gpio_callback,
+        )
+        GPIO.add_event_detect(
+            self.pin2, GPIO.BOTH, callback=self._gpio_callback,
+        )
+
+    def reset(self):
+        """Reset internal transition counter."""
+        self.counter = 0
 
     def stop(self):
+        """Unregister for GPIO events of the photo interrupter."""
         GPIO.remove_event_detect(self.pin1)
         GPIO.remove_event_detect(self.pin2)
 
-    def reset(self):
-        self.tick_counter = 0
+    def _gpio_callback(self, pin: int):
+        """Increments counter for observed transitions.
 
-    def gpio_callback(self, pin):
-        self.tick_counter += 1
-
-    def __call__(self):
-        return 0.5 * self.tick_counter * self.tick_cm
-
-    def deinit(self):
-        self.stop()
-
-
-class Odometer():
-    def __init__(self, pin):
-        self.speed_counter = 0 #
-        self.speed = 0
-        self.last_time = 0
-        self.pin = pin
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        self.timer_flag = True
-        self.timer = threading.Thread(target=self.fun_timer, name="Thread1")
-
-    def start(self):
-        self.timer.start()
-        # print('speed start')
-
-    def print_result(self, s):
-        print("Rising: {}; Falling: {}; High Level: {}; Low Level: {}".format(s.count("01"), s.count("10"), s.count("1"), s.count("0")))
-
-    """"
-    http://cmra.rec.ri.cmu.edu/previews/rcx_products/robotics_educator_workbook/content/mech/pages/Diameter_Distance_TraveledTEACH.pdf
-    3.3 is the radius of the actual wheel in cm. Multiplied by 2 corresponds to the diameter.
-    The time.sleep(0.001) in the for loop dictates the frequency of checking the pin values and hence the time over which the distance had been measured.
-    So the value of self.speed is the distance in cm the wheel/car has travelled in 1sec (100 * time.sleep(0.001) * 10).
-    """
-
-
-    # calculates the speed
-    def fun_timer(self):
-        while self.timer_flag:
-            l = ""
-            for _ in range(100):
-                l += str(GPIO.input(self.pin))
-                time.sleep(0.001)
-            # self.print_result(l)
-            count = (l.count("01") + l.count("10")) / 2
-            rps = count / 20.0 * 10
-            self.speed = round(2 * math.pi * 3.3 * rps, 2)
-
-
-    def deinit(self):
-        self.timer_flag = False
-        self.timer.join()
-
-    def __call__(self):
-        return self.speed
+        Args:
+            pin:
+                GPIO pin with observed transition (ignored).
+        """
+        self.counter += 1
 
     def __del__(self):
-        self.deinit()
+        self.stop()

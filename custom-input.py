@@ -10,6 +10,9 @@ import termios
 import asyncio
 import time
 
+from odometer import Duodometer
+
+
 power_val = 50
 key = 'status'
 print("If you want to quit.Please press q")
@@ -50,12 +53,16 @@ def test1():
         fc.stop() 
 
 def test2():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup( 12, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    counter = 0
-    while True:
-        print(GPIO.input(12))
-        time.sleep(0.001) 
+    odometer = Duodometer(4, 24)
+
+    odometer.start()
+    
+    for i in range(0,20):
+        time.sleep(1)
+        print(odometer.distance)
+
+    odometer.stop()
+
 
 def test3():
     speed4 = Speed(25)
