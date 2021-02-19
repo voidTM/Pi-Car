@@ -10,9 +10,21 @@ prev_pos = []
 curr_pos = [0,0] 
 
 # speed is the same wether it turns left or right
+turn_meter = Odometer(12, 22)
 
-def turn_right(angle):
-    continue
+
+# turns car a specific distance
+def turn_right(power, angle):
+    
+    dist = angle_to_dist(angle)
+    turn_meter.reset()
+    turn_meter.start()
+    fc.forward(power)
+    while(turn_meter.distance < dist):
+        continue
+    
+    fc.stop()
+
 
 
 def new_pos():
@@ -26,6 +38,14 @@ def distance_moved(prev_dist):
     return curr_dist - prev_dist
 
 
+
+def angle_to_dist(angle, radius = 7):
+    
+    rot = angle / 360
+    circumference = 2 * radius * math.pi
+
+    return rot * circumference
+    
 
 def rotation(curr_theta, start_dist, end_dist):
 
