@@ -157,7 +157,7 @@ if __name__ == "__main__":
         theta = 0
         meter.start()
         prevDistance = 0
-        for i in range(0, 4):
+        for i in range(0, 1):
             currObstacles = mapping_scan()
             currDistance = meter.distance
             
