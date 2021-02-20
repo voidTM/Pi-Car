@@ -28,6 +28,8 @@ x4 = [-20, -20, -19, -17, -15, -13, -11,  -8,  -4,   0,   4,   7,  10,
 y4 = [ 0,  3,  7, 10, 12, 16, 20, 24, 24, 24, 25, 20, 18, 16, 13, 11,  8,
         0,  0]
 
+
+dist_hash = {-60: 43.81, -55: 39.73, -50: 28.51, -45: 16.66, -40: 45.28, -35: 31.53, -30: 29.36, -25: 28.94, -20: 29.02, -15: 28.58, -10: 29.01, -5: 29.83, 0: 30.54, 5: 39.72, 10: 40.88, 15: 38.71, 20: 39.19, 25: 38.93, 30: 37.94, 35: 39.42, 40: 43.75, 45: 44.21, 50: 44.08, 55: 43.55, 60: 39.67}
 # should be cars angle?
 def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
     # angle in radians?
@@ -43,8 +45,9 @@ def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
 
 # returns a list of data points 
 def b_interp(x1,y1, x2, y2):
-    xRange = np.arrange(x1, x2)
+    xRange = np.arange(x1, x2)
     yRange = np.interp(xRange,[x1,x2], [y1,y2])
+    yRange = yRange.astype(int)
     results = np.array([xRange,yRange])
 
     return results.T
@@ -81,6 +84,7 @@ def fill_map( x, y, value = 255):
 
 
 
+
 def fill_map2( x, y, value = 255):
     
     bitMap = np.zeros((100, 100))
@@ -88,14 +92,32 @@ def fill_map2( x, y, value = 255):
 
     xy = np.array([x,y]).T
 
+    for i in range(1, len(xy)):
+
+        mark = b_interp(xy[i - 1][0], xy[i-1][1], xy[i][0], xy[i][1])
+
+        print(mark)
+        # update with interpolated values
+        for i in range(len(mark)):
+            
+            if mark[i][0] >= 50:
+                continue
+
+            if mark[i][1].max() > 100 or mark[i].min() < 0:
+                continue
+            x_offset = mark[i][0] + 50
+            y_offset = mark[i][1]
+            bitMap[y_offset][x_offset] = 1
+
+        continue
     print(xy)
         
-    plt.imshow(bit_map, interpolation='none', origin = "lower")
+    plt.imshow(bitMap, interpolation='none', origin = "lower")
     plt.show()
 
 plt.plot(x4, y4)
 plt.show()
 
-#fill_map(x4, y4)
+fill_map(x4, y4)
 
 fill_map2(x4,y4)

@@ -59,7 +59,7 @@ def my_step_scan(ref1 = 10, ref2 = 35):
         us_step = STEP
     
     #dist = get_distance_at(current_angle)
-    status = get_status_at(current_angle, ref1=ref1, ref2= ref2)#ref1
+    status = fc.get_status_at(current_angle, ref1=ref1, ref2= ref2)#ref1
 
     #scan_list[i] = status
     return (current_angle, status)
