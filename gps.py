@@ -1,4 +1,14 @@
 
+import time, math
+import picar_4wd as fc
+
+import sys
+import time
+
+import scanner
+import gps
+from odometer import Duodometer
+
 # goal is to track the car's position through motor movement.
 
 # records the direction 
@@ -10,7 +20,7 @@ prev_pos = []
 curr_pos = [0,0] 
 
 # speed is the same wether it turns left or right
-turn_meter = Odometer(12, 22)
+turn_meter = Duodometer(12, 22)
 
 
 # turns car a specific distance
@@ -25,10 +35,6 @@ def turn_right(power, angle):
     
     fc.stop()
 
-
-
-def new_pos():
-    continue
 
 # calculates the relative distance moved
 def distance_moved(prev_dist):
@@ -58,7 +64,7 @@ def rotation(curr_theta, start_dist, end_dist):
 
 
     # convert to degrees
-    deg = radians * (180 / pi)
+    deg = radians * (180 / math.pi)
 
     return  int(curr_theta + deg) % 360
 
