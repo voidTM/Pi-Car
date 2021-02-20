@@ -42,6 +42,13 @@ def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
     
     return outputX, outputY
 
+def pol2cart(angle, dist):
+    rad_angle = np.radians(angle)
+        
+    x = dist * np.sin(rad_angle)
+    y = dist * np.cos(rad_angle)
+
+    return (x.astype(int), y.astype(int))
 
 # returns a list of data points 
 def b_interp(x1,y1, x2, y2):
@@ -115,9 +122,13 @@ def fill_map2( x, y, value = 255):
     plt.imshow(bitMap, interpolation='none', origin = "lower")
     plt.show()
 
-plt.plot(x4, y4)
+
+external_x, exeternal_y = pol2cart(np.array(list(dist_hash.keys())) , np.array(list(dist_hash.values())))
+print(external_x, exeternal_y)
+
+plt.plot(external_x, exeternal_y)
 plt.show()
 
-fill_map(x4, y4)
+fill_map(external_x, exeternal_y)
 
-fill_map2(x4,y4)
+#fill_map2(x4,y4)
