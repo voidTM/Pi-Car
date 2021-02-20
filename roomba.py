@@ -6,7 +6,7 @@ import picar_4wd as fc
 import sys
 import time
 
-import scan as sc
+import scanner
 from odometer import Duodometer
 
 """
@@ -15,10 +15,32 @@ from odometer import Duodometer
 # 60 degree is about the closest servos
 #scanning
 
-        
-# same as drive 1 but aims to use distance rather than status
-def drive():
-    speed = 30
+
+def turn_target(scanned_distances):
+    mid = len(scanned_distances) // 2
+
+    left = scanned_distances[:mid]
+    right = scanned_distances[mid:]
+
+    target = 40 # target for open space
+    direction = 0 #turn direction
+
+    if(sum(left) > sum(right)):
+        direction = -1
+        target = max(left) - 5
+    elif(sum(left) < sum(right)):
+        direction = 1
+        target = max(right) - 5
+    else:
+        direction = 0
+    
+    return direction, target
+
+
+
+
+# drive using distance         
+def drive(speed = 30):
 
     blocked = True
 
@@ -26,13 +48,18 @@ def drive():
     tracker.start()
 
     while True:
-        scan_list = sc.scan_step_dist()
+        
+        # get scan by distance
+        scan_list = scanner.scan_step_dist()
         if not scan_list:
             continue
+
+        # preprocess scanlist
         scan_list = [200 if d < 0 else 200 if d > 200 else d for d in  scan_list] 
 
-        #print(scan_list)
+
         ahead = scan_list[2:8]
+
         # coast clear full speed ahead        
         if min(ahead) > 35:
             #print("Coast Clear")
@@ -77,7 +104,8 @@ def drive():
             while(fc.get_distance_at(0) < 40):
                 fc.backward(2)
 
-    
+
+# aims for more accuracte angle    
 def drive2():
 
     speed = 30
@@ -88,7 +116,7 @@ def drive2():
     tracker.start()
 
     while True:
-        scan_list = sc.scan_step_dist()
+        scan_list = scanner.scan_step_dist()
         if not scan_list:
             continue
         scan_list = [200 if d < 0 else 200 if d > 200 else d for d in  scan_list] 
@@ -148,6 +176,19 @@ def drive2():
             while(fc.get_distance_at(0) < target):
                 fc.backward(2)
 
+# drives a specified distance
+def drive_dist(speed = 30, distance= 40):
+
+    blocked = False
+
+    trip = Duodometer(4,24)
+    trip.start()
+
+    while trip.distance < distance:
+        scan_list = scanner.scan_step_dist()
+        if not scan_list:
+            continue
+        
 
 if __name__ == "__main__":
     try: 

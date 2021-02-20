@@ -6,7 +6,7 @@ from odometer import Duodometer
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sc
-
+import scanner
 
 # 60 degree is about the closest servos
 # think of arks
@@ -24,9 +24,9 @@ step_count = ANGLE_RANGE//STEP
 scan_status = {}
 
 # each bit on the map should be 5 cm
-bit_map = np.zeros((200, 200))
+bit_map = np.full((200, 200), -1)
 current_pos = (50,0)
-relative_map = np.zeros((100,200,200))
+relative_map = np.full((100,200,200), -1)
 
 
 # note ultrasonic are waves and thus not entirely accurate

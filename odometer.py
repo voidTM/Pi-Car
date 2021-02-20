@@ -50,6 +50,8 @@ class Duodometer(object):
         self.pin1 = pin1
         self.pin2 = pin2
         self.multiplier = slippage_multiplier
+        self.prev_distance = 0
+        self.curr_distance = 0
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -65,7 +67,16 @@ class Duodometer(object):
             self.counter / self.divisor / self.transitions_per_revolution
         )
         wheel_circumference = self.wheel_diameter * math.pi
-        return wheel_circumference * avg_wheel_revolutions * self.multiplier
+
+        self.prev_distance = self.curr_distance
+        self.curr_distance = wheel_circumference * avg_wheel_revolutions * self.multiplier
+        return self.curr_distance
+
+    def distance_moved(self):
+        #ultrasonic reading2 - ultrasonic reading1   
+
+        return distance - self.prev_distance
+
 
     def start(self):
         """Register for GPIO events of the photo interrupter."""
