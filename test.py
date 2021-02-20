@@ -42,6 +42,8 @@ def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta):
     
     return outputX, outputY
 
+def basicOffset(obstacleX, obstacleY):
+
 def pol2cart(angle, dist):
     rad_angle = np.radians(angle)
         
