@@ -168,13 +168,15 @@ def drive4():
     speed = 30
     scan_dist = 35
     
-    while True:
+    blocked = False
+    while not blocked:
         scanned = fc.scan_step(scan_dist)
         if not scanned:
             continue
         print(scanned)
         if(min(scanned) == 0):
             fc.stop()
+            blocked = True
         
 
         

@@ -185,7 +185,10 @@ def drive_dist(speed = 30, distance= 40):
     trip.start()
 
     while trip.distance < distance:
-
+        scan_list = scanner.scan_step_dist()
+        if not scan_list:
+            continue
+        
 
 if __name__ == "__main__":
     try: 

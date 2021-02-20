@@ -3,6 +3,7 @@ from picar_4wd.speed import Speed
 import time, math
 import threading
 import picar_4wd as fc
+import numpy as np
 
 
 ANGLE_RANGE = 180
@@ -16,6 +17,7 @@ min_angle = -ANGLE_RANGE/2
 scan_status = []
 scan_dist = []
 
+# holds all the scanning info
 
 def next_step():
     global current_angle, us_step
@@ -76,4 +78,20 @@ def scan_step_dist():
         return tmp
     else:
         return False
+
+
+# does a full scan of the entire range
+# note ultrasonic are waves and thus not entirely accurate
+def mapping_scan(min_angle = -90, max_angle = -90, step = 5):
+    # set to min_angle
+    fc.get_status_at(min_angle)
+    time.sleep(1)
+    scan_dist = []
+    for angle in range(min_angle, max_angle + 1, 5):
+        # give time for settling
+        time.sleep(0.1)
+        scan_dist.append([angle, fc.get_distance_at(angle)])
+ 
+    return np.array(scan_dist)
+
 

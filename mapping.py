@@ -6,7 +6,7 @@ from odometer import Duodometer
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sc
-
+import scanner
 
 # 60 degree is about the closest servos
 # think of arks
