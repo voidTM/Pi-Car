@@ -37,10 +37,10 @@ def turn_target(scanned_distances):
     return direction, target
 
 
-        
-# same as drive 1 but aims to use distance rather than status
-def drive():
-    speed = 30
+
+
+# drive using distance         
+def drive(speed = 30):
 
     blocked = True
 
@@ -104,7 +104,8 @@ def drive():
             while(fc.get_distance_at(0) < 40):
                 fc.backward(2)
 
-    
+
+# aims for more accuracte angle    
 def drive2():
 
     speed = 30
@@ -174,6 +175,16 @@ def drive2():
         else:
             while(fc.get_distance_at(0) < target):
                 fc.backward(2)
+
+# drives a specified distance
+def drive_dist(speed = 30, distance= 40):
+
+    blocked = False
+
+    trip = Duodometer(4,24)
+    trip.start()
+
+    while trip.distance < distance:
 
 
 if __name__ == "__main__":
