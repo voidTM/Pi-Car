@@ -44,7 +44,7 @@ def drive_forward(power = 5, distance = 10):
     
     fc.stop()
     meter.stop()
-
+    return meter.distance
 
 # turns car a specific distance
 def turn_target(scanned_distances):

@@ -1,69 +1,48 @@
 
 import time, math
-import picar_4wd as fc
 
 import sys
 import time
 
-import scanner
-import gps
-from odometer import Duodometer
 
-# goal is to track the car's position through motor movement.
-
-# position in cm
-starting_pos = []
-prev_pos = []
-curr_pos = [0,0] 
-
-# speed is the same wether it turns left or right
-turn_meter = Duodometer(12, 22)
+import numpy as np
 
 
 
+# goal is to track the car's position on a map
 
-# calculates the relative distance moved
-def distance_moved(prev_dist):
-    #ultrasonic reading2 - ultrasonic reading1   
-    curr_dist = fc.get_distance_at(0)
+class GPS(object):
+    """
+    Keeps track of a cars position and orientation on a grid/map
+    """
+    destination = None
+    pathing = False
+
+    # starts with an empty grid
+    def __init__(self, map_size: int = 200, resolution: int = 5, start_x: int = 100, start_y: int 100, orientation: int = 0):
+
+        self.grid = np.full((200, 200), 0, dtype = int)
+        self.resolution = resolution
+        self.orientation = orientation
+        self.pos_x = start_x
+        self.pos_y = start_y
+
+
+    # loads a grid
+    def load_grid(self, grid: np.array, resolution: int = 5, start_x: int = None, start_y: int = None, orientation: int = 0):
+        self.grid = grid
+        self.resolution = resolution
+        self.orientation = orientation
+
+        if start_x is None:
+            self.pos_x = len(grid) // 2
+        if start_x is None:
+            self.pos_y = len(grid[0]) // 2
+
     
-    return curr_dist - prev_dist
-
-
-
-def angle_to_dist(angle, radius = 7):
+    def update_pos(self, new_x, new_y):
+        self.pos_x = new_x
+        self.pos_y = new_y
     
-    rot = angle / 360
-    circumference = 2 * radius * math.pi
-
-    return rot * circumference
-    
-def dist_to_angle(dist, radius = 7):
-    circumference = 2 * radius * math.pi
-
-    # only last rotation matters
-    rot = (dist // circumference) - (dist / circumference)
-
-    return rot * 360
-    
-
-
-# checks how far the car has rotated
-def rotation(curr_theta, start_dist, end_dist):
-
-    # distance between front wheels ia about 14cm    
-    d = 14 
-    r = 7
-    circumference = d * math.pi 
-    
-    radians  = (end_dist - start_dist) / r
-
-
-    # convert to degrees
-    deg = radians * (180 / math.pi)
-
-    return  int(curr_theta + deg) % 360
-
-
-def hybridAPathing():
-    return
+    def update_orientation(self, new_theta):
+        self.orientation = new_theta

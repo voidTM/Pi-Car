@@ -40,6 +40,7 @@ class Car(object):
         move_meter.reset()
         
 
+    # basic car drive functionality
     def turn_left(self, power = 5, angle):
         dist = angle_to_dist(angle)
         move_meter.start()
@@ -51,6 +52,9 @@ class Car(object):
         move_meter.stop()
         move_meter.reset()
 
+        # update 
+        
+    
     def drive_forward(self, power = 5, distance = 10):
 
         move_meter.start()
