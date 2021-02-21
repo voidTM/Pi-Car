@@ -14,16 +14,36 @@ from odometer import Duodometer
 # speed is the same wether it turns left or right
 turn_meter = Duodometer(12, 22)
 
-def turn_right(power, angle):
+def turn_right(power = 5, angle):
     
     dist = angle_to_dist(angle)
     turn_meter.start()
-    fc.forward(power)
+    fc.turn_right(power)
     while(turn_meter.distance < dist):
         continue
     
     fc.stop()
     turn_meter.stop()
+
+def turn_left(power = 5, angle):
+    dist = angle_to_dist(angle)
+    turn_meter.start()
+    fc.turn_left(power)
+    while(turn_meter.distance < dist):
+        continue
+    
+    fc.stop()
+    turn_meter.stop()
+
+def drive_forward(power = 5, distance = 10):
+    dist = angle_to_dist(angle)
+    meter.start()
+    fc.forward(power)
+    while(turn_meter.distance < dist and fc.get_distance_at(0) > 20):
+        continue
+    
+    fc.stop()
+    meter.stop()
 
 
 # turns car a specific distance
@@ -74,8 +94,6 @@ def drive_dist(speed = 30, distance= 40, theta = 0):
 
     trip = Duodometer(4,24)
     trip.start()
-    turn_track = Duodometer(10, 20)
-    turn_track.start()
     while trip.distance < distance:
 
         scan_list = scanner.scan_step_dist()
@@ -137,7 +155,7 @@ def drive_dist(speed = 30, distance= 40, theta = 0):
             theta -= gps.dist_to_angle(turn_track.distance)
 
         else:
-            while(fc.get_distance_at(0) < target):
+            while(fc.get_distance_at(0) < 40):
                 fc.backward(2)
 
     fc.stop()

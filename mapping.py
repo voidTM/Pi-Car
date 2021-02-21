@@ -172,8 +172,8 @@ def map_n_drive():
 
         map_obstacles(bit_map, car_pos, car_theta, currObstacles)
 
-        theta, distance_driven = dr.drive_dist(speed = 20, distance = 20, theta =car_theta)
-
+        theta, distance_driven = dr.drive_dist(speed = 5, distance = 20, theta =car_theta)
+        
         # update car position
         delta_X, delta_Y = pol2cart(theta, distance_driven)
         car_pos[0] = int(delta_X / resolution) + car_pos[0]
