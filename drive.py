@@ -1,5 +1,3 @@
-from picar_4wd.speed import Speed
-import RPi.GPIO as GPIO
 import time, math
 import picar_4wd as fc
 
@@ -7,44 +5,13 @@ import sys
 import time
 
 import scanner
-import gps
+import utils
+from car import Car
 from odometer import Duodometer
 
 
 # speed is the same wether it turns left or right
 turn_meter = Duodometer(12, 22)
-
-def turn_right(power = 5, angle):
-    
-    dist = angle_to_dist(angle)
-    turn_meter.start()
-    fc.turn_right(power)
-    while(turn_meter.distance < dist):
-        continue
-    
-    fc.stop()
-    turn_meter.stop()
-
-def turn_left(power = 5, angle):
-    dist = angle_to_dist(angle)
-    turn_meter.start()
-    fc.turn_left(power)
-    while(turn_meter.distance < dist):
-        continue
-    
-    fc.stop()
-    turn_meter.stop()
-
-def drive_forward(power = 5, distance = 10):
-    dist = angle_to_dist(angle)
-    meter.start()
-    fc.forward(power)
-    while(turn_meter.distance < dist and fc.get_distance_at(0) > 20):
-        continue
-    
-    fc.stop()
-    meter.stop()
-    return meter.distance
 
 # turns car a specific distance
 def turn_target(scanned_distances):

@@ -1,4 +1,6 @@
 
+import time, math
+import picar_4wd as fc
 
 
 import odometer
@@ -11,6 +13,8 @@ class Car(object):
     the picar itself
     """
     
+    orientation = 0
+
     # should ideally be a singleton class
     def __init__(self, power: int = 10):
 
@@ -39,6 +43,7 @@ class Car(object):
         move_meter.stop()
         move_meter.reset()
         
+    def turn_right_dist(self, power)
 
     # basic car drive functionality
     def turn_left(self, power = 5, angle):
@@ -82,3 +87,4 @@ class Car(object):
         move_meter.reset()
 
         return distance
+
