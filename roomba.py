@@ -176,18 +176,6 @@ def drive2():
             while(fc.get_distance_at(0) < target):
                 fc.backward(2)
 
-# drives a specified distance
-def drive_dist(speed = 30, distance= 40):
-
-    blocked = False
-
-    trip = Duodometer(4,24)
-    trip.start()
-
-    while trip.distance < distance:
-        scan_list = scanner.scan_step_dist()
-        if not scan_list:
-            continue
         
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ from odometer import Duodometer
 import numpy as np
 import matplotlib.pyplot as plt
 import scanner
+import drive as dr
 from scipy.interpolate import interp1d
 
 
@@ -128,7 +129,10 @@ def nearby_points(grid, obs_x, obs_y):
     maxx = min(obs_x + radius, len(grid) - 1)
     maxy = min(obs_y + radius, len(grid) - 1)
 
-    for x in range(obs_x -)
+    for x in range(obs_x - radius, obs_x + radius):
+        for y in range(obs_y - radius, obs_y + radius):
+            if grid[x][y] == 1:
+                continue
 
     return nearby
 
@@ -137,10 +141,8 @@ def map_obstacles(grid, car_pos, car_orientation, obstacle_pos):
    
 
     global resolution
-    print(car_orientation)
     for obstacle in obstacle_pos:
         # 1 convert polar to carteisan
-
 
         obs_x, obs_y = pol2cart(obstacle[0] + car_orientation, obstacle[1])
 
@@ -154,71 +156,34 @@ def map_obstacles(grid, car_pos, car_orientation, obstacle_pos):
             grid[obs_x][obs_y] = 1
 
         # check for nearby points
+    
+    
+    np.savetxt('maps/testmap.out', bit_map,fmt='%i', delimiter=',')
 
     return grid
 
-def set_obstacle(map, car_pos, orientation, obstacle_pos):
-	# set the occupied cells when detecting an obstacle
-	# grid:				ndarray [width,height]
-	# car_pos:			[x y] pose of the car
-	# orientation:      quaternion, orientation of the car
-	global resolution
-    
-
-	if not car_range == 0.0:
-
-		rotMatrix = numpy.array([[numpy.cos(euler[2]),   numpy.sin(euler[2])],
-			                     [-numpy.sin(euler[2]),  numpy.cos(euler[2])]])
-		obstacle = numpy.dot(rotMatrix,numpy.array([0, (car_range + position_sonar[0]) // resolution])) + numpy.array([off_x,off_y])
-
-
-		# set probability of occupancy to 100 and neighbour cells to 50
-		grid[int(obstacle[0]), int(obstacle[1])] = int(100)
-		if  grid[int(obstacle[0]+1), int(obstacle[1])]   < int(1):
-			grid[int(obstacle[0]+1), int(obstacle[1])]   = int(50)
-		if  grid[int(obstacle[0]), 	 int(obstacle[1]+1)] < int(1):
-			grid[int(obstacle[0]),   int(obstacle[1]+1)] = int(50)
-		if  grid[int(obstacle[0]-1), int(obstacle[1])]   < int(1):
-			grid[int(obstacle[0]-1), int(obstacle[1])]   = int(50)
-		if  grid[int(obstacle[0]),   int(obstacle[1]-1)] < int(1):
-			grid[int(obstacle[0]),   int(obstacle[1]-1)] = int(50)
-
-		t = 0.5
-		i = 1
-		free_cell = numpy.dot(rotMatrix,numpy.array([0, t*i])) + numpy.array([off_x,off_y])
-		while grid[int(free_cell[0]), int(free_cell[1])] < int(1):
-			grid[int(free_cell[0]), int(free_cell[1])] = int(0)
-			free_cell = numpy.dot(rotMatrix,numpy.array([0, t*i])) + numpy.array([off_x,off_y])
-			i = i+1;
-
-
 def map_n_drive():
-    global theta, car_pos, bit_map
+    global car_pos, bit_map
 
-    meter = Duodometer(4,24)
-    meter.start()
-    theta = 0
-    prevDistance = 0
-
-    for i in range(0, 1):
+    car_theta = 0
+    curr_distance = 0
+    for i in range(0, 2):
         currObstacles = scanner.mapping_scan()
-        currDistance = meter.distance
+
+        map_obstacles(bit_map, car_pos, car_theta, currObstacles)
+
+        theta, distance_driven = dr.drive_dist(speed = 20, distance = 20, theta =car_theta)
+
+        # update car position
+        delta_X, delta_Y = pol2cart(theta, distance_driven)
+        car_pos[0] = int(delta_X / resolution) + car_pos[0]
+        car_pos[1] = int(delta_Y / resolution) + car_pos[1]
+        print(car_pos)
 
 if __name__ == "__main__":
     try: 
         
-        meter = Duodometer(4,24)
-        car_theta = 0
-        meter.start()
-        prevDistance = 0
-
-        for i in range(0, 1):
-            currObstacles = scanner.mapping_scan(step = 2)
-            currDistance = meter.distance
-            
-
-
-            map_obstacles(bit_map, car_pos, car_theta, currObstacles)
+        map_n_drive()
 
 
     finally: 

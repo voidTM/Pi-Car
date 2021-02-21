@@ -84,7 +84,7 @@ def scan_step_dist():
 # note ultrasonic are waves and thus not entirely accurate
 def mapping_scan(min_angle = MIN_ANGLE, max_angle = MAX_ANGLE, step = 5):
     # set to min_angle
-    fc.get_status_at(min_angle)
+    fc.get_status_at(-90)
     time.sleep(1)
     scan_dist = []
     for angle in range(min_angle, max_angle + 1, 5):

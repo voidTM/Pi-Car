@@ -11,9 +11,6 @@ from odometer import Duodometer
 
 # goal is to track the car's position through motor movement.
 
-# records the direction 
-relative_theta = 0
-
 # position in cm
 starting_pos = []
 prev_pos = []
@@ -23,17 +20,6 @@ curr_pos = [0,0]
 turn_meter = Duodometer(12, 22)
 
 
-# turns car a specific distance
-def turn_right(power, angle):
-    
-    dist = angle_to_dist(angle)
-    turn_meter.reset()
-    turn_meter.start()
-    fc.forward(power)
-    while(turn_meter.distance < dist):
-        continue
-    
-    fc.stop()
 
 
 # calculates the relative distance moved
@@ -52,7 +38,17 @@ def angle_to_dist(angle, radius = 7):
 
     return rot * circumference
     
+def dist_to_angle(dist, radius = 7):
+    circumference = 2 * radius * math.pi
 
+    # only last rotation matters
+    rot = (dist // circumference) - (dist / circumference)
+
+    return rot * 360
+    
+
+
+# checks how far the car has rotated
 def rotation(curr_theta, start_dist, end_dist):
 
     # distance between front wheels ia about 14cm    
@@ -68,3 +64,6 @@ def rotation(curr_theta, start_dist, end_dist):
 
     return  int(curr_theta + deg) % 360
 
+
+def hybridAPathing():
+    return
