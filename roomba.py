@@ -55,7 +55,7 @@ def drive(speed = 30):
             continue
 
         # preprocess scanlist
-        scan_list = [200 if d < 0 else 200 if d > 200 else d for d in  scan_list] 
+        scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
 
 
         ahead = scan_list[2:8]

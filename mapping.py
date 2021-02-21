@@ -5,43 +5,19 @@ from odometer import Duodometer
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy as sc
 import scanner
+from scipy.interpolate import interp1d
 
-# 60 degree is about the closest servos
-# think of arks
-#scanning
-ANGLE_RANGE = 180
-STEP = 10
-us_step = STEP
-angle_distance = [0,0]
-current_angle = 0
-max_angle = 90
-min_angle = -90
-step_count = ANGLE_RANGE//STEP
-
-# degrees are from max -> min        
-scan_status = {}
 
 # each bit on the map should be 5 cm
-bit_map = np.full((200, 200), -1)
-current_pos = (50,0)
-relative_map = np.full((100,200,200), -1)
+resolution = 5
+# mid point of map
+car_pos = np.array([100,100])
+# -1 for unknown
+# 0 for clear
+# 1 for obstacle
+bit_map = np.full((200, 200), 0, dtype = int)
 
-
-# note ultrasonic are waves and thus not entirely accurate
-def mapping_scan():
-    global current_angle, us_step, min_angle, max_angle
-    fc.get_status_at(min_angle)
-    time.sleep(1)
-    scan_dist = []
-    for angle in range(min_angle, max_angle + 1, 5):
-        # give time for settling
-        time.sleep(0.1)
-        scan_dist.append([angle, fc.get_distance_at(angle)])
- 
-    #print(scan_dist)
-    return np.array(scan_dist)
 
 
 def pol2cart(angle, dist):
@@ -54,12 +30,13 @@ def pol2cart(angle, dist):
 
 
 def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta = -1):
+    global resolution
     if theta >= 0:
         outputX = vehicleX - obstacleX
     else:
         outputX = vehicleX + obstacleX
 
-    outputY = (vehicleY * 2) + obstacleY
+    outputY = vehicleY + obstacleY
     
     return outputX, outputY
 
@@ -86,92 +63,166 @@ def find_obstacles(carX = 0, carY = 0):
     return l
 
 
+# loads a stored map
+def load_map(filepath):
+    print(filepath)
 
-def fill_map(map, x_bounds, y_bounds, value = 10):
 
-    # bind the x range between 0 and 99
-    lower_x = max(x_bounds[0], 0)
-    upper_x = min(x_bounds[1], 99)
 
-    x = np.arange(lower_x, upper_x)
+def interpolate(x1, y1, x2, y2):
+    # interpolate across the x axis
+    xRange = np.arange(x1, x2)
+    fx = interp1d([x1,x2], [y1,y2])
 
-    if(x.size == 0):
-        print("x is out of map bounds")
-        return 
+    if x1 > x2:
+        xRange = np.arange(x2, x1)
+        fx = interp1d([x2,x1], [y2,y1])
 
-    y = np.interp(x, x_bounds, y_bounds)
+    yRange = fx(xRange)
+    print(x2,y2)
+    print(xRange,yRange)    
 
-    print(x)
-    print(y)
-    """
-    xy = np.array([x,y])
-    print(xy.shape)
-    print(xy)
-    # fill in 1 column by column
-    for i in range(len(y)):
-        continue
-    """
+    yRange = yRange.astype(int)
 
+    return np.array([xRange,yRange]).T
+
+
+def fill_between(grid, x1, y1, x2, y2, value):
     
-# set 1 grid cell to be 5 cm
+    interpolated_values = interpolate(x1, y1, x2, y2)
+    
+    if interpolated_values.size == 0:
+        print("failed interpolation", x2,y2)
+
+    for v in interpolated_values:
+        if in_map_bounds(grid, v[0], v[1]):
+            grid[v[1]][v[0]] = value
+
+    return grid
+
+# check to see if obstacle is within map bounds
+def in_map_bounds(grid, x, y):
+
+    upper_bound = len(grid) - 1
+    if x < 0 or x > upper_bound:
+        return False 
+    if y < 0 or y > upper_bound:
+        return False
+    
+    return True
+
 # 2 datapointa are 3 or fewer datapoints away join them?
 
+
+# returns a list of nearby points if any
+def nearby_points(grid, obs_x, obs_y):
+
+    # 20cm should give enough space for a picar to pass through
+    radius = 20 // resolution
+
+    nearby = np.array([])
+
+    # set search boundaries
+    minx = max(obs_x - radius, 0)
+    miny = max(obs_y - radius, 0)
+    maxx = min(obs_x + radius, len(grid) - 1)
+    maxy = min(obs_y + radius, len(grid) - 1)
+
+    for x in range(obs_x -)
+
+    return nearby
+
 # adds scanned information to map\s?
-def map_dist():
+def map_obstacles(grid, car_pos, car_orientation, obstacle_pos):
+   
 
-    global bit_map, scan_dist
-    prev_point = [0,0]     
-    x_bounds = [0,0]
-    y_bounds = [0,0] 
-    obstacle_locations = []
-    for angle in scan_dist:
-        x, y = pol2cart(angle, scan_dist[angle])
-
-        if(prev_point[0] < x):
-            x_bounds = np.array([prev_point[0], x])
-            y_bounds = np.array([prev_point[1], y])
-        else:
-            x_bounds = np.array([x, prev_point[0]])
-            y_bounds = np.array([y, prev_point[1]])
-        print(x,y)
-        #fill_map(bit_map, x_bounds, y_bounds, 1)
-        prev_point = [x,y]
-        obstacle_locations.append([x,y])
-
-    obstacles = np.array(obstacle_locations)
-    print(obstacles)
-    obstacles = obstacles.T
-
-    x = plt.plot(obstacles[0], obstacles[1], 'o')
+    global resolution
+    print(car_orientation)
+    for obstacle in obstacle_pos:
+        # 1 convert polar to carteisan
 
 
-    np.savetxt('front_bitmap.txt', x, delimiter=' ')
+        obs_x, obs_y = pol2cart(obstacle[0] + car_orientation, obstacle[1])
+
+        # 2 calculate offset from car posistion
+        obs_x = int(obs_x / resolution) + car_pos[0]
+        obs_y = int(obs_y / resolution) + car_pos[1]
+        # map if not out of bounds
+
+        #print(obs_x, obs_y)
+        if in_map_bounds(grid, obs_x, obs_y):
+            grid[obs_x][obs_y] = 1
+
+        # check for nearby points
+
+    return grid
+
+def set_obstacle(map, car_pos, orientation, obstacle_pos):
+	# set the occupied cells when detecting an obstacle
+	# grid:				ndarray [width,height]
+	# car_pos:			[x y] pose of the car
+	# orientation:      quaternion, orientation of the car
+	global resolution
     
 
+	if not car_range == 0.0:
 
+		rotMatrix = numpy.array([[numpy.cos(euler[2]),   numpy.sin(euler[2])],
+			                     [-numpy.sin(euler[2]),  numpy.cos(euler[2])]])
+		obstacle = numpy.dot(rotMatrix,numpy.array([0, (car_range + position_sonar[0]) // resolution])) + numpy.array([off_x,off_y])
+
+
+		# set probability of occupancy to 100 and neighbour cells to 50
+		grid[int(obstacle[0]), int(obstacle[1])] = int(100)
+		if  grid[int(obstacle[0]+1), int(obstacle[1])]   < int(1):
+			grid[int(obstacle[0]+1), int(obstacle[1])]   = int(50)
+		if  grid[int(obstacle[0]), 	 int(obstacle[1]+1)] < int(1):
+			grid[int(obstacle[0]),   int(obstacle[1]+1)] = int(50)
+		if  grid[int(obstacle[0]-1), int(obstacle[1])]   < int(1):
+			grid[int(obstacle[0]-1), int(obstacle[1])]   = int(50)
+		if  grid[int(obstacle[0]),   int(obstacle[1]-1)] < int(1):
+			grid[int(obstacle[0]),   int(obstacle[1]-1)] = int(50)
+
+		t = 0.5
+		i = 1
+		free_cell = numpy.dot(rotMatrix,numpy.array([0, t*i])) + numpy.array([off_x,off_y])
+		while grid[int(free_cell[0]), int(free_cell[1])] < int(1):
+			grid[int(free_cell[0]), int(free_cell[1])] = int(0)
+			free_cell = numpy.dot(rotMatrix,numpy.array([0, t*i])) + numpy.array([off_x,off_y])
+			i = i+1;
+
+
+def map_n_drive():
+    global theta, car_pos, bit_map
+
+    meter = Duodometer(4,24)
+    meter.start()
+    theta = 0
+    prevDistance = 0
+
+    for i in range(0, 1):
+        currObstacles = scanner.mapping_scan()
+        currDistance = meter.distance
 
 if __name__ == "__main__":
     try: 
         
         meter = Duodometer(4,24)
-        theta = 0
+        car_theta = 0
         meter.start()
         prevDistance = 0
+
         for i in range(0, 1):
-            currObstacles = mapping_scan()
+            currObstacles = scanner.mapping_scan(step = 2)
             currDistance = meter.distance
             
 
 
-            print(meter.distance, theta)
-            print(currObstacles)
+            map_obstacles(bit_map, car_pos, car_theta, currObstacles)
 
-            fc.turn_right(10)
-            while meter.distance < 14:
-                continue
-            #find new location
-            meter.reset()
-            fc.stop()
+
     finally: 
         fc.get_distance_at(0)
         fc.stop()
+
+        np.savetxt('maps/testmap.out', bit_map,fmt='%i', delimiter=',')
