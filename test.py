@@ -4,6 +4,15 @@ import matplotlib.pyplot as plt
 import sys
 from PIL import Image
 
+
+import time, math
+import picar_4wd as fc
+
+import utils
+from odometer import Duodometer
+import gps
+from car import Car
+
 x = [ 31,  31,  32,  34,  36,  38,  32,  37,  42,  50,  58,  75,  99, 113, 125, 134, 141, 146, 149]
 y = [ 0,  3,  6,  9, 12, 15, 32, 36, 46, 48, 48, 70, 86, 75, 63, 48, 33, 16,  0]
 
@@ -126,12 +135,22 @@ def fill_map2( x, y, value = 255):
     plt.show()
 
 
-external_x, exeternal_y = pol2cart(np.array(list(dist_hash.keys())) , np.array(list(dist_hash.values())))
-print(external_x, exeternal_y)
 
-plt.plot(external_x, exeternal_y)
-plt.show()
+def test1():
+    external_x, exeternal_y = pol2cart(np.array(list(dist_hash.keys())) , np.array(list(dist_hash.values())))
+    print(external_x, exeternal_y)
 
-fill_map(external_x, exeternal_y)
+    plt.plot(external_x, exeternal_y)
+    plt.show()
 
-#fill_map2(x4,y4)
+    fill_map(external_x, exeternal_y)
+
+
+def car_test():
+    
+    picar = Car()
+
+    picar.turn_right(90)
+    picar.turn_left(90)
+    picar.forward(10)
+    picar.backward(10)

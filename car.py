@@ -31,19 +31,17 @@ class Car(object):
         
     # turning
     def turn(angle, power = 10):
-        turn_dist = gps.angle_to_dist(angle)
 
         if angle < 0:
-            self.turn_left(abs)
+            self.turn_left(angle)
         elif angle > 1:
-            while(fc.get_distance_at(0) < turn_dist):
-                fc.turn_right(power)
+            self.turn_right(angle)
         else:
             while(fc.get_distance_at(0) < turn_dist):
                 fc.backward(2)
 
     def turn_right(self, power = 5, angle):
-        dist = angle_to_dist(angle)
+        dist = utils.angle_to_dist(angle)
 
 
         move_meter.start()
@@ -55,12 +53,30 @@ class Car(object):
         fc.stop()
         move_meter.stop()
         move_meter.reset()
+
+        orientation -= angle
         
-    def turn_right_dist(self, power)
+    def turn_right_target(self, power = 5, target):
+
+        move_meter.start()
+        fc.turn_right(power)
+        while(fc.get_distance_at(0) < target):
+            continue
+        fc.stop()
+        move_meter.stop()
+
+        distance_turned = move_meter.distance
+        # netagive angle for right turn
+        angle = dist_to_angle(distance_turned)
+
+        orientation -= angle
+
+        return -angle
+
 
     # basic car drive functionality
     def turn_left(self, power = 5, angle):
-        dist = angle_to_dist(angle)
+        dist = utils.angle_to_dist(angle)
         move_meter.start()
         fc.turn_left(power)
         while(move_meter.distance < dist):
@@ -73,10 +89,13 @@ class Car(object):
         # update 
         
     
-    def drive_forward(self, power = 5, distance = 10):
+    def drive_forward(self, power = 5, distance = None):
 
         move_meter.start()
         fc.forward(power)
+
+        if distance == None:
+            while()
         while(move_meter.distance < dist and fc.get_distance_at(0) > 20):
             continue
         
