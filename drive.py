@@ -5,7 +5,6 @@ import sys
 import time
 
 import scanner
-import utils
 from car import Car
 from odometer import Duodometer
 
@@ -49,7 +48,7 @@ def turn(angle, power = 10):
     else:
         while(fc.get_distance_at(0) < turn_dist):
             fc.backward(2)
-
+    
 
 
 

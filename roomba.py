@@ -44,8 +44,6 @@ def drive(speed = 30):
 
     blocked = True
 
-    tracker = Duodometer(4,24)
-    tracker.start()
 
     while True:
         
@@ -90,9 +88,7 @@ def drive(speed = 30):
 
         
         if not blocked:
-            print(tracker.distance)
             blocked = True
-            tracker.stop()
 
         if direction  == -1:
             print("turning left")
@@ -112,8 +108,6 @@ def drive2():
 
     blocked = False
 
-    tracker = Duodometer(4,24)
-    tracker.start()
 
     while True:
         scan_list = scanner.scan_step_dist()
@@ -127,7 +121,6 @@ def drive2():
         if min(ahead) > 35:
             #print("Coast Clear")
             if  blocked:
-                tracker.start()
                 blocked = False
                 
             fc.forward(speed)
@@ -159,28 +152,30 @@ def drive2():
 
         
         if not blocked:
-            print(tracker.distance)
             blocked = True
-            tracker.stop()
         
 
         if direction  == -1:
             print("turning left")
             while(fc.get_distance_at(0) < target):
                 fc.turn_left(10)
+            fc.stop()
         elif direction  == 1:
             print("turning right")
             while(fc.get_distance_at(0) < target):
                 fc.turn_right(10)
+            fc.stop()
+
         else:
             while(fc.get_distance_at(0) < target):
                 fc.backward(2)
+            fc.stop()
 
         
 
 if __name__ == "__main__":
     try: 
-        drive()
+        drive2()
     finally: 
         fc.get_distance_at(0)
         fc.stop()
