@@ -39,7 +39,7 @@ class Car(object):
 
     # right turns
     def turn_right(self, angle, power = 5):
-        dist = utils.angle_to_dist(angle)
+        dist = utils.angle_to_dist(angle) * 1.1
 
 
         self.trip_meter.reset()        
