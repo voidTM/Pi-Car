@@ -22,6 +22,7 @@ class GPS(object):
     def __init__(self, map_size: int = 200, resolution: int = 5, start_x: int = 100, start_y: int 100):
 
         self.grid = np.full((200, 200), 0, dtype = int)
+        self.grid_size = [200, 200]
         self.resolution = resolution
         self.pos_x = start_x
         self.pos_y = start_y
@@ -33,6 +34,7 @@ class GPS(object):
         self.grid = grid
         self.resolution = resolution
         self.orientation = orientation
+        self.grid_size = [len(grid), len(grid[0])]
 
         if start_x is None:
             self.pos_x = len(grid) // 2
@@ -42,9 +44,22 @@ class GPS(object):
         self.target_x = None
         self.target_y = None
 
+    def save_grid(self, filepath: string = 'maps/testmap.out'):
+        np.savetxt(filepath, self.grid, fmt='%i', delimiter=',')
+
+
+    # check to see if a coordinate is in map bounds
+    def in_map_bounds(self, x: int, y: int):
+
+        if x < 0 or x > self.grid_size[0]:
+            return False 
+        if y < 0 or y > self.grid_size[1]:
+            return False
+        
+        return True
 
     #sets a new position for the car    
-    def set_postion(self, new_x, new_y):
+    def set_postion(self, new_x: int, new_y : int):
         self.pos_x = new_x
         self.pos_y = new_y
     
@@ -62,4 +77,8 @@ class GPS(object):
         self.target_y = target_y
 
     def add_relative_obstacle(self, obstacle_direction, obstacle_angle):
+
     def add_obstacle(self, obstacle_x, obstacle_y):
+        
+        #if in bounds
+

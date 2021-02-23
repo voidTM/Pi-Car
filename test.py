@@ -154,3 +154,14 @@ def car_test():
     picar.turn_left(90)
     picar.forward(10)
     picar.backward(10)
+
+
+if __name__ == "__main__":
+    try: 
+        
+        car_test()
+        
+
+    finally: 
+        fc.stop()
+
