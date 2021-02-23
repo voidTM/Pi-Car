@@ -22,24 +22,15 @@ class Car(object):
 
         # initialize odometers
 
-        # tracks the entire trip
-        self.trip_meter = Duodometer(4, 24)
+        # slippage should be 2?
+        self.trip_meter = Duodometer(4, 24, 2)
         self.trip_meter.start()
         
-    # turning
-    def turn(self, angle, power = 10):
-
-        if angle < 0:
-            self.turn_left(angle)
-        elif angle > 1:
-            self.turn_right(angle)
-        else:
-            while(fc.get_distance_at(0) < turn_dist):
-                fc.backward(2)
 
     # right turns
     def turn_right(self, angle, power = 5):
-        dist = utils.angle_to_dist(angle) * 1.1
+        slippage = 1.3
+        dist = utils.angle_to_dist(angle) * slippage
 
 
         self.trip_meter.reset()        
@@ -103,6 +94,18 @@ class Car(object):
 
         return self.orientation
 
+
+
+    # turning
+    def turn(self, angle, power = 10):
+        print(angle)
+        if angle < 0:
+            self.turn_right(abs(angle))
+        elif angle > 1:
+            self.turn_left(angle)
+        else:
+            while(fc.get_distance_at(0) < turn_dist):
+                fc.backward(2)
 
     def drive_forward(self, distance = None, power = 5):
 
