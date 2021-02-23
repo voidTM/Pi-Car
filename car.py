@@ -23,7 +23,7 @@ class Car(object):
         # initialize odometers
 
         # slippage should be 2?
-        self.trip_meter = Duodometer(4, 24, 2)
+        self.trip_meter = Duodometer(4, 24)
         self.trip_meter.start()
         
 
@@ -64,7 +64,8 @@ class Car(object):
 
     # left turns
     def turn_left(self, angle, power = 5):
-        dist = utils.angle_to_dist(angle)
+        slippage = 0.87
+        dist = utils.angle_to_dist(angle) * slippage
         self.trip_meter.reset()
 
         fc.turn_left(power)
