@@ -77,8 +77,21 @@ class GPS(object):
         self.target_y = target_y
 
     def add_relative_obstacle(self, obstacle_direction, obstacle_angle):
+        
+        obs_x, obs_y = utils.pol2cart(orientation, distance)
+
+        obs_x += self.pos_x
+        obs_y += self.pos_y
+        add_obstacle(obs_x, obs_y)
 
     def add_obstacle(self, obstacle_x, obstacle_y):
         
-        #if in bounds
+        
+
+
+
+        if self.in_map_bounds(obstacle_x, obstacle_y):
+            # link with other nearby obstacles
+
+            self.grid[obstacle_x][obstacle_y] = 1
 
