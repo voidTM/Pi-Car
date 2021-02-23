@@ -9,48 +9,6 @@ from car import Car
 from odometer import Duodometer
 
 
-# speed is the same wether it turns left or right
-turn_meter = Duodometer(12, 22)
-
-# turns car a specific distance
-def turn_target(scanned_distances):
-    mid = len(scanned_distances) // 2
-
-    left = scanned_distances[:mid]
-    right = scanned_distances[mid:]
-
-    target = 40 # target for open space
-    direction = 0 #turn direction
-
-    if(sum(left) > sum(right)):
-        direction = -1
-        target = max(left)
-        
-    elif(sum(left) < sum(right)):
-        direction = 1
-        target = max(right)
-    else:
-        direction = 0
-    
-    return direction, target
-        
-
-# turns car a specified angle
-def turn(angle, power = 10):
-    turn_dist = gps.angle_to_dist(angle)
-
-    if angle < 0:
-        while(fc.get_distance_at(0) < turn_dist):
-            fc.turn_left(power)
-    elif angle > 1:
-        while(fc.get_distance_at(0) < turn_dist):
-            fc.turn_right(power)
-    else:
-        while(fc.get_distance_at(0) < turn_dist):
-            fc.backward(2)
-    
-
-
 
 # 20 should be the minimum distance
 
@@ -130,3 +88,22 @@ def drive_dist(speed = 30, distance= 40, theta = 0):
 
     turn_track.stop()
     return theta, trip.distance
+
+
+def drive_basic():
+    picar = Car()
+
+    picar.turn_right(90)
+    picar.turn_left(90)
+    picar.forward(10)
+    picar.backward(10)
+
+
+
+
+if __name__ == "__main__":
+    try: 
+        drive_basic()
+    finally: 
+        fc.get_distance_at(0)
+        fc.stop()

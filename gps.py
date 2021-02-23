@@ -16,12 +16,19 @@ class GPS(object):
     Keeps track of a cars position and orientation on a grid/map
     """
     destination = None
-    pathing = False
+
+    # list of obstacles
+    obstacles = []
+
 
     # starts with an empty grid
-    def __init__(self, map_size: int = 200, resolution: int = 5, start_x: int = 100, start_y: int 100):
+    def __init__(self, map_width: int = 200, map_length: int = 200, resolution: int = 5, start_x: int = 100, start_y: int = 100):
 
-        self.grid = np.full((200, 200), 0, dtype = int)
+        self.grid = np.full((map_width, map_length), 0, dtype = int)
+        
+        # weighted grid fro nump
+        self.h_grid = np.zeros([map_width,map_length])
+
         self.grid_size = [200, 200]
         self.resolution = resolution
         self.pos_x = start_x
@@ -44,7 +51,7 @@ class GPS(object):
         self.target_x = None
         self.target_y = None
 
-    def save_grid(self, filepath: string = 'maps/testmap.out'):
+    def save_grid(self, filepath: str = 'maps/testmap.out'):
         np.savetxt(filepath, self.grid, fmt='%i', delimiter=',')
 
 
@@ -72,10 +79,7 @@ class GPS(object):
         self.pos_y += y_dist
 
 
-    def set_target(self, target_x, target_y):
-        self.target_x = target_x
-        self.target_y = target_y
-
+    # takes in an obstacles polar coordinates from car
     def add_relative_obstacle(self, obstacle_direction, obstacle_angle):
         
         obs_x, obs_y = utils.pol2cart(orientation, distance)
@@ -86,12 +90,10 @@ class GPS(object):
 
     def add_obstacle(self, obstacle_x, obstacle_y):
         
-        
-
-
+        # look for nearby obstacles
+        obstacles.append([obstacle_x, obstacle_y])
 
         if self.in_map_bounds(obstacle_x, obstacle_y):
             # link with other nearby obstacles
-
+            # add to grid
             self.grid[obstacle_x][obstacle_y] = 1
-

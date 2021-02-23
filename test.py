@@ -151,9 +151,14 @@ def car_test():
     picar = Car()
 
     picar.turn_right(90)
+    time.sleep(1)
     picar.turn_left(90)
-    picar.forward(10)
-    picar.backward(10)
+    time.sleep(1)
+    picar.drive_forward(10)
+    time.sleep(1)
+    picar.drive_backward(10)
+    time.sleep(1)
+
 
 
 if __name__ == "__main__":
