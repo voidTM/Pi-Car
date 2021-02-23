@@ -19,17 +19,17 @@ class GPS(object):
     pathing = False
 
     # starts with an empty grid
-    def __init__(self, map_size: int = 200, resolution: int = 5, start_x: int = 100, start_y: int 100, orientation: int = 0):
+    def __init__(self, map_size: int = 200, resolution: int = 5, start_x: int = 100, start_y: int 100):
 
         self.grid = np.full((200, 200), 0, dtype = int)
         self.resolution = resolution
-        self.orientation = orientation
         self.pos_x = start_x
         self.pos_y = start_y
-
+        self.target_x = None
+        self.target_y = None
 
     # loads a grid
-    def load_grid(self, grid: np.array, resolution: int = 5, start_x: int = None, start_y: int = None, orientation: int = 0):
+    def load_grid(self, grid: np.array, resolution: int = 5, start_x: int = None, start_y: int = None):
         self.grid = grid
         self.resolution = resolution
         self.orientation = orientation
@@ -39,10 +39,27 @@ class GPS(object):
         if start_x is None:
             self.pos_y = len(grid[0]) // 2
 
-    
-    def update_pos(self, new_x, new_y):
+        self.target_x = None
+        self.target_y = None
+
+
+    #sets a new position for the car    
+    def set_postion(self, new_x, new_y):
         self.pos_x = new_x
         self.pos_y = new_y
     
-    def update_orientation(self, new_theta):
-        self.orientation = new_theta
+
+    # calculate distance driven from previous point
+    def update_postion(self, distance, orientation):
+        x_dist, y_dist = utils.pol2cart(orientation, distance)
+        
+        self.pos_x += x_dist
+        self.pos_y += y_dist
+
+
+    def set_target(self, target_x, target_y):
+        self.target_x = target_x
+        self.target_y = target_y
+
+    def add_relative_obstacle(self, obstacle_direction, obstacle_angle):
+    def add_obstacle(self, obstacle_x, obstacle_y):

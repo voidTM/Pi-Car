@@ -24,9 +24,6 @@ class Car(object):
 
         # tracks the entire trip
         self.trip_meter = Duodometer(4, 24)
-
-        # used for single moves
-        self.move_meter = Duodometer(12, 22)
         
         
     # turning
@@ -40,83 +37,102 @@ class Car(object):
             while(fc.get_distance_at(0) < turn_dist):
                 fc.backward(2)
 
+    # right turns
     def turn_right(self, power = 5, angle):
         dist = utils.angle_to_dist(angle)
 
 
-        move_meter.start()
-        
+        self.trip_meter.reset()        
         fc.turn_right(power)
-        while(move_meter.distance < dist):
+        while(self.trip_meter.distance < dist):
             continue
         
         fc.stop()
-        move_meter.stop()
-        move_meter.reset()
 
         orientation -= angle
+
+        return orientation
         
     def turn_right_target(self, power = 5, target):
 
-        move_meter.start()
+        self.trip_meter.start()
         fc.turn_right(power)
         while(fc.get_distance_at(0) < target):
             continue
         fc.stop()
-        move_meter.stop()
+        self.trip_meter.stop()
 
-        distance_turned = move_meter.distance
+        distance_turned = self.trip_meter.distance
         # netagive angle for right turn
         angle = dist_to_angle(distance_turned)
 
         orientation -= angle
 
-        return -angle
+        return orientation
 
 
-    # basic car drive functionality
+    # left turns
     def turn_left(self, power = 5, angle):
         dist = utils.angle_to_dist(angle)
-        move_meter.start()
+        self.trip_meter.reset()
+
         fc.turn_left(power)
-        while(move_meter.distance < dist):
+        while(self.trip_meter.distance < dist):
             continue
         
         fc.stop()
-        move_meter.stop()
-        move_meter.reset()
 
         # update 
-        
+        orientation += angle
+
+        return orientation
     
+    def turn_left_target(self, power = 5, target):
+
+        self.trip_meter.reset()
+        fc.turn_left(power)
+        while(fc.get_distance_at(0) < target):
+            continue
+        fc.stop()
+
+        distance_turned = self.trip_meter.distance
+        # netagive angle for right turn
+        angle = dist_to_angle(distance_turned)
+
+        orientation += angle
+
+        return orientation
+
+
     def drive_forward(self, power = 5, distance = None):
 
-        move_meter.start()
+        self.trip_meter.start()
         fc.forward(power)
 
+        # if no distance is defined then drive forward until blocked
         if distance == None:
-            while()
-        while(move_meter.distance < dist and fc.get_distance_at(0) > 20):
-            continue
+            while(fc.get_distance_at(0) > 20):
+                continue
+        else:
+            while(self.trip_meter.distance < dist and fc.get_distance_at(0) > 20):
+                continue
         
         fc.stop()
-        actually_traveled = move_meter.distance
-        move_meter.stop()
-        move_meter.reset()
+        actually_traveled = self.trip_meter.distance
+        self.trip_meter.stop()
+        self.trip_meter.reset()
 
         return actually_traveled
     
     def drive_backward(self, power = 5, distance = 10)
-        move_meter.start()
+        self.trip_meter.reset()
         fc.drive_backward(power)
 
-        while(move_meter.distance < dist):
+        while(self.trip_meter.distance < dist):
             continue
         
         fc.stop()
-        actually_traveled = move_meter.distance
-        move_meter.stop()
-        move_meter.reset()
+        actually_traveled = self.trip_meter.distance
 
         return distance
 
