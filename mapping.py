@@ -21,27 +21,6 @@ bit_map = np.full((200, 200), 0, dtype = int)
 
 
 
-def pol2cart(angle, dist):
-    rad_angle = np.radians(angle)
-        
-    x = dist * np.sin(rad_angle)
-    y = dist * np.cos(rad_angle)
-    return (x, y)
-
-
-
-def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta = -1):
-    global resolution
-    if theta >= 0:
-        outputX = vehicleX - obstacleX
-    else:
-        outputX = vehicleX + obstacleX
-
-    outputY = vehicleY + obstacleY
-    
-    return outputX, outputY
-
-
 # finds the relative locations of an object
 # and returns a numpy array of coordinates
 def find_obstacles(carX = 0, carY = 0):
@@ -62,11 +41,6 @@ def find_obstacles(carX = 0, carY = 0):
     l = np.array(relativeLocations).T
     print(list(l))
     return l
-
-
-# loads a stored map
-def load_map(filepath):
-    print(filepath)
 
 
 
@@ -101,16 +75,6 @@ def fill_between(grid, x1, y1, x2, y2, value):
 
     return grid
 
-# check to see if obstacle is within map bounds
-def in_map_bounds(grid, x, y):
-
-    upper_bound = len(grid) - 1
-    if x < 0 or x > upper_bound:
-        return False 
-    if y < 0 or y > upper_bound:
-        return False
-    
-    return True
 
 # 2 datapointa are 3 or fewer datapoints away join them?
 
