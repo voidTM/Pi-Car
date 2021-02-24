@@ -2,11 +2,9 @@
 import time, math
 
 import sys
-import time
-
-
 import numpy as np
 
+import utils
 
 
 # goal is to track the car's position on a map
@@ -28,7 +26,7 @@ class GPS(object):
         # weighted grid fro nump
         self.h_grid = np.zeros([map_width,map_length])
 
-        self.grid_size = [200, 200]
+        self.grid_size = [map_width, map_length]
         self.resolution = resolution
         self.pos_x = start_x
         self.pos_y = start_y
@@ -56,10 +54,10 @@ class GPS(object):
 
     # check to see if a coordinate is in map bounds
     def in_map_bounds(self, x: int, y: int):
-
-        if x < 0 or x > self.grid_size[0]:
+        
+        if x < 0 or x >= self.grid_size[0]:
             return False 
-        if y < 0 or y > self.grid_size[1]:
+        if y < 0 or y >= self.grid_size[1]:
             return False
         
         return True
@@ -79,23 +77,27 @@ class GPS(object):
 
 
     # takes in an obstacles polar coordinates from car
-    def add_relative_obstacle(self, obstacle_direction, obstacle_angle):
+    def add_relative_obstacle(self, orientation, distance):
         
+        # add in cars orientation
         obs_x, obs_y = utils.pol2cart(orientation, distance)
 
-        obs_x += self.pos_x
-        obs_y += self.pos_y
-        add_obstacle(obs_x, obs_y)
+        obs_x = (obs_x // self.resolution) + self.pos_x
+        obs_y = (obs_y // self.resolution) + self.pos_y
+        self.add_obstacle(int(obs_x), int(obs_y))
 
     def add_obstacle(self, obstacle_x, obstacle_y):
         
         # look for nearby obstacles
-        obstacles.append([obstacle_x, obstacle_y])
+        self.obstacles.append([obstacle_x, obstacle_y])
 
         if self.in_map_bounds(obstacle_x, obstacle_y):
             # link with other nearby obstacles
             # add to grid
+            print("in bounds")
             self.grid[obstacle_x][obstacle_y] = 1
+        else:
+            print("out of bounds", obstacle_x, obstacle_y)
 
 
     # astar navigation
@@ -133,3 +135,6 @@ class GPS(object):
     # same goal but need new path
     def recalculate_navigation(self):
         pass
+
+
+
