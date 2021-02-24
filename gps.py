@@ -183,7 +183,6 @@ class GPS(object):
 
         openNodes = PriorityQueue()
         openNodes.put((0, start))
-        closedNodes = {}
         gScore = {}
         fScore = {}
         hScore = {}
@@ -196,14 +195,13 @@ class GPS(object):
             if curr_pos == goal:
                 return self.reconstructPath(cameFrom, goal)
             
-            closedNodes[tuple(curr_pos)] = curr_score
 
             for neighbor in self.find_neighbors(curr_pos):
                 # since no diagonals just use a flat number?
                 tentative_gScore = gScore[curr_pos] + self.distBetween(curr_pos, neighbor)
 
                 # already been calculated before and score is higher
-                if neighbor not in closedNodes or tentative_gScore < gScore[tuple(neighbor)]:
+                if neighbor not in gScore or tentative_gScore < gScore[tuple(neighbor)]:
                     # adds to current set if not in
                     cameFrom[neighbor] = curr_pos
                     gScore[neighbor] = tentative_gScore
