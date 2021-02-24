@@ -23,13 +23,14 @@ class Car(object):
         # initialize odometers
 
         # slippage should be 2?
-        self.trip_meter = Duodometer(4, 24)
+        self.trip_meter = Duodometer(4, 24 , 2)
         self.trip_meter.start()
         
 
     # right turns
     def turn_right(self, angle, power = 5):
-        slippage = 1.3
+        # need to adjust slippage for turning
+        slippage = 2.6
         dist = utils.angle_to_dist(angle) * slippage
 
 
@@ -41,11 +42,12 @@ class Car(object):
         fc.stop()
 
         self.orientation -= angle
+        print("new car orientation", self.orientation)
 
         return self.orientation
         
     def turn_right_target(self, target, power = 5):
-
+        slippage = 2.6
         self.trip_meter.start()
         fc.turn_right(power)
         while(fc.get_distance_at(0) < target):
@@ -53,18 +55,22 @@ class Car(object):
         fc.stop()
         self.trip_meter.stop()
 
-        distance_turned = self.trip_meter.distance
+        distance_turned = self.trip_meter.distance * 0.65
         # netagive angle for right turn
         angle = dist_to_angle(distance_turned)
 
         self.orientation -= angle
+        print("angle turned", angle)
+        print("new car orientation", self.orientation)
 
         return self.orientation
 
 
     # left turns
     def turn_left(self, angle, power = 5):
-        slippage = 0.87
+        # need to adjust slippage for turning
+
+        slippage = 1.74
         dist = utils.angle_to_dist(angle) * slippage
         self.trip_meter.reset()
 
@@ -76,10 +82,12 @@ class Car(object):
 
         # update 
         self.orientation += angle
-
+        print("new car orientation", self.orientation)
         return self.orientation
     
     def turn_left_target(self, target, power = 5):
+        # need to adjust slippage for turning
+        slippage = 1.74
 
         self.trip_meter.reset()
         fc.turn_left(power)
@@ -92,6 +100,7 @@ class Car(object):
         angle = dist_to_angle(distance_turned)
 
         self.orientation += angle
+        print("new car orientation", self.orientation)
 
         return self.orientation
 
@@ -112,16 +121,20 @@ class Car(object):
 
         self.trip_meter.reset()
         fc.forward(power)
-
+        slippage = 2
+        print(self.trip_meter.distance, distance)
         # if no distance is defined then drive forward until blocked
         if distance == None:
-            while(fc.get_distance_at(0) > 20):
+            while(fc.get_status_at(0) == 2):
                 continue
         else:
-            while(self.trip_meter.distance < distance and fc.get_distance_at(0) > 20):
+            while(self.trip_meter.distance < distance and fc.get_status_at(0) > 1):
                 continue
         
         fc.stop()
+        print(self.trip_meter.distance, distance)
+        print(fc.get_distance_at(0))
+
         actually_traveled = self.trip_meter.distance
 
         return actually_traveled

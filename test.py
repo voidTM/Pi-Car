@@ -146,7 +146,7 @@ def test1():
     fill_map(external_x, exeternal_y)
 
 
-def car_test():
+def car_turn_test():
     
     picar = Car()
 
@@ -154,12 +154,15 @@ def car_test():
     time.sleep(5)
     picar.turn(180)
 
+def car_drive_test():
+    picar = Car()
+    print(picar.drive_forward(100))
 
 
 if __name__ == "__main__":
     try: 
         
-        car_test()
+        car_turn_test()
         
 
     finally: 
