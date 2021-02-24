@@ -12,16 +12,17 @@ import numpy as np
 
 class AStar:
 
+    fgrid =[]
     def distBetween(self,current,neighbor):
         # since only straights
         return 10
 
     def heuristicEstimate(self,start,goal):
-        return abs(star[0] - goal[0]) + abs(start[1] - goal[1])
+        return abs(start[0] - goal[0]) + abs(start[1] - goal[1])
 
 
     # this should be a generator?
-    def neighborNodes(self,current):
+    def neighborNodes(self, grid, current):
         neighbors = []
         # if not obstacle and in bounds
         return neighbors
@@ -99,6 +100,7 @@ class AStar:
         fScore = {}
         hScore = {}
 
+        gGrid = np.array(grid)
 
         while len(openSet) != 0:
             curr_w, curr_p = openNodes.get() # priority queue should pop the lowest
@@ -116,11 +118,12 @@ class AStar:
                     # adds to current set if not in
                     cameFrom[neighbor] = current
                     gScore[neighbor] = tentative_gScore
+                    gGrid[neighbor[0]][neighbor[1]] = tentative_gScore
                     fScore[neighbor] = gScore[neighbor] + self.heuristicEstimate(neighbor,goal)
                     if neighbor not in openNodes:
                         openNodes.put((fScore[neighbor] ,neighbor))
 
-
+        return gGrid
 
 
 
