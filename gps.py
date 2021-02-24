@@ -45,8 +45,12 @@ class GPS(object):
 
         if start_x is None:
             self.pos_x = len(grid) // 2
+        else:
+            self.pos_x = start_x
         if start_x is None:
             self.pos_y = len(grid[0]) // 2
+        else: 
+            self.pos_y = start_y
 
         self.target_x = None
         self.target_y = None
@@ -112,35 +116,9 @@ class GPS(object):
 
     # astar navigation
     # sets a new target
-    def set_navigation_goal(self, goal):
-
-        current = [self.pos_x, self.pos_y]
-        cameFrom = {}
-        openSet = set([current])
-        closedSet = set()
-
-
-        gScore = {}
-        fScore = {}
-        gScore[start] = 0
-        fScore[start] = gScore[start] + self.heuristicEstimate(start,goal)
-        while len(openSet) != 0:
-            current = self.getLowest(openSet,fScore)
-            if current == goal:
-                return self.reconstructPath(cameFrom,goal)
-            openSet.remove(current)
-            closedSet.add(current)
-            for neighbor in self.neighborNodes(current):
-                tentative_gScore = gScore[current] + self.distBetween(current,neighbor)
-                if neighbor in closedSet and tentative_gScore >= gScore[neighbor]:
-                    continue
-                if neighbor not in closedSet or tentative_gScore < gScore[neighbor]:
-                    cameFrom[neighbor] = current
-                    gScore[neighbor] = tentative_gScore
-                    fScore[neighbor] = gScore[neighbor] + self.heuristicEstimate(neighbor,goal)
-                    if neighbor not in openSet:
-                        openSet.add(neighbor)
-        return 0
+    def set_navigation_goal(self, goal: tuple):
+        start = (self.pos_x, self.pos_y)
+        path = self.astar(start, goal)
 
     # same goal but need new path
     def recalculate_navigation(self):
@@ -160,6 +138,7 @@ class GPS(object):
                 if self.grid[neighbor[0]][neighbor[1]] != 1: # not an obstacle
                     yield tuple(neighbor)
 
+    # reconstructs the path 
     def reconstructPath(self,cameFrom,goal):
         path = deque()
         node = goal
