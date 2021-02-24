@@ -97,7 +97,7 @@ def drive_basic():
     picar.turn_left(90)
     picar.forward(10)
     picar.backward(10)
-
+    
 
 
 
@@ -110,6 +110,7 @@ def move_left_clear():
 if __name__ == "__main__":
     try: 
         drive_basic()
+
     finally: 
         fc.get_distance_at(0)
         fc.stop()

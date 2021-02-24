@@ -132,4 +132,4 @@ class GPS(object):
 
     # same goal but need new path
     def recalculate_navigation(self):
-        
+        pass

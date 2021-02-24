@@ -9,7 +9,8 @@ class AStar:
         pass
 
     def heuristicEstimate(self,start,goal):
-        pass
+        return abs(star[0] - goal[0]) + abs(start[1] - goal[1])
+
 
     def neighborNodes(self,current):
         pass
