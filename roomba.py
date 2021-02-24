@@ -175,7 +175,7 @@ def drive2():
 
 if __name__ == "__main__":
     try: 
-        drive2()
+        drive()
     finally: 
         fc.get_distance_at(0)
         fc.stop()
