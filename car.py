@@ -23,7 +23,7 @@ class Car(object):
         # initialize odometers
 
         # slippage should be 2?
-        self.trip_meter = Duodometer(4, 24 , 2)
+        self.trip_meter = Duodometer(4, 25 , 2)
         self.trip_meter.start()
         
 

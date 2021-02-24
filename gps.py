@@ -15,8 +15,7 @@ class GPS(object):
     """
     Keeps track of a cars position and orientation on a grid/map
     """
-    destination = None
-
+    goal = None
     # list of obstacles
     obstacles = []
 
@@ -100,9 +99,8 @@ class GPS(object):
 
 
     # astar navigation
-    
-    
-    def new_navigation_goal(self, goal):
+    # sets a new target
+    def set_navigation_goal(self, goal):
 
         current = [self.pos_x, self.pos_y]
         cameFrom = {}
@@ -131,3 +129,7 @@ class GPS(object):
                     if neighbor not in openSet:
                         openSet.add(neighbor)
         return 0
+
+    # same goal but need new path
+    def recalculate_navigation(self):
+        
