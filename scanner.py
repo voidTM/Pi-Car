@@ -89,7 +89,9 @@ def mapping_scan(min_angle = MIN_ANGLE, max_angle = MAX_ANGLE, step = 5):
     for angle in range(min_angle, max_angle + 1, 5):
         # give time for settling
         time.sleep(0.1)
-        scan_dist.append([angle, fc.get_distance_at(angle)])
+        dist = fc.get_distance_at(angle)
+        if dist != -2:
+            scan_dist.append([angle, dist])
  
     return np.array(scan_dist)
 

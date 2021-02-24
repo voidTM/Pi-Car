@@ -1,12 +1,11 @@
-import time, math
-import threading
 import picar_4wd as fc
 from odometer import Duodometer
 
 import numpy as np
-import matplotlib.pyplot as plt
 import scanner
-import drive as dr
+import utils
+
+from gps import GPS
 from scipy.interpolate import interp1d
 
 
@@ -17,7 +16,7 @@ car_pos = np.array([100,100])
 # -1 for unknown
 # 0 for clear
 # 1 for obstacle
-bit_map = np.full((200, 200), 0, dtype = int)
+bit_map = np.full((20, 20), 0, dtype = int)
 
 
 
@@ -100,49 +99,23 @@ def nearby_points(grid, obs_x, obs_y):
 
     return nearby
 
-# adds scanned information to map\s?
-def map_obstacles(grid, car_pos, car_orientation, obstacle_pos):
-   
-
-    global resolution
-    for obstacle in obstacle_pos:
-        # 1 convert polar to carteisan
-
-        obs_x, obs_y = pol2cart(obstacle[0] + car_orientation, obstacle[1])
-
-        # 2 calculate offset from car posistion
-        obs_x = int(obs_x / resolution) + car_pos[0]
-        obs_y = int(obs_y / resolution) + car_pos[1]
-        # map if not out of bounds
-
-        #print(obs_x, obs_y)
-        if in_map_bounds(grid, obs_x, obs_y):
-            grid[obs_x][obs_y] = 1
-
-        # check for nearby points
-    
-    
-    np.savetxt('maps/testmap.out', bit_map,fmt='%i', delimiter=',')
-
-    return grid
-
 def map_n_drive():
-    global car_pos, bit_map
 
     car_theta = 0
     curr_distance = 0
-    for i in range(0, 2):
+    grid = GPS(map_width = 20, map_length = 20, start_x = 10, start_y = 0)
+
+    for i in range(0, 1):
         currObstacles = scanner.mapping_scan()
 
-        map_obstacles(bit_map, car_pos, car_theta, currObstacles)
 
-        theta, distance_driven = dr.drive_dist(speed = 5, distance = 20, theta =car_theta)
-        
-        # update car position
-        delta_X, delta_Y = pol2cart(theta, distance_driven)
-        car_pos[0] = int(delta_X / resolution) + car_pos[0]
-        car_pos[1] = int(delta_Y / resolution) + car_pos[1]
-        print(car_pos)
+        for obstacle in currObstacles:
+            print(obstacle)
+            grid.add_relative_obstacle(obstacle[0], obstacle[1])
+
+    
+    grid.save_grid('maps/minimap.out')
+
 
 if __name__ == "__main__":
     try: 
@@ -154,4 +127,3 @@ if __name__ == "__main__":
         fc.get_distance_at(0)
         fc.stop()
 
-        np.savetxt('maps/testmap.out', bit_map,fmt='%i', delimiter=',')
