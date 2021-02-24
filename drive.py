@@ -101,6 +101,12 @@ def drive_basic():
 
 
 
+def move_left_clear():
+
+    
+
+
+
 if __name__ == "__main__":
     try: 
         drive_basic()

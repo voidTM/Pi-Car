@@ -97,3 +97,37 @@ class GPS(object):
             # link with other nearby obstacles
             # add to grid
             self.grid[obstacle_x][obstacle_y] = 1
+
+
+    # astar navigation
+    
+    
+    def new_navigation_goal(self, goal):
+
+        current = [self.pos_x, self.pos_y]
+        cameFrom = {}
+        openSet = set([current])
+        closedSet = set()
+
+
+        gScore = {}
+        fScore = {}
+        gScore[start] = 0
+        fScore[start] = gScore[start] + self.heuristicEstimate(start,goal)
+        while len(openSet) != 0:
+            current = self.getLowest(openSet,fScore)
+            if current == goal:
+                return self.reconstructPath(cameFrom,goal)
+            openSet.remove(current)
+            closedSet.add(current)
+            for neighbor in self.neighborNodes(current):
+                tentative_gScore = gScore[current] + self.distBetween(current,neighbor)
+                if neighbor in closedSet and tentative_gScore >= gScore[neighbor]:
+                    continue
+                if neighbor not in closedSet or tentative_gScore < gScore[neighbor]:
+                    cameFrom[neighbor] = current
+                    gScore[neighbor] = tentative_gScore
+                    fScore[neighbor] = gScore[neighbor] + self.heuristicEstimate(neighbor,goal)
+                    if neighbor not in openSet:
+                        openSet.add(neighbor)
+        return 0
