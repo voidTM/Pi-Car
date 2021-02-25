@@ -107,15 +107,18 @@ class GPS(object):
             print("out of bounds", obstacle_x, obstacle_y)
 
 
-    def distBetween(self,current,neighbor):
+
+
+    # astar navigation
+    # sets a new target
+
+    def distBetween(self,current, neighbor):
         # since only straights
         return 10
 
     def heuristicEstimate(self,start,goal):
         return abs(start[0] - goal[0]) + abs(start[1] - goal[1])
 
-    # astar navigation
-    # sets a new target
     def set_navigation_goal(self, goal: tuple):
         start = (self.pos_x, self.pos_y)
         path = self.astar(start, goal)
