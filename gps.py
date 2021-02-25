@@ -27,7 +27,7 @@ class GPS(object):
         
         # weighted grid fro nump
         self.h_grid = np.zeros([map_width,map_length])
-        self.g_grid = np.zeros([map_width,map_length])
+        self.f_grid = np.zeros([map_width,map_length])
         self.grid_size = [map_width, map_length]
         self.resolution = resolution
         self.pos_x = start_x
@@ -41,7 +41,7 @@ class GPS(object):
         self.resolution = resolution
         self.grid_size = [len(grid), len(grid[0])]
         self.h_grid = np.array(grid)
-        self.g_grid = np.array(grid)
+        self.f_grid = np.array(grid)
 
         if start_x is None:
             self.pos_x = len(grid) // 2
@@ -112,6 +112,71 @@ class GPS(object):
     # astar navigation
     # sets a new target
 
+    def set_navigation_goal(self, goal: tuple):
+        start = (self.pos_x, self.pos_y)
+        path = self.astar(start, goal)
+        instructions = self.path_to_instruction(path)
+        #return instructions
+    
+    # attempts to convert path to insruction sets
+    def path_to_instruction(self, path):
+        
+        # maps direction to instruction
+        instruct_map = { "nn": "forward", "ne": "right", "nw": "left", "ns": "back",
+                "ee": "forward", "es": "right", "en": "left", "ew": "back",
+                "ss": "forward", "sw": "right", "se": "left", "sn": "back",
+                "ww": "forward", "wn": "right", "ws": "left", "we": "back"}
+
+        direction_map = {(1,0): "e", (-1,0):"w", (0,1):"n", (0, -1): "s"}
+
+        prev = path.popleft()
+        prev_direction = "n"
+        prev_instruction = None
+        instructions = []
+
+        while len(path) > 0:
+            curr = path.popleft()
+
+            dx = curr[0] - prev[0]
+            dy = curr[1] - prev[1]
+
+            # get new direction
+            new_direction = direction_map[(dx, dy)]
+
+            new_instruction = instruct_map[prev_direction + new_direction]
+            #instructions.append((new_instruction, 1))
+            if prev_instruction == new_instruction:
+                # merges previous instruction and last one if they go in the same direction
+                merge = (new_instruction, instructions[-1][1] + 1)
+                instructions[-1] = merge
+            else:
+                instructions.append((new_instruction, 1))
+            
+
+            prev = curr
+
+            prev_direction = new_direction
+            prev_instruction = new_instruction
+
+        print(instructions)
+        return instructions
+ 
+
+
+    # reconstructs the path 
+    def reconstructPath(self, cameFrom, goal):
+        # stack style
+        path = deque()
+        node = goal
+        path.appendleft(node)
+
+        while node in cameFrom:
+            node = cameFrom[node]
+            path.appendleft(node)
+        np.savetxt("maps/solution.out", self.f_grid, fmt='%i', delimiter=',')
+
+        return path
+
     def distBetween(self,current, neighbor):
         # since only straights
         return 10
@@ -119,9 +184,6 @@ class GPS(object):
     def heuristicEstimate(self,start,goal):
         return abs(start[0] - goal[0]) + abs(start[1] - goal[1])
 
-    def set_navigation_goal(self, goal: tuple):
-        start = (self.pos_x, self.pos_y)
-        path = self.astar(start, goal)
 
     # same goal but need new path
     def recalculate_navigation(self):
@@ -141,21 +203,6 @@ class GPS(object):
                 if self.grid[neighbor[0]][neighbor[1]] != 1: # not an obstacle
                     yield tuple(neighbor)
 
-    # reconstructs the path 
-    def reconstructPath(self,cameFrom,goal):
-        path = deque()
-        node = goal
-        path.appendleft(node)
-        while node in cameFrom:
-            node = cameFrom[node]
-            path.appendleft(node)
-            self.g_grid[node[0]][node[1]] = 4
-
-        print(path)
-        print(self.g_grid)
-        np.savetxt("maps/solution.out", self.g_grid, fmt='%i', delimiter=',')
-
-        return path
 
     # coordinates need to be stored and recieved as tuples
     def astar(self, start: tuple, goal: tuple):
@@ -167,7 +214,6 @@ class GPS(object):
         openNodes.put((0, start))
         gScore = {}
         fScore = {}
-        hScore = {}
 
         gScore[start] = 0
         fScore[start] = gScore[start] + self.heuristicEstimate(start,goal)
@@ -188,6 +234,7 @@ class GPS(object):
                     cameFrom[neighbor] = curr_pos
                     gScore[neighbor] = tentative_gScore
                     fScore[neighbor] = gScore[neighbor] + self.heuristicEstimate(neighbor,goal)
+                    self.f_grid[neighbor[0]][neighbor[1]] = fScore[neighbor]
                     openNodes.put((fScore[neighbor] ,neighbor))
 
 

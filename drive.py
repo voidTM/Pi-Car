@@ -101,8 +101,19 @@ def drive_basic():
 
 
 
-def move_left_clear():
-    pass
+def drive_target(start:tuple, target:tuple):
+
+    car_theta = 0
+    curr_distance = 0
+    nav = GPS(map_width = 50, map_length = 50, resolution = 5, start_x = 25, start_y = 0)
+
+    instructions = nag.set_navigation_goal(target)
+
+    # while not at target
+    while(len(instructions) > 0):
+        continue
+
+    
     
 
 
