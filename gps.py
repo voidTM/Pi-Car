@@ -143,7 +143,7 @@ class GPS(object):
         
             # get new direction
             new_direction = direction_map[(dx, dy)]
-            print(new_direction, (dx, dy))
+            #print(new_direction, (dx, dy))
 
             if prev_direction == new_direction:
                 prev_instruction = instructions.pop()
@@ -184,10 +184,6 @@ class GPS(object):
     def heuristicEstimate(self,start,goal):
         return abs(start[0] - goal[0]) + abs(start[1] - goal[1])
 
-
-    # same goal but need new path
-    def recalculate_navigation(self):
-        pass
 
     def find_neighbors(self, curr_p):
         #print(curr_p, type(curr_p))
