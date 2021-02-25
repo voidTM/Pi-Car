@@ -58,7 +58,6 @@ def set_input_tensor(interpreter, image):
 
 def get_output_tensor(interpreter, index):
   """Returns the output tensor at the given index."""
- # print(interpreter.get_output_details())
   output_details = interpreter.get_output_details()[index]
   tensor = np.squeeze(interpreter.get_tensor(output_details['index']))
   return tensor
@@ -112,9 +111,18 @@ def main():
   labels = load_labels(args.labels)
   interpreter = Interpreter(args.model)
   interpreter.allocate_tensors()
-  print(interpreter.get_input_details())
-  _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
+    # Get input and output tensors.
+  input_details = interpreter.get_input_details()
+  output_details = interpreter.get_output_details()
+  print(input_details)
+  print(output_details)
+    # Test the model on random input data.
+  input_shape = input_details[0]['shape']
+
+
+
+  _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
   with picamera.PiCamera(
       resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
