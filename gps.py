@@ -118,19 +118,15 @@ class GPS(object):
         instructions = self.path_to_instruction(path)
         #return instructions
     
-    # attempts to convert path to insruction sets
+    # trunctates a list of points into a path
     def path_to_instruction(self, path):
         
         # maps direction to instruction
-        instruct_map = { "nn": "forward", "ne": "right", "nw": "left", "ns": "back",
-                "ee": "forward", "es": "right", "en": "left", "ew": "back",
-                "ss": "forward", "sw": "right", "se": "left", "sn": "back",
-                "ww": "forward", "wn": "right", "ws": "left", "we": "back"}
 
         direction_map = {(1,0): "e", (-1,0):"w", (0,1):"n", (0, -1): "s"}
 
         prev = path.popleft()
-        prev_direction = "n"
+        prev_direction = None
         prev_instruction = None
         instructions = []
 
@@ -143,20 +139,18 @@ class GPS(object):
             # get new direction
             new_direction = direction_map[(dx, dy)]
 
-            new_instruction = instruct_map[prev_direction + new_direction]
-            #instructions.append((new_instruction, 1))
-            if prev_instruction == new_instruction:
-                # merges previous instruction and last one if they go in the same direction
-                merge = (new_instruction, instructions[-1][1] + 1)
+
+            
+            if prev_direction == new_direction:
+                merge = (prev_direction, instructions[-1][1] + self.resolution)
                 instructions[-1] = merge
             else:
-                instructions.append((new_instruction, 1))
+                instructions.append((prev_direction, self.resolution))
             
 
             prev = curr
 
             prev_direction = new_direction
-            prev_instruction = new_instruction
 
         print(instructions)
         return instructions
