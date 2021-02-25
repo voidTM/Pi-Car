@@ -122,8 +122,9 @@ class GPS(object):
     def path_to_instruction(self, path):
         
         # maps direction to instruction
-
-        direction_map = {(1,0): "e", (-1,0):"w", (0,1):"n", (0, -1): "s"}
+        
+        # car orientation
+        direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0):270}
 
         prev = path.popleft()
         prev_direction = None

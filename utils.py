@@ -49,6 +49,10 @@ def pol2cart(angle, dist):
     return (x, y)
 
 
+def cart2pol(x1, y1, x2, y2):
+    dx = x2 - x1
+    dy = y1 - y2
+
 
 def offsetXY(obstacleX, obstacleY, vehicleX, vehicleY, theta = -1):
     global resolution

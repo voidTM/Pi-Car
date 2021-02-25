@@ -3,12 +3,13 @@ import picar_4wd as fc
 
 import sys
 import time
+from collections import deque
 
 import scanner
+import utils
 from car import Car
 from odometer import Duodometer
-from GPS import GPS
-from collections import deque
+from gps import GPS
 
 
 
@@ -103,27 +104,41 @@ def drive_basic():
 
 
 
-def drive_target(start:tuple, target:tuple):
+def drive_target(target:tuple):
 
     car_theta = 0
     curr_distance = 0
     nav = GPS(map_width = 50, map_length = 50, resolution = 5, start_x = 25, start_y = 0)
-
+    picar = Car()
     instructions = nav.set_navigation_goal(target)
+
 
     # while not at target
     while(len(instructions) > 0):
         # convert instructions to polar
         step = instructions.popleft()
-        print(step)
-    
+        print("car orientation:", picar.orientation)
+        print("directions: ", step)
+        direction = step[0] - picar.orientation
+        
+        # change direction if needed
+        if direction > 0:
+            picar.turn_left(direction)
+        elif direction < 0:
+            picar.turn_right(abs(direction))
+
+        if step[1] >= 0:
+            picar.drive_forward(distance = step[1])
+        else:
+            picar.drive_backward(distance = abs(step[1]))
+
     
 
 
 
 if __name__ == "__main__":
     try: 
-        drive_target(start = (25,0), target = )
+        drive_target((0, 20))
 
     finally: 
         fc.get_distance_at(0)
