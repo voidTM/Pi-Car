@@ -121,6 +121,7 @@ def drive_target(target:tuple):
         print("directions: ", step)
         direction = step[0] - picar.orientation
         
+        driven = 0
         # change direction if needed
         if direction > 0:
             picar.turn_left(direction)
@@ -128,11 +129,16 @@ def drive_target(target:tuple):
             picar.turn_right(abs(direction))
 
         if step[1] >= 0:
-            picar.drive_forward(distance = step[1])
+            driven = picar.drive_forward(distance = step[1])
         else:
-            picar.drive_backward(distance = abs(step[1]))
+            driven = picar.drive_backward(distance = abs(step[1]))
 
-    
+        nav.update_postion(distance = int(driven), orientation = picar.orientation)
+        print( "nav position", nav.position)
+        if driven < step[1]:
+            print("blocked!, rerouting")
+            print(int(driven), step[1])
+            #instructions = nav.set_navigation_goal(target)
 
 
 

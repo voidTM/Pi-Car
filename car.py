@@ -122,7 +122,6 @@ class Car(object):
         self.trip_meter.reset()
         fc.forward(power)
         slippage = 2
-        print(self.trip_meter.distance, distance)
         # if no distance is defined then drive forward until blocked
         if distance == None:
             while(fc.get_status_at(0) == 2):
@@ -133,7 +132,6 @@ class Car(object):
         
         fc.stop()
         print(self.trip_meter.distance, distance)
-        print(fc.get_distance_at(0))
 
         actually_traveled = self.trip_meter.distance
 

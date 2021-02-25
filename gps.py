@@ -58,6 +58,9 @@ class GPS(object):
     def save_grid(self, filepath: str = 'maps/testmap.out'):
         np.savetxt(filepath, self.grid, fmt='%i', delimiter=',')
 
+    @property
+    def position(self):
+        return (self.pos_x, self.pos_y)
 
     # check to see if a coordinate is in map bounds
     def in_bounds(self, x: int, y: int):
@@ -79,8 +82,8 @@ class GPS(object):
     def update_postion(self, distance, orientation):
         x_dist, y_dist = utils.pol2cart(orientation, distance)
         
-        self.pos_x += x_dist
-        self.pos_y += y_dist
+        self.pos_x += (x_dist // self.resolution)
+        self.pos_y += (y_dist // self.resolution)
 
 
     # takes in an obstacles polar coordinates from car
