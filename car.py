@@ -13,7 +13,7 @@ class Car(object):
     the picar itself
     """
     
-    orientation = 0
+    orientation = 90
 
     # should ideally be a singleton class
     def __init__(self, power: int = 10):
@@ -83,6 +83,7 @@ class Car(object):
         # update 
         self.orientation += angle
         print("new car orientation", self.orientation)
+
         return self.orientation
     
     def turn_left_target(self, target, power = 5):

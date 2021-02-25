@@ -123,17 +123,20 @@ class GPS(object):
     
     # trunctates a list of points into a path
     def path_to_instruction(self, path):
-        
-        # maps direction to instruction
-        
-        # car orientation
-        direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0):270}
-        print(path)
-        prev = path.popleft()
-        prev_direction = None
 
         # use dequeue instead?
         instructions = deque()
+
+        # maps direction to instruction
+        if len(path) == 9:
+            return instructions
+        # car orientation
+        #direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0): -90}
+        direction_map = {(0,1): 90, (-1,0): 180, (0, -1): 270, (1,0): 0}
+        print(path)
+        prev = path.popleft() # empty path?
+        prev_direction = None
+
 
         while len(path) > 0:
             curr = path.popleft()
@@ -144,7 +147,9 @@ class GPS(object):
             # get new direction
             new_direction = direction_map[(dx, dy)]
             #print(new_direction, (dx, dy))
-
+            if new_direction == None:
+                print(new_direction, (dx, dy))
+            
             if prev_direction == new_direction:
                 prev_instruction = instructions.pop()
                 merge = (prev_direction, prev_instruction[1] + self.resolution)
@@ -170,11 +175,14 @@ class GPS(object):
         node = goal
         path.appendleft(node)
 
+        s_grid = np.array(self.grid)
         while node in cameFrom:
             node = cameFrom[node]
             path.appendleft(node)
-        np.savetxt("maps/solution.out", self.f_grid, fmt='%i', delimiter=',')
-
+            s_grid[node[0]][node[1]] = 7
+        np.savetxt("maps/obstacles.out", self.grid, fmt='%i', delimiter=',')
+        np.savetxt("maps/f.out", self.f_grid, fmt='%i', delimiter=',')
+        np.savetxt("maps/solution.out", s_grid, fmt='%i', delimiter=',')
         return path
 
     def distBetween(self,current, neighbor):
@@ -219,7 +227,7 @@ class GPS(object):
         while not openNodes.empty():
             curr_score, curr_pos = openNodes.get() # priority queue should pop the lowest
             if curr_pos == goal:
-                return self.reconstructPath(cameFrom, goal)
+                break
             
 
             for neighbor in self.find_neighbors(curr_pos):
@@ -236,4 +244,5 @@ class GPS(object):
                     openNodes.put((fScore[neighbor] ,neighbor))
 
 
+        return self.reconstructPath(cameFrom, goal)
 

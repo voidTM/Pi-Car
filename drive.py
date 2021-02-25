@@ -108,7 +108,7 @@ def drive_target(target:tuple):
 
     car_theta = 0
     curr_distance = 0
-    nav = GPS(map_width = 50, map_length = 50, resolution = 5, start_x = 25, start_y = 0)
+    nav = GPS(map_width = 20, map_length = 20, resolution = 5, start_x = 10, start_y = 0)
     picar = Car()
     instructions = nav.set_navigation_goal(target)
     i = 0
@@ -149,18 +149,20 @@ def drive_target(target:tuple):
             # add obstacles
             for obst in obstacles:
                 #print(obst)
-                nav.add_relative_obstacle(obst[0], obst[1])
+                abs_orient = obst[0] + picar.orientation
+                nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
             
             print("iteration:", i)
 
             # reroute
             instructions = nav.set_navigation_goal(target)
+            break
             #print(instructions)
 
 
 if __name__ == "__main__":
     try: 
-        drive_target((0, 20))
+        drive_target((0, 15))
 
     finally: 
         fc.get_distance_at(0)
