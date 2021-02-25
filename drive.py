@@ -7,6 +7,8 @@ import time
 import scanner
 from car import Car
 from odometer import Duodometer
+from GPS import GPS
+from collections import deque
 
 
 
@@ -107,12 +109,13 @@ def drive_target(start:tuple, target:tuple):
     curr_distance = 0
     nav = GPS(map_width = 50, map_length = 50, resolution = 5, start_x = 25, start_y = 0)
 
-    instructions = nag.set_navigation_goal(target)
+    instructions = nav.set_navigation_goal(target)
 
     # while not at target
     while(len(instructions) > 0):
-        continue
-
+        # convert instructions to polar
+        step = instructions.popleft()
+        print(step)
     
     
 
@@ -120,7 +123,7 @@ def drive_target(start:tuple, target:tuple):
 
 if __name__ == "__main__":
     try: 
-        drive_basic()
+        drive_target(start = (25,0), target = )
 
     finally: 
         fc.get_distance_at(0)

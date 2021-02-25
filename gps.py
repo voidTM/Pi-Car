@@ -116,7 +116,7 @@ class GPS(object):
         start = (self.pos_x, self.pos_y)
         path = self.astar(start, goal)
         instructions = self.path_to_instruction(path)
-        #return instructions
+        return instructions
     
     # trunctates a list of points into a path
     def path_to_instruction(self, path):
@@ -127,8 +127,9 @@ class GPS(object):
 
         prev = path.popleft()
         prev_direction = None
-        prev_instruction = None
-        instructions = []
+
+        # use dequeue instead?
+        instructions = deque()
 
         while len(path) > 0:
             curr = path.popleft()
@@ -142,8 +143,10 @@ class GPS(object):
 
             
             if prev_direction == new_direction:
-                merge = (prev_direction, instructions[-1][1] + self.resolution)
-                instructions[-1] = merge
+                prev_instruction = instructions.pop()
+                merge = (prev_direction, prev_instruction[1] + self.resolution)
+                instructions.append(merge)
+                #instructions[-1] = merge
             else:
                 instructions.append((prev_direction, self.resolution))
             

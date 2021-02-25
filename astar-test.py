@@ -17,6 +17,13 @@ def testempty():
 
     t = GPS()
     t.load_grid(grid, start_x = 10, start_y = 0)
-    t.set_navigation_goal((19, 10))
+    instructions = t.set_navigation_goal((19, 10))
+
+    # while not at target
+    while(len(instructions) > 0):
+        # convert instructions to polar
+        step = instructions.pop()
+        print(step)
+
 
 testempty()
