@@ -82,8 +82,8 @@ class GPS(object):
     def update_postion(self, distance, orientation):
         x_dist, y_dist = utils.pol2cart(orientation, distance)
         
-        self.pos_x += (x_dist // self.resolution)
-        self.pos_y += (y_dist // self.resolution)
+        self.pos_x += int(x_dist // self.resolution)
+        self.pos_y += int(y_dist // self.resolution)
 
 
     # takes in an obstacles polar coordinates from car
@@ -92,8 +92,8 @@ class GPS(object):
         # add in cars orientation
         obs_x, obs_y = utils.pol2cart(orientation, distance)
 
-        obs_x = (obs_x // self.resolution) + self.pos_x
-        obs_y = (obs_y // self.resolution) + self.pos_y
+        obs_x = int(obs_x // self.resolution) + self.pos_x
+        obs_y = int(obs_y // self.resolution) + self.pos_y
         self.add_obstacle(int(obs_x), int(obs_y))
 
     def add_obstacle(self, obstacle_x, obstacle_y):
@@ -104,7 +104,7 @@ class GPS(object):
         if self.in_bounds(obstacle_x, obstacle_y):
             # link with other nearby obstacles
             # add to grid
-            print("in bounds")
+            #print("in bounds")
             self.grid[obstacle_x][obstacle_y] = 1
         else:
             print("out of bounds", obstacle_x, obstacle_y)
@@ -128,7 +128,7 @@ class GPS(object):
         
         # car orientation
         direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0):270}
-
+        print(path)
         prev = path.popleft()
         prev_direction = None
 
@@ -140,12 +140,11 @@ class GPS(object):
 
             dx = curr[0] - prev[0]
             dy = curr[1] - prev[1]
-
+        
             # get new direction
             new_direction = direction_map[(dx, dy)]
+            print(new_direction, (dx, dy))
 
-
-            
             if prev_direction == new_direction:
                 prev_instruction = instructions.pop()
                 merge = (prev_direction, prev_instruction[1] + self.resolution)
@@ -191,17 +190,19 @@ class GPS(object):
         pass
 
     def find_neighbors(self, curr_p):
-        neighbors = []
+        #print(curr_p, type(curr_p))
 
+        neighbors = []
+        
         neighbors.append([curr_p[0] + 1, curr_p[1]]) #right
         neighbors.append([curr_p[0] - 1, curr_p[1]]) #left
-
         neighbors.append([curr_p[0], curr_p[1] + 1]) # above
         neighbors.append([curr_p[0], curr_p[1] - 1]) # below
 
         for neighbor in neighbors:
+            #print(neighbor, type(neighbor))
             if self.in_bounds(neighbor[0], neighbor[1]): # in bounds
-                if self.grid[neighbor[0]][neighbor[1]] != 1: # not an obstacle
+                if self.grid[int(neighbor[0])][int(neighbor[1])] != 1: # not an obstacle
                     yield tuple(neighbor)
 
 

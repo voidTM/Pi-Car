@@ -112,6 +112,7 @@ def drive_target(target:tuple):
     picar = Car()
     instructions = nav.set_navigation_goal(target)
 
+    print(instructions)
 
     # while not at target
     while(len(instructions) > 0):
@@ -135,11 +136,24 @@ def drive_target(target:tuple):
 
         nav.update_postion(distance = int(driven), orientation = picar.orientation)
         print( "nav position", nav.position)
+
+        # blocked
         if driven < step[1]:
             print("blocked!, rerouting")
             print(int(driven), step[1])
-            #instructions = nav.set_navigation_goal(target)
+            # scan for obstacles
+            obstacles = scanner.mapping_scan()
+            print(obstacles)
+            # add obstacles
+            for obst in obstacles:
+                #print(obst)
+                nav.add_relative_obstacle(obst[0], obst[1])
+            
 
+            # reroute
+            instructions = nav.set_navigation_goal(target)
+            #print(instructions)
+            break
 
 
 if __name__ == "__main__":
