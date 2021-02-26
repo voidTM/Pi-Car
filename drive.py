@@ -126,9 +126,9 @@ def drive_target(target:tuple):
         driven = 0
         # change direction if needed
         if direction > 0:
-            picar.turn_left(direction)
+            picar.turn_right(direction)
         elif direction < 0:
-            picar.turn_right(abs(direction))
+            picar.turn_left(abs(direction))
 
         if step[1] >= 0:
             driven = picar.drive_forward(distance = step[1])

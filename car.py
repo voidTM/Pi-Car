@@ -41,7 +41,7 @@ class Car(object):
         
         fc.stop()
 
-        self.orientation -= angle
+        self.orientation += angle
         print("new car orientation", self.orientation)
 
         return self.orientation
@@ -59,7 +59,7 @@ class Car(object):
         # netagive angle for right turn
         angle = dist_to_angle(distance_turned)
 
-        self.orientation -= angle
+        self.orientation += angle
         print("angle turned", angle)
         print("new car orientation", self.orientation)
 
@@ -81,7 +81,7 @@ class Car(object):
         fc.stop()
 
         # update 
-        self.orientation += angle
+        self.orientation -= angle
         print("new car orientation", self.orientation)
 
         return self.orientation
@@ -100,7 +100,7 @@ class Car(object):
         # netagive angle for right turn
         angle = dist_to_angle(distance_turned)
 
-        self.orientation += angle
+        self.orientation -= angle
         print("new car orientation", self.orientation)
 
         return self.orientation

@@ -132,8 +132,8 @@ class GPS(object):
         if len(path) == 9:
             return instructions
         # car orientation
-        direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0): -90}
-        #direction_map = {(0,1): 90, (-1,0): 180, (0, -1): 270, (1,0): 0}
+        #direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0): -90}
+        direction_map = {(0,1): 0, (-1,0): -90, (0, -1): 180, (1,0): 90}
         print(path)
         prev = path.popleft() # empty path?
         prev_direction = None
@@ -148,16 +148,16 @@ class GPS(object):
             # get new direction
             new_direction = direction_map[(dx, dy)]
             #print(new_direction, (dx, dy))
-            if new_direction == None:
-                print(new_direction, (dx, dy))
+            if prev_direction == None:
+                print(prev_direction, new_direction, (dx, dy))
             
             if prev_direction == new_direction:
                 prev_instruction = instructions.pop()
-                merge = (prev_direction, prev_instruction[1] + self.resolution)
+                merge = (new_direction, prev_instruction[1] + self.resolution)
                 instructions.append(merge)
                 #instructions[-1] = merge
             else:
-                instructions.append((prev_direction, self.resolution))
+                instructions.append((new_direction, self.resolution))
             
 
             prev = curr
