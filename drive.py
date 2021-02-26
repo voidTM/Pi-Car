@@ -156,7 +156,6 @@ def drive_target(target:tuple):
 
             # reroute
             instructions = nav.set_navigation_goal(target)
-            break
             #print(instructions)
 
 
