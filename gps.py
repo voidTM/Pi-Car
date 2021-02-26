@@ -157,7 +157,7 @@ class GPS(object):
                 instructions.append(merge)
                 #instructions[-1] = merge
             else:
-                instructions.append((new_direction, self.resolution))
+                instructions.append((new_direction, self.resolution + 20))
             
 
             prev = curr
