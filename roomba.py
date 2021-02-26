@@ -90,12 +90,14 @@ def drive(speed = 30):
         if not blocked:
             blocked = True
 
-        if direction  == -1:
+        if direction  == 1:
             print("turning left")
             fc.turn_left(10)
-        elif direction  == 1:
+            break
+        elif direction  == -1:
             print("turning right")
             fc.turn_right(10)
+            break
         else:
             while(fc.get_distance_at(0) < 40):
                 fc.backward(2)
@@ -183,4 +185,5 @@ if __name__ == "__main__":
         drive()
     finally: 
         fc.get_distance_at(0)
+        time.sleep(3)
         fc.stop()
