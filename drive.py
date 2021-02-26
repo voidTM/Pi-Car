@@ -108,7 +108,7 @@ def drive_target(target:tuple):
 
     car_theta = 0
     curr_distance = 0
-    nav = GPS(map_width = 20, map_length = 20, resolution = 5, start_x = 10, start_y = 0)
+    nav = GPS(map_width = 20, map_length = 20, resolution = 10, start_x = 10, start_y = 0)
     picar = Car()
     instructions = nav.set_navigation_goal(target)
     i = 0
@@ -142,7 +142,7 @@ def drive_target(target:tuple):
         if driven < step[1]:
             i += 1
             print("blocked!, rerouting")
-            print(int(driven), step[1])
+            #print(int(driven), step[1])
             # scan for obstacles
             obstacles = scanner.mapping_scan()
             print(obstacles)

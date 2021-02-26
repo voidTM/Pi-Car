@@ -13,7 +13,7 @@ class Car(object):
     the picar itself
     """
     
-    orientation = 90
+    orientation = 0
 
     # should ideally be a singleton class
     def __init__(self, power: int = 10):

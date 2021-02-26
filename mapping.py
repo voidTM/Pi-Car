@@ -103,15 +103,15 @@ def map_n_drive():
 
     car_theta = 0
     curr_distance = 0
-    grid = GPS(map_width = 20, map_length = 20, start_x = 10, start_y = 0)
+    grid = GPS(map_width = 10, map_length = 10, start_x = 5, start_y = 0, resolution = 10)
 
     for i in range(0, 1):
         currObstacles = scanner.mapping_scan()
 
 
         for obstacle in currObstacles:
-            print(obstacle)
-            grid.add_relative_obstacle(obstacle[0], obstacle[1])
+            angle = obstacle[0] + 90
+            grid.add_relative_obstacle(angle, obstacle[1])
 
     
     grid.save_grid('maps/minimap.out')

@@ -94,6 +94,7 @@ class GPS(object):
 
         obs_x = int(obs_x // self.resolution) + self.pos_x
         obs_y = int(obs_y // self.resolution) + self.pos_y
+
         self.add_obstacle(int(obs_x), int(obs_y))
 
     def add_obstacle(self, obstacle_x, obstacle_y):
@@ -131,8 +132,8 @@ class GPS(object):
         if len(path) == 9:
             return instructions
         # car orientation
-        #direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0): -90}
-        direction_map = {(0,1): 90, (-1,0): 180, (0, -1): 270, (1,0): 0}
+        direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0): -90}
+        #direction_map = {(0,1): 90, (-1,0): 180, (0, -1): 270, (1,0): 0}
         print(path)
         prev = path.popleft() # empty path?
         prev_direction = None
