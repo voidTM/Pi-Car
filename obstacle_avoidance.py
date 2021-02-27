@@ -1,5 +1,5 @@
 import time, math
-import threading
+import threading, queue
 import picar_4wd as fc
 
 import sys
@@ -8,7 +8,20 @@ import termios
 import asyncio
 import time
 
-# 20 should be the minimum distance
+
+obstacles = queue.Queue()
+
+def stopper():
+    time.sleep(1)
+    for i in range(10):
+        obstacles.put(i)
+        time.sleep(4)
+
+
+def obstacle_ahead():
+    x = obstacles.get()
+    return x
+
 
 def drive():
     speed = 2
@@ -17,6 +30,12 @@ def drive():
     blocked = False
 
     while True:
+        
+        if obstacle_ahead():
+            fc.stop()
+            time.sleep(2)
+            continue
+
         scan_list = fc.scan_step(scan_dist)
         if not scan_list:
             continue
@@ -29,7 +48,6 @@ def drive():
             
             fc.turn_right(speed)
         else:
-            time.sleep(10)
             scan_dist = 20
             speed = 30
             fc.forward(speed)
