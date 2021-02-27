@@ -16,8 +16,6 @@ car_pos = np.array([100,100])
 # -1 for unknown
 # 0 for clear
 # 1 for obstacle
-bit_map = np.full((20, 20), 0, dtype = int)
-
 
 
 # finds the relative locations of an object
@@ -98,32 +96,4 @@ def nearby_points(grid, obs_x, obs_y):
                 continue
 
     return nearby
-
-def map_n_drive():
-
-    car_theta = 0
-    curr_distance = 0
-    grid = GPS(map_width = 10, map_length = 10, start_x = 5, start_y = 0, resolution = 10)
-
-    for i in range(0, 1):
-        currObstacles = scanner.mapping_scan()
-
-
-        for obstacle in currObstacles:
-            angle = obstacle[0] + 90
-            grid.add_relative_obstacle(angle, obstacle[1])
-
-    
-    grid.save_grid('maps/minimap.out')
-
-
-if __name__ == "__main__":
-    try: 
-        
-        map_n_drive()
-
-
-    finally: 
-        fc.get_distance_at(0)
-        fc.stop()
 

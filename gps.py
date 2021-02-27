@@ -15,10 +15,6 @@ class GPS(object):
     """
     Keeps track of a cars position and orientation on a grid/map
     """
-    goal = None
-    # list of obstacles
-    obstacles = []
-
 
     # starts with an empty grid
     def __init__(self, map_width: int = 200, map_length: int = 200, resolution: int = 5, start_x: int = 100, start_y: int = 100):
@@ -86,6 +82,15 @@ class GPS(object):
         self.pos_y += int(y_dist // self.resolution)
 
 
+    def add_point(self, x:int, y: int, value: int = 1):
+        success = False
+        if self.in_bounds(obstacle_x, obstacle_y):
+            self.grid{x}[y] = value
+            success = True
+        
+        return success
+        
+
     # takes in an obstacles polar coordinates from car
     def add_relative_obstacle(self, orientation, distance):
         
@@ -97,18 +102,17 @@ class GPS(object):
 
         self.add_obstacle(int(obs_x), int(obs_y))
 
-    def add_obstacle(self, obstacle_x, obstacle_y):
+    def add_obstacle(self, obstacle_x: int, obstacle_y: int):
         
-        # look for nearby obstacles
-        self.obstacles.append([obstacle_x, obstacle_y])
+        # look for nearby points
 
-        if self.in_bounds(obstacle_x, obstacle_y):
-            # link with other nearby obstacles
-            # add to grid
-            #print("in bounds")
-            self.grid[obstacle_x][obstacle_y] = 1
-        else:
-            print("out of bounds", obstacle_x, obstacle_y)
+        # add buffer
+        
+        self.add_point(obstacle_x, obstacle_y, 1)
+        self.add_point(obstacle_x, obstacle_y + 1, 1)
+        self.add_point(obstacle_x, obstacle_y - 1, 1)
+        self.add_point(obstacle_x + 1, obstacle_y, 1)
+        self.add_point(obstacle_x - 1, obstacle_y, 1)
 
 
 
@@ -157,7 +161,8 @@ class GPS(object):
                 instructions.append(merge)
                 #instructions[-1] = merge
             else:
-                instructions.append((new_direction, self.resolution + 20))
+                # need buffer?
+                instructions.append((new_direction, self.resolution))
             
 
             prev = curr

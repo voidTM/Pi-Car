@@ -93,17 +93,8 @@ def drive_dist(speed = 30, distance= 40, theta = 0):
     return theta, trip.distance
 
 
-def drive_basic():
-    picar = Car()
 
-    picar.turn_right(90)
-    picar.turn_left(90)
-    picar.forward(10)
-    picar.backward(10)
-
-
-
-
+# drives toward a certain target
 def drive_target(target:tuple):
 
     car_theta = 0
@@ -119,7 +110,6 @@ def drive_target(target:tuple):
     while(len(instructions) > 0):
         # convert instructions to polar
         step = instructions.popleft()
-        print("car orientation:", picar.orientation)
         print("directions: ", step)
         direction = step[0] - picar.orientation
         
@@ -159,9 +149,50 @@ def drive_target(target:tuple):
             #print(instructions)
 
 
+def drive_instructions(picar: Car, nav:GPS, instructions:deque):
+
+    while(len(instructions) > 0):
+        # convert instructions to polar
+        step = instructions.popleft()
+        print("directions: ", step)
+        direction = step[0] - picar.orientation
+        
+        driven = 0
+        # change direction if needed
+        if direction > 0:
+            picar.turn_right(direction)
+        elif direction < 0:
+            picar.turn_left(abs(direction))
+
+        if step[1] >= 0:
+            driven = picar.drive_forward(distance = step[1])
+        else:
+            driven = picar.drive_backward(distance = abs(step[1]))
+
+        nav.update_postion(distance = int(driven), orientation = picar.orientation)
+        print( "nav position", nav.position)
+
+        # if blocked rerout
+        if driven < step[1]:
+            i += 1
+            print("blocked!")
+            print("remaining instructions:", instructions)
+            
+            return
+
+def turn_test():
+
+    picar = Car()
+    for i in range(0,10):
+        piccar.turn_left(90)
+        time.sleep(1)
+        piccar.turn_right(90)
+        time.sleep(1)
+
+    
 if __name__ == "__main__":
     try: 
-        drive_target((0, 15))
+        drive_target((0, 10))
 
     finally: 
         fc.get_distance_at(0)

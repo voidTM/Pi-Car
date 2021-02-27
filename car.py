@@ -30,7 +30,7 @@ class Car(object):
     # right turns
     def turn_right(self, angle, power = 5):
         # need to adjust slippage for turning
-        slippage = 2
+        slippage = 2.2
         dist = utils.angle_to_dist(angle) * slippage
 
 
