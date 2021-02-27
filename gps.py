@@ -84,7 +84,7 @@ class GPS(object):
 
     def add_point(self, x:int, y: int, value: int = 1):
         success = False
-        if self.in_bounds(obstacle_x, obstacle_y):
+        if self.in_bounds(x, y):
             self.grid[x][y] = value
             success = True
         
@@ -103,12 +103,13 @@ class GPS(object):
         self.add_obstacle(int(obs_x), int(obs_y))
 
     def add_obstacle(self, obstacle_x: int, obstacle_y: int):
-        
+
+        # add point
+        self.add_point(obstacle_x, obstacle_y, 1)
+
         # look for nearby points
 
         # add buffer
-        
-        self.add_point(obstacle_x, obstacle_y, 1)
         self.add_point(obstacle_x, obstacle_y + 1, 1)
         self.add_point(obstacle_x, obstacle_y - 1, 1)
         self.add_point(obstacle_x + 1, obstacle_y, 1)
@@ -137,7 +138,7 @@ class GPS(object):
             return instructions
         # car orientation
         #direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0): -90}
-        direction_map = {(0,1): 0, (-1,0): -90, (0, -1): 180, (1,0): 90}
+        direction_map = {(0,1): 0, (-1,0): 270, (0, -1): 180, (1,0): 90}
         print(path)
         prev = path.popleft() # empty path?
         prev_direction = None

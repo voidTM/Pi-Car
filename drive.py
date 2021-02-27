@@ -111,11 +111,16 @@ def drive_target(target:tuple):
         # convert instructions to polar
         step = instructions.popleft()
         print("directions: ", step)
+                
         direction = step[0] - picar.orientation
+        direction = (direction + 180) % 360 - 180
+        print("turning angle", direction)
+
+        #direction = step[0] - picar.orientation
         
         driven = 0
         # change direction if needed
-        if direction > 0:
+        if direction > 0: 
             picar.turn_right(direction)
         elif direction < 0:
             picar.turn_left(abs(direction))
@@ -178,7 +183,9 @@ def drive_instructions(picar: Car, nav:GPS, instructions:deque):
             print("blocked!")
             print("remaining instructions:", instructions)
             
-            return
+            return False
+
+    return True
 
 def turn_test():
 
@@ -192,8 +199,9 @@ def turn_test():
     
 if __name__ == "__main__":
     try: 
-        #drive_target((0, 10))
-        turn_test()
+        
+        drive_target((0, 10))
+        #turn_test()
     finally: 
         fc.get_distance_at(0)
         fc.stop()
