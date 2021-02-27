@@ -12,10 +12,10 @@ import time
 obstacles = queue.Queue()
 
 def stopper():
-    time.sleep(1)
+    #time.sleep(1)
     for i in range(10):
         obstacles.put(i)
-        time.sleep(5)
+        time.sleep(10)
 
 
 def obstacle_ahead():
