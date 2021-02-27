@@ -2,9 +2,12 @@ import time, math
 import picar_4wd as fc
 
 import sys
-import time
+import threading
+import signal
 from collections import deque
 
+
+# self defined
 import scanner
 import utils
 from car import Car
