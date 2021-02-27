@@ -28,7 +28,7 @@ class Car(object):
         
 
     # right turns
-    def turn_right(self, angle, power = 5):
+    def turn_right(self, angle, power = 10):
         # need to adjust slippage for turning
         slippage = 2.2
         dist = utils.angle_to_dist(angle) * slippage
@@ -47,7 +47,7 @@ class Car(object):
         return self.orientation
         
     def turn_right_target(self, target, power = 5):
-        slippage = 2.6
+        slippage = 2.2
         self.trip_meter.start()
         fc.turn_right(power)
         while(fc.get_distance_at(0) < target):
@@ -67,10 +67,11 @@ class Car(object):
 
 
     # left turns
-    def turn_left(self, angle, power = 5):
+    def turn_left(self, angle, power = 10):
         # need to adjust slippage for turning
 
-        slippage = 2 #1.74
+        slippage = 1.95 #1.74
+        #siippage = 1.95
         dist = utils.angle_to_dist(angle) * slippage
         self.trip_meter.reset()
 
@@ -88,7 +89,7 @@ class Car(object):
     
     def turn_left_target(self, target, power = 5):
         # need to adjust slippage for turning
-        slippage = 2 
+        slippage = 2
 
         self.trip_meter.reset()
         fc.turn_left(power)
@@ -154,7 +155,7 @@ class Car(object):
 
 
 # turns towards its target
-
+# unused
 def turn_target(scanned_distances):
     mid = len(scanned_distances) // 2
 

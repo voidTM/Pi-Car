@@ -85,7 +85,7 @@ class GPS(object):
     def add_point(self, x:int, y: int, value: int = 1):
         success = False
         if self.in_bounds(obstacle_x, obstacle_y):
-            self.grid{x}[y] = value
+            self.grid[x][y] = value
             success = True
         
         return success

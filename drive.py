@@ -184,16 +184,16 @@ def turn_test():
 
     picar = Car()
     for i in range(0,10):
-        piccar.turn_left(90)
+        picar.turn_left(90)
         time.sleep(1)
-        piccar.turn_right(90)
+        picar.turn_right(90)
         time.sleep(1)
 
     
 if __name__ == "__main__":
     try: 
-        drive_target((0, 10))
-
+        #drive_target((0, 10))
+        turn_test()
     finally: 
         fc.get_distance_at(0)
         fc.stop()
