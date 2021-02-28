@@ -1,5 +1,6 @@
 import time, math
 import threading, queue
+
 import picar_4wd as fc
 
 import sys
@@ -8,20 +9,9 @@ import termios
 import asyncio
 import time
 
+import detect_picamera as picam
 
 obstacles = queue.Queue()
-
-def stopper():
-    #time.sleep(1)
-    for i in range(10):
-        obstacles.put(i)
-        time.sleep(10)
-
-
-def obstacle_ahead():
-    x = obstacles.get()
-    return x
-
 
 def drive():
     speed = 2
@@ -59,9 +49,10 @@ def drive():
 
 if __name__ == "__main__":
     try: 
-        threading.Thread(target=stopper, daemon=True).start()
+        threading.Thread(target=picam.main_camera,args=(obstacles,), daemon=True).start()
+        #threading.Thread(target=drive, daemon=True).start()
         drive()
-        obstacles.join()
     finally: 
+        obstacles.join()
         fc.get_distance_at(0)
         fc.stop()

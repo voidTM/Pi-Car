@@ -102,12 +102,28 @@ def drive_target(target:tuple):
 
     car_theta = 0
     curr_distance = 0
-    nav = GPS(map_width = 20, map_length = 20, resolution = 10, start_x = 10, start_y = 0)
+    nav = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
     picar = Car()
-    instructions = nav.set_navigation_goal(target)
-    i = 0
-    print("iteration:", i)
-    print(instructions)
+    
+    at_destination = False
+
+    while(not at_destination):
+
+        print("blocked!, rerouting")
+        # scan for obstacles
+        obstacles = scanner.mapping_scan()
+        print(obstacles)
+        for obst in obstacles:
+            abs_orient = obst[0] + picar.orientation
+            nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
+            
+        instructions = nav.set_navigation_goal(target)
+        
+        at_destination = drive_instructions(picar, nav, instructions)
+        
+
+# drive according to instructions until blocked or finished
+def drive_instructions(picar: Car, nav:GPS, instructions:deque):
 
     # while not at target
     while(len(instructions) > 0):
@@ -117,9 +133,8 @@ def drive_target(target:tuple):
                 
         direction = step[0] - picar.orientation
         direction = (direction + 180) % 360 - 180
-        print("turning angle", direction)
+        #print("turning angle", direction)
 
-        #direction = step[0] - picar.orientation
         
         driven = 0
         # change direction if needed
@@ -134,58 +149,10 @@ def drive_target(target:tuple):
             driven = picar.drive_backward(distance = abs(step[1]))
 
         nav.update_postion(distance = int(driven), orientation = picar.orientation)
-        print( "nav position", nav.position)
+        print( "curr position", nav.position)
 
         # if blocked rerout
         if driven < step[1]:
-            i += 1
-            print("blocked!, rerouting")
-            #print(int(driven), step[1])
-            # scan for obstacles
-            obstacles = scanner.mapping_scan()
-            print(obstacles)
-            # add obstacles
-            for obst in obstacles:
-                #print(obst)
-                abs_orient = obst[0] + picar.orientation
-                nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
-            
-            print("iteration:", i)
-
-            # reroute
-            instructions = nav.set_navigation_goal(target)
-            #print(instructions)
-
-
-def drive_instructions(picar: Car, nav:GPS, instructions:deque):
-
-    while(len(instructions) > 0):
-        # convert instructions to polar
-        step = instructions.popleft()
-        print("directions: ", step)
-        direction = step[0] - picar.orientation
-        
-        driven = 0
-        # change direction if needed
-        if direction > 0:
-            picar.turn_right(direction)
-        elif direction < 0:
-            picar.turn_left(abs(direction))
-
-        if step[1] >= 0:
-            driven = picar.drive_forward(distance = step[1])
-        else:
-            driven = picar.drive_backward(distance = abs(step[1]))
-
-        nav.update_postion(distance = int(driven), orientation = picar.orientation)
-        print( "nav position", nav.position)
-
-        # if blocked rerout
-        if driven < step[1]:
-            i += 1
-            print("blocked!")
-            print("remaining instructions:", instructions)
-            
             return False
 
     return True
