@@ -22,8 +22,6 @@ class GPS(object):
         self.grid = np.full((map_width, map_length), 0, dtype = int)
         
         # weighted grid fro nump
-        self.h_grid = np.zeros([map_width,map_length])
-        self.f_grid = np.zeros([map_width,map_length])
         self.grid_size = [map_width, map_length]
         self.resolution = resolution
         self.pos_x = start_x
@@ -36,8 +34,6 @@ class GPS(object):
         self.grid = grid
         self.resolution = resolution
         self.grid_size = [len(grid), len(grid[0])]
-        self.h_grid = np.array(grid)
-        self.f_grid = np.array(grid)
 
         if start_x is None:
             self.pos_x = len(grid) // 2
@@ -188,7 +184,6 @@ class GPS(object):
 
         s_grid[self.pos_x][self.pos_y] = 9
         np.savetxt("maps/obstacles.out", self.grid, fmt='%i', delimiter=',')
-        np.savetxt("maps/f.out", self.f_grid, fmt='%i', delimiter=',')
         np.savetxt("maps/solution.out", s_grid, fmt='%i', delimiter=',')
         return path
 
@@ -247,7 +242,6 @@ class GPS(object):
                     cameFrom[neighbor] = curr_pos
                     gScore[neighbor] = tentative_gScore
                     fScore[neighbor] = gScore[neighbor] + self.heuristicEstimate(neighbor,goal)
-                    self.f_grid[neighbor[0]][neighbor[1]] = fScore[neighbor]
                     openNodes.put((fScore[neighbor] ,neighbor))
 
 
