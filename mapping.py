@@ -17,6 +17,8 @@ car_pos = np.array([100,100])
 # 0 for clear
 # 1 for obstacle
 
+# need to merge into  gps and scanner
+
 
 # finds the relative locations of an object
 # and returns a numpy array of coordinates

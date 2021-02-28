@@ -129,7 +129,7 @@ class Car(object):
             while(fc.get_status_at(0) == 2):
                 continue
         else:
-            while(self.trip_meter.distance < distance and fc.get_status_at(0) > 0):
+            while(self.trip_meter.distance < distance and fc.get_status_at(0, 20) == 2):
                 continue
         
         fc.stop()

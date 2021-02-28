@@ -31,6 +31,8 @@ from PIL import Image
 # v2.5
 from tflite_runtime.interpreter import Interpreter
 
+from queue import Queue
+
 CAMERA_WIDTH = 640
 CAMERA_HEIGHT = 480
 
@@ -88,12 +90,18 @@ def detect_objects(interpreter, image, threshold):
 
 def annotate_objects( results, labels):
   """Draws the bounding box and label for each object in the results."""
+  relevant = []
   for obj in results:
-      print(labels[obj['class_id']], obj['score'])
+      #print(labels[obj['class_id']], obj['score'])
+      if labels[obj['class_id']] == "person":
+        relevant.append("person")
+      elif labels[obj['class_id']] == "stop sign":
+        relevant.append("stop sign")
+  
+  return relevant
 
-
-def main():
-
+def main_camera(obstacle_queue: Queue):
+  """
   parser = argparse.ArgumentParser(
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument(
@@ -110,6 +118,9 @@ def main():
 
   labels = load_labels(args.labels)
   interpreter = Interpreter(args.model)
+  """
+  labels = load_labels("/tmp/coco_labels.txt")
+  interpreter = Interpreter("/tmp/detect.tflite")
   interpreter.allocate_tensors()
 
     # Get input and output tensors.
@@ -136,16 +147,23 @@ def main():
             (input_width, input_height), Image.ANTIALIAS)
         start_time = time.monotonic()
         # detects th objects
-        results = detect_objects(interpreter, image, args.threshold)
+
+        #results = detect_objects(interpreter, image, args.threshold)
+        results = detect_objects(interpreter, image, 0.5)
+
         elapsed_ms = (time.monotonic() - start_time) * 1000
 
-        annotate_objects(results, labels)
+        useful = annotate_objects(results, labels)
+        [obstacle_queue.put(i) for i in useful]
+        print(useful)
+
         stream.seek(0)
         stream.truncate()
 
     finally:
       camera.stop_preview()
 
-
+"""
 if __name__ == '__main__':
-  main()
+  main_camera()
+"""

@@ -5,6 +5,7 @@ import threading
 import picar_4wd as fc
 import numpy as np
 
+# everything related to scanning
 
 ANGLE_RANGE = 180
 STEP = 18
