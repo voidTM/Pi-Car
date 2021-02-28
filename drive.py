@@ -76,25 +76,35 @@ def roomba(speed:int = 10):
 
                 fc.backward(2)
 
+# drives forward until blocked
 def drive_n_stop(speed: int = 10):
     clear = True
+    fc.forward(speed)
     while clear:
+        scan_list = fc.scan_step()
+        if not scan_list:
+            continue
+
+        ahead = scan_list[2:8]
+        # coast clear full speed ahead        
+        if min(ahead) < 2:
+            #print("Coast Clear")
+            clear = False
+            fc.stop()
 
 
 
 # drives toward a certain target on a grid
-def drive_target(target:tuple):
+def drive_target(nav: GPS,  target: tuple):
 
     car_theta = 0
     curr_distance = 0
-    nav = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
     picar = Car()
     
     at_destination = False
 
     while(not at_destination):
 
-        print("blocked!, rerouting")
         # scan for obstacles
         obstacles = scanner.mapping_scan()
         print(obstacles)
@@ -149,8 +159,13 @@ def drive_instructions2(picar: Car, nav:GPS, instructions:deque, obstacles: Queu
 
 if __name__ == "__main__":
     try: 
-        roomba()
-        #drive_target((0, 10))
+        #roomba()
+        #nav1 = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
+        nav2 = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
+        nav3 = GPS(map_width = 30, map_length = 50, resolution = 5, start_x = 15, start_y = 0)
+
+        target = (10, 40)
+        drive_target(nav3, target)
         #turn_test()
     finally: 
         fc.get_distance_at(0)

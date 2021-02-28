@@ -31,7 +31,7 @@ class Car(object):
     # right turns
     def turn_right(self, angle: int, power: int = 5):
         # need to adjust slippage for turning
-        slippage = 2.1
+        slippage = 2.2 
         dist = utils.angle_to_dist(angle) * slippage
 
 
@@ -48,7 +48,7 @@ class Car(object):
         return self.orientation
         
     def turn_right_target(self, target: float, power: int = 5):
-        slippage = 2.1
+        slippage = 2.2
         self.trip_meter.start()
         fc.turn_right(power)
         while(fc.get_distance_at(0) < target):
