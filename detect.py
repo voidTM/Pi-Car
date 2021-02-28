@@ -89,10 +89,21 @@ def detect_objects(interpreter, image, threshold):
 def annotate_objects( results, labels):
   """Draws the bounding box and label for each object in the results."""
   
+  stop = ["person", "stop sign", "bicycle", "car", "motorcycle", "bus", "train", "truck", "traffic light"]
+  turn_left = [""]
+  turn_right = []
+  slow = []
   traffic_objects = [""]
   relevant = []
   for obj in results:
       
+      if labels[obj['class_id']] in stop:
+        relevant.append((labels[obj['class_id']], "stop"))
+      elif: labels[obj['class_id']] in turn_left:
+        relevant.append(())
+      elif: labels[obj['class_id']] in turn_left:
+      elif: labels[obj['class_id']] in turn_left:
+
       """
       if labels[obj['class_id']] == "person":
         relevant.append("person")
@@ -101,7 +112,7 @@ def annotate_objects( results, labels):
       """
   return relevant
 
-def s(obstacle_queue: Queue):
+def look_for_objects(obstacle_queue: Queue):
 
   labels = load_labels("picam/Object-detection/Model/coco_labels.txt")
   interpreter = Interpreter("picam/Object-detection/Model/detect.tflite")
@@ -139,7 +150,6 @@ def s(obstacle_queue: Queue):
 
         useful = annotate_objects(results, labels)
         [obstacle_queue.put(i) for i in useful]
-        print(useful)
 
         stream.seek(0)
         stream.truncate()

@@ -9,7 +9,7 @@ import termios
 import asyncio
 import time
 
-import detect_picamera as picam
+import detect as picam
 
 q = queue.Queue()
 
@@ -51,7 +51,6 @@ def drive(obstacles: queue.Queue):
 if __name__ == "__main__":
     try: 
         #threading.Thread(target=picam.main_camera,args=(q,), daemon=True).start()
-        #threading.Thread(target=stopper, args=(obstacles,), daemon=True).start()
         drive(q)
     finally: 
         q.join()

@@ -98,19 +98,13 @@ class PiCam(object):
       input_tensor[:, :] = image
 
 
-    def get_output_tensor(interpreter, index):
+    def get_output_tensor(self, interpreter, index):
       """Returns the output tensor at the given index."""
       output_details = interpreter.get_output_details()[index]
       tensor = np.squeeze(interpreter.get_tensor(output_details['index']))
       return tensor
 
-        def snapshot(self):
-            with picamera.PiCamera(
-            resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
-                
-            finally:
-                camera.close()
-
+    def stream_objects()
 
 
 
@@ -126,7 +120,3 @@ def load_labels(path):
       else:
         labels[row_number] = pair[0].strip()
   return labels
-
-
-
-
