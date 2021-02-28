@@ -71,9 +71,7 @@ def scan_step_dist():
     scan_dist.append(dist)
     if current_angle == MIN_ANGLE or current_angle == MAX_ANGLE:
         if us_step < 0:
-            # print("reverse")
             scan_dist.reverse()
-        # print(scan_list)
         tmp = scan_dist.copy()
         scan_dist = []
         return tmp

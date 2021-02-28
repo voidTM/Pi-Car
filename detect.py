@@ -89,10 +89,10 @@ def detect_objects(interpreter, image, threshold):
 def annotate_objects( results, labels):
   """Draws the bounding box and label for each object in the results."""
   
-  stop = ["person", "stop sign", "bicycle", "car", "motorcycle", "bus", "train", "truck", "traffic light"]
-  turn_left = [""]
-  turn_right = []
-  slow = []
+  stop = ["person", "stop sign","bus", "train", "truck"]
+  turn_left = ["bottle", "wine glass", "cup"]
+  turn_right = ["orange", "apple", "banana"]
+  rerout = ["bicycle", "car", "motorcycle" ]
   relevant = []
   for obj in results:
       
@@ -102,16 +102,8 @@ def annotate_objects( results, labels):
         relevant.append((labels[obj['class_id']], "turn_left"))
       elif labels[obj['class_id']] in turn_right:
         relevant.append((labels[obj['class_id']], "turn_right"))
-      elif labels[obj['class_id']] in slow:
-        relevant.append((labels[obj['class_id']], "slow"))
 
 
-      """
-      if labels[obj['class_id']] == "person":
-        relevant.append("person")
-      elif labels[obj['class_id']] == "stop sign":
-        relevant.append("stop sign")
-      """
   return relevant
 
 def look_for_objects(obstacle_queue: Queue):

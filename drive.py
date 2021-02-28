@@ -19,7 +19,7 @@ import detect as picam
 
 
 # drives around without any mapping, but has basic obstacle avoidance
-def roomba(speed = 10):
+def roomba(speed:int = 10):
 
     while True:
         
@@ -32,8 +32,7 @@ def roomba(speed = 10):
         scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
 
 
-        ahead = scan_list[3:7]
-
+        ahead = scan_list[2:8]
         # coast clear full speed ahead        
         if min(ahead) > 35:
             #print("Coast Clear")
@@ -57,27 +56,31 @@ def roomba(speed = 10):
         # turns in the direction with the most open space
 
         if(sum(right) > sum(left)):
-            direction = -1
-        elif(sum(right) < sum(left)):
             direction = 1
-        else:
-            direction = 0
+        elif(sum(right) < sum(left)):
+            direction = -1
 
-        
-        print(sum(left), sum(right))
-        print ( direction)
+        print(left, right)
+        #print(sum(left), sum(right))
+        #print ( direction)
 
         if direction  == 1:
             print("Turning right")
             fc.turn_right(10)
         elif direction  == -1:
-            print("Turning Right")
+            print("Turning left")
             fc.turn_left(10)
         else:
             while(fc.get_distance_at(0) < 30):
                 logging.info("too close backing up")
 
                 fc.backward(2)
+
+def drive_n_stop(speed: int = 10):
+    clear = True
+    while clear:
+
+
 
 # drives toward a certain target on a grid
 def drive_target(target:tuple):
