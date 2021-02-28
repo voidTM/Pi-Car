@@ -33,7 +33,8 @@ import cv2
 
 CAMERA_WIDTH = 1280 #640
 CAMERA_HEIGHT = 720 #480
-
+#CAMERA_WIDTH = 640 #640
+#CAMERA_HEIGHT = 480 #480
 
 def load_labels(path):
   """Loads the labels file. Supports files with or without index numbers."""
@@ -100,96 +101,8 @@ def annotate_objects( results, labels):
       """
   return relevant
 
-def main_camera(obstacle_queue: Queue):
-  
-  parser = argparse.ArgumentParser(
-      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-  parser.add_argument(
-      '--model', help='File path of .tflite file.', required=True)
-  parser.add_argument(
-      '--labels', help='File path of labels file.', required=True)
-  parser.add_argument(
-      '--threshold',
-      help='Score threshold for detected objects.',
-      required=False,
-      type=float,
-      default=0.5)
-  args = parser.parse_args()
-
-  labels = load_labels(args.labels)
-  interpreter = Interpreter(args.model)
-  
-  """
-  labels = load_labels("/tmp/coco_labels.txt")
-  interpreter = Interpreter("/tmp/detect.tflite")
-
-  """
-  interpreter.allocate_tensors()
-
-    # Get input and output tensors.
-  input_details = interpreter.get_input_details()
-  output_details = interpreter.get_output_details()
-  print(input_details)
-  print(output_details)
-    # Test the model on random input data.
-  input_shape = input_details[0]['shape']
-
-
-
-  _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
-
-  with picamera.PiCamera(
-      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
-    camera.start_preview()
-    try:
-      stream = io.BytesIO()
-      for _ in camera.capture_continuous(
-          stream, format='jpeg', use_video_port=True):
-        stream.seek(0)
-        image = Image.open(stream).convert('RGB').resize(
-            (input_width, input_height), Image.ANTIALIAS)
-        start_time = time.monotonic()
-        # detects th objects
-
-        #results = detect_objects(interpreter, image, args.threshold)
-        results = detect_objects(interpreter, image, 0.5)
-
-        elapsed_ms = (time.monotonic() - start_time) * 1000
-
-        useful = annotate_objects(results, labels)
-        [obstacle_queue.put(i) for i in useful]
-        print(useful)
-
-        stream.seek(0)
-        stream.truncate()
-
-    finally:
-      camera.stop_preview()
-
-"""
-if __name__ == '__main__':
-  main_camera()
-"""
 
 def main():
-  """
-  parser = argparse.ArgumentParser(
-      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-  parser.add_argument(
-      '--model', help='File path of .tflite file.', required=True)
-  parser.add_argument(
-      '--labels', help='File path of labels file.', required=True)
-  parser.add_argument(
-      '--threshold',
-      help='Score threshold for detected objects.',
-      required=False,
-      type=float,
-      default=0.5)
-  args = parser.parse_args()
-  
-  labels = load_labels(args.labels)
-  interpreter = Interpreter(args.model)
-  """
   
   labels = load_labels("picam/Object-detection/Model/coco_labels.txt")
   interpreter = Interpreter("picam/Object-detection/Model/detect.tflite")
@@ -204,7 +117,7 @@ def main():
     # Test the model on random input data.
   input_shape = input_details[0]['shape']
 
-
+  threshold = 0.6
 
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
@@ -221,8 +134,7 @@ def main():
         start_time = time.monotonic()
         # detects th objects
 
-        #results = detect_objects(interpreter, image, args.threshold)
-        results = detect_objects(interpreter, image, 0.5)
+        results = detect_objects(interpreter, image, threshold)
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
         useful = annotate_objects(results, labels)

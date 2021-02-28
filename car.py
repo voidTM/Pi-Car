@@ -13,24 +13,22 @@ class Car(object):
     the picar itself
     """
     
-    orientation = 0
 
     # should ideally be a singleton class
-    def __init__(self, power: int = 10):
+    def __init__(self):
 
-        self.power = power
 
         # initialize odometers
-
+        self.orientation = 0
         # slippage should be 2?
         self.trip_meter = Duodometer(4, 25)
         self.trip_meter.start()
         
 
     # right turns
-    def turn_right(self, angle, power = 10):
+    def turn_right(self, angle: int, power: int = 5):
         # need to adjust slippage for turning
-        slippage = 2.2
+        slippage = 2.1
         dist = utils.angle_to_dist(angle) * slippage
 
 
@@ -46,8 +44,8 @@ class Car(object):
 
         return self.orientation
         
-    def turn_right_target(self, target, power = 5):
-        slippage = 2.2
+    def turn_right_target(self, target: float, power: int = 5):
+        slippage = 2.1
         self.trip_meter.start()
         fc.turn_right(power)
         while(fc.get_distance_at(0) < target):
@@ -67,7 +65,7 @@ class Car(object):
 
 
     # left turns
-    def turn_left(self, angle, power = 10):
+    def turn_left(self, angle: int, power: int = 5):
         # need to adjust slippage for turning
 
         slippage = 1.95 #1.74
@@ -87,7 +85,7 @@ class Car(object):
 
         return self.orientation
     
-    def turn_left_target(self, target, power = 5):
+    def turn_left_target(self, target: float, power: int = 5):
         # need to adjust slippage for turning
         slippage = 2
 
@@ -109,7 +107,7 @@ class Car(object):
 
 
     # turning
-    def turn(self, angle, power = 10):
+    def turn(self, angle: int, power: int = 10):
         print(angle)
         if angle < 0:
             self.turn_right(abs(angle))
@@ -119,17 +117,19 @@ class Car(object):
             while(fc.get_distance_at(0) < turn_dist):
                 fc.backward(2)
 
-    def drive_forward(self, distance = None, power = 5):
+    def drive_forward(self, distance: int = None, power: int = 5):
 
         self.trip_meter.reset()
         fc.forward(power)
-        slippage = 2
+        coast_clear = True
         # if no distance is defined then drive forward until blocked
         if distance == None:
-            while(fc.get_status_at(0) == 2):
+            while(coast_clear):
                 continue
         else:
-            while(self.trip_meter.distance < distance and fc.get_status_at(0, 20) == 2):
+            while(self.trip_meter.distance < distance and coast_clear):
+                if (fc.get_status_at(0, 20) != 2):
+                    coast_clear = False
                 continue
         
         fc.stop()
@@ -139,6 +139,23 @@ class Car(object):
 
         return actually_traveled
     
+    def drive_forward2(self, distance: int, power: int = 5):
+        self.trip_meter.reset()
+        fc.forward(power)
+        clear = True
+        while(self.trip_meter.distance < distance):
+            scan_list = fc.scan_step(20)
+            if not scan_list:
+                continue
+            tmp = scan_list[3:7]
+            if tmp != [2,2,2,2]:
+                blocked = True
+                break
+        fc.stop()
+        if blocked:
+            self.drive_backward(10)
+                    
+
     def drive_backward(self, distance = 10, power = 5):
         self.trip_meter.reset()
         fc.backward(power)
