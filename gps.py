@@ -108,13 +108,11 @@ class GPS(object):
         self.add_point(obstacle_x, obstacle_y, 1)
 
         # look for nearby points
-
+        buffer = 20 // self.resolution
         # add buffer
-        self.add_point(obstacle_x, obstacle_y + 1, 1)
-        self.add_point(obstacle_x, obstacle_y - 1, 1)
-        self.add_point(obstacle_x + 1, obstacle_y, 1)
-        self.add_point(obstacle_x - 1, obstacle_y, 1)
-
+        for x in range(buffer):
+            for y in range(buffer):
+                self.add_point(obstacle_x + x, obstacle_y + y, 1)
 
 
 
@@ -183,10 +181,12 @@ class GPS(object):
         path.appendleft(node)
 
         s_grid = np.array(self.grid)
-        while node in cameFrom:
+        while node in cameFrom
             node = cameFrom[node]
             path.appendleft(node)
             s_grid[node[0]][node[1]] = 7
+
+        s_grid[self.pos_x][self.pos_y] = 9
         np.savetxt("maps/obstacles.out", self.grid, fmt='%i', delimiter=',')
         np.savetxt("maps/f.out", self.f_grid, fmt='%i', delimiter=',')
         np.savetxt("maps/solution.out", s_grid, fmt='%i', delimiter=',')
