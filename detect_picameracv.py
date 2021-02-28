@@ -15,10 +15,6 @@
 # limitations under the License.
 """Example using TF Lite to detect objects with the Raspberry Pi camera."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import argparse
 import io
 import re
@@ -32,6 +28,8 @@ from PIL import Image
 from tflite_runtime.interpreter import Interpreter
 
 from queue import Queue
+
+import cv2
 
 CAMERA_WIDTH = 1280 #640
 CAMERA_HEIGHT = 720 #480
