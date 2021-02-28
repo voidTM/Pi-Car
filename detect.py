@@ -73,7 +73,6 @@ def detect_objects(interpreter, image, threshold):
   classes = get_output_tensor(interpreter, 1)
   scores = get_output_tensor(interpreter, 2)
   count = int(get_output_tensor(interpreter, 3))
-
   results = []
   for i in range(count):
     if scores[i] >= threshold:
@@ -95,7 +94,9 @@ def annotate_objects( results, labels):
   rerout = ["bicycle", "car", "motorcycle" ]
   relevant = []
   for obj in results:
-      
+      ymin, xmin, ymax, xmax = obj['bounding_box']
+      size = (ymax - ymin) * (xmax - xmin)
+      print(size)
       if labels[obj['class_id']] in stop:
         relevant.append((labels[obj['class_id']], "stop"))
       elif labels[obj['class_id']] in turn_left:
@@ -150,3 +151,7 @@ def look_for_objects(obstacle_queue: Queue):
 
     finally:
       camera.stop_preview()
+
+    def is_close_by(obj, frame_height, min_height_pct=0.1):
+      obj_height = obj.bounding_box[1][1]-obj.bounding_box[0][1]
+      return obj_height / frame_height > min_height_pct

@@ -160,24 +160,6 @@ if __name__ == '__main__':
 """
 
 def main():
-  """
-  parser = argparse.ArgumentParser(
-      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-  parser.add_argument(
-      '--model', help='File path of .tflite file.', required=True)
-  parser.add_argument(
-      '--labels', help='File path of labels file.', required=True)
-  parser.add_argument(
-      '--threshold',
-      help='Score threshold for detected objects.',
-      required=False,
-      type=float,
-      default=0.5)
-  args = parser.parse_args()
-  
-  labels = load_labels(args.labels)
-  interpreter = Interpreter(args.model)
-  """
   
   labels = load_labels("picam/Object-detection/Model/coco_labels.txt")
   interpreter = Interpreter("picam/Object-detection/Model/detect.tflite")
@@ -221,3 +203,5 @@ def main():
 
     finally:
       camera.stop_preview()
+
+main()

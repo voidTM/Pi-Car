@@ -108,6 +108,7 @@ def drive_target(nav: GPS,  target: tuple):
         # scan for obstacles
         obstacles = scanner.mapping_scan()
         print(obstacles)
+        
         for obst in obstacles:
             abs_orient = obst[0] + picar.orientation
             nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])

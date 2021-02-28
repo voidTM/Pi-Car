@@ -142,21 +142,6 @@ class Car(object):
 
         return actually_traveled
     
-    def drive_forward_2(self, distance: int, power: int = 5):
-        self.trip_meter.reset()
-        fc.forward(power)
-        clear = True
-        while(self.trip_meter.distance < distance):
-            scan_list = fc.scan_step(20)
-            if not scan_list:
-                continue
-            tmp = scan_list[3:7]
-            if tmp != [2,2,2,2]:
-                blocked = True
-                break
-        fc.stop()
-        if blocked:
-            self.drive_backward(10)
                     
     def drive_forward_cam(self, distance: int, obstacles: Queue, power: int = 5):
         self.trip_meter.reset()
@@ -164,15 +149,29 @@ class Car(object):
         clear = True
         while(self.trip_meter.distance < distance):
             scan_list = fc.scan_step(20)
+
+
+            # handle obstacles
+            if not obstacles.empty():
+                fc.stop()
+
+
             if not scan_list:
                 continue
+
             tmp = scan_list[3:7]
             if tmp != [2,2,2,2]:
                 blocked = True
                 break
+        
         fc.stop()
         if blocked:
             self.drive_backward(10)
+        
+        actually_traveled = self.trip_meter.distance
+
+        return actually_traveled
+
 
 
     def drive_backward(self, distance = 10, power = 5):
@@ -187,18 +186,19 @@ class Car(object):
 
         return actually_traveled
 
+    def handle_obstacle(self, obstacle: tuple):
+        pass
+
+
+class PiCar(Car):
+
+    def __init__(self):
+        super().__init__(self):
+    
+    
+
 
 
 # updates and normalizes the angle to be within 0-360
 def update_angle(angle1:int, angle2:int):
     return (angle1 + angle2 + 360) %360
-    
-
-# the car class with picam model dection added
-class CamCar(Car):
-
-    def __init__(self, model:str , label:str ):
-        super().__init__(self)
-
-    def drive_forward(self):
-        pass
