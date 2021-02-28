@@ -2,12 +2,13 @@
 import time, math
 import picar_4wd as fc
 
-import utils
-from odometer import Duodometer
-import gps
 
-import scanner
-import detect
+from queue import Queue
+
+from odometer import Duodometer
+import gps, scanner, utils, detect
+
+
 
 class Car(object):
     """
@@ -141,7 +142,7 @@ class Car(object):
 
         return actually_traveled
     
-    def drive_forward2(self, distance: int, obstacles: power: int = 5):
+    def drive_forward_2(self, distance: int, power: int = 5):
         self.trip_meter.reset()
         fc.forward(power)
         clear = True
@@ -157,6 +158,22 @@ class Car(object):
         if blocked:
             self.drive_backward(10)
                     
+    def drive_forward_cam(self, distance: int, obstacles: Queue, power: int = 5):
+        self.trip_meter.reset()
+        fc.forward(power)
+        clear = True
+        while(self.trip_meter.distance < distance):
+            scan_list = fc.scan_step(20)
+            if not scan_list:
+                continue
+            tmp = scan_list[3:7]
+            if tmp != [2,2,2,2]:
+                blocked = True
+                break
+        fc.stop()
+        if blocked:
+            self.drive_backward(10)
+
 
     def drive_backward(self, distance = 10, power = 5):
         self.trip_meter.reset()
@@ -172,7 +189,7 @@ class Car(object):
 
 
 
-
+# updates and normalizes the angle to be within 0-360
 def update_angle(angle1:int, angle2:int):
     return (angle1 + angle2 + 360) %360
     
@@ -183,3 +200,5 @@ class CamCar(Car):
     def __init__(self, model:str , label:str ):
         super().__init__(self)
 
+    def drive_forward(self):
+        pass

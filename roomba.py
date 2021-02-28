@@ -5,6 +5,7 @@ import picar_4wd as fc
 
 import sys
 import time
+import logging
 
 import scanner
 from odometer import Duodometer
@@ -16,35 +17,10 @@ from odometer import Duodometer
 #scanning
 
 
-def turn_target(scanned_distances):
-    mid = len(scanned_distances) // 2
 
-    left = scanned_distances[:mid]
-    right = scanned_distances[mid:]
-
-    target = 40 # target for open space
-    direction = 0 #turn direction
-
-    if(sum(left) > sum(right)):
-        direction = -1
-        target = max(left) - 5
-    elif(sum(left) < sum(right)):
-        direction = 1
-        target = max(right) - 5
-    else:
-        direction = 0
-    
-    return direction, target
-
-
-
-
-# drive using distance         
-def drive(speed = 30):
-
+# picar drives around like a roomba without any  
+def roomba(speed = 20):
     blocked = True
-
-
     while True:
         
         # get scan by distance
@@ -52,25 +28,78 @@ def drive(speed = 30):
         if not scan_list:
             continue
 
-        # preprocess scanlist
-        scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
-
+        # the preprocessing limits the max distance to 200cm
+        # since any -2 means no response set the value to 200cm
+        scan_list = [200 if d == -2 else d for d in  scan_list] 
 
         ahead = scan_list[2:8]
 
         # coast clear full speed ahead        
-        if min(ahead) > 35:
-            #print("Coast Clear")
-            blocked = False
+        if min(ahead) > 20:
             fc.forward(speed)
             continue
-        elif min(scan_list) > 20:
-            fc.forward(5)
+
+        logging.info("Too close stopping")
+        fc.stop()
+
+        # cap at 200
+        right = scan_list[:5]
+        left = scan_list[5:]
+
+        # -1 = turn left, 0 forward, 1 turn right
+        direction = 0
+        
+        # evaluates which direction turn
+        # turns in the direction with the most open space
+
+        if(sum(right) > sum(left)):
+            direction = -1
+        elif(sum(right) < sum(left)):
+            direction = 1
+        else:
+            direction = 0
+
+        
+        print(sum(left), sum(right))
+        print ( direction)
+
+        if direction  == 1:
+            logging.info("Turning right")
+            fc.turn_right(10)
+            time.sleep(1)
+            fc.stop()
+        elif direction  == -1:
+            logging.info("Turning Right")
+            fc.turn_left(10)
+            time.sleep(1)
+            fc.stop()
+        else:
+            while(fc.get_distance_at(0) < 30):
+                logging.info("too close backing up")
+
+                fc.backward(2)
+
+
+def roomba1(speed = 20):
+
+    while True:
+        
+        # get scan by distance
+        scan_list = fc.scan_step(35)
+        if not scan_list:
             continue
 
-        #print("need to stop")
+        # the preprocessing limits the max distance to 200cm
+        # since any -2 means no response set the value to 200cm
 
-        fc.stop()
+        ahead = scan_list[2:8]
+
+        # coast clear full speed ahead        
+        if min(ahead) > 1:
+            fc.forward(speed)
+            continue
+
+        logging.info("Too close stopping")
 
         # cap at 200
         left = scan_list[:5]
@@ -78,35 +107,37 @@ def drive(speed = 30):
 
         # -1 = turn left, 0 forward, 1 turn right
         direction = 0
-        print(left, right)
+        
+        # evaluates which direction turn
+        # turns in the direction with the most open space
+
         if(sum(left) > sum(right)):
             direction = -1
-        elif(sum(left) < sum(right)):
+        elif(sum(left)  < sum(right)):
             direction = 1
         else:
             direction = 0
 
-        
-        if not blocked:
-            blocked = True
 
         if direction  == 1:
-            print("turning left")
-            fc.turn_left(10)
-            break
+            logging.info("Turning Left")
+            fc.turn_left(20)
+            time.sleep(1)
+            
         elif direction  == -1:
-            print("turning right")
-            fc.turn_right(10)
-            break
+            logging.info("Turning Right")
+            fc.turn_right(20)
+            time.sleep(1)
         else:
-            while(fc.get_distance_at(0) < 40):
+            while(fc.get_distance_at(0) < 30):
+                logging.info("too close backing up")
+
                 fc.backward(2)
 
-
 # aims for more accuracte angle    
-def drive2():
+def roomba2():
 
-    speed = 30
+    speed = 10
 
     blocked = False
 
@@ -115,20 +146,18 @@ def drive2():
         scan_list = scanner.scan_step_dist()
         if not scan_list:
             continue
-        scan_list = [200 if d < 0 else 200 if d > 200 else d for d in  scan_list] 
+        scan_list = [200 if d == -2 else d for d in  scan_list] 
 
         #print(scan_list)
         ahead = scan_list[2:8]
         # coast clear full speed ahead        
+        print(ahead)
         if min(ahead) > 35:
             #print("Coast Clear")
             if  blocked:
                 blocked = False
                 
             fc.forward(speed)
-            continue
-        elif min(scan_list) > 20:
-            fc.forward(5)
             continue
 
         #print("need to stop")
@@ -145,10 +174,10 @@ def drive2():
         print(left, right)
         if(sum(left) > sum(right)):
             direction = -1
-            target = max(left) - 5
+            target = max(left) - 20
         elif(sum(left) < sum(right)):
             direction = 1
-            target = max(right) - 5
+            target = max(right) - 20
         else:
             direction = 0
 
@@ -176,14 +205,10 @@ def drive2():
         
 
 
-def roomba3():
-    pass
-
-
 if __name__ == "__main__":
     try: 
-        drive()
+        logging.basicConfig(filename='roomba_drive.log', level=logging.INFO)
+        roomba()
     finally: 
         fc.get_distance_at(0)
-        time.sleep(3)
         fc.stop()

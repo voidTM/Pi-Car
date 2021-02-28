@@ -9,6 +9,8 @@ import picamera
 from PIL import Image
 # v2.5
 from tflite_runtime.interpreter import Interpreter
+from queue import Queue
+
 
 CAMERA_WIDTH = 640
 CAMERA_HEIGHT = 480
@@ -44,7 +46,7 @@ class PiCam(object):
         _, self.input_height, self.input_width, _ = interpreter.get_input_details()[0]['shape']
 
 
-    def start_detection(self):
+    def stream_detection(self, detected: Queue):
         with picamera.PiCamera(
         resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
         camera.start_preview()
@@ -103,8 +105,6 @@ class PiCam(object):
       output_details = interpreter.get_output_details()[index]
       tensor = np.squeeze(interpreter.get_tensor(output_details['index']))
       return tensor
-
-    def stream_objects()
 
 
 

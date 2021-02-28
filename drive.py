@@ -17,6 +17,65 @@ from gps import GPS
 import detect as picam
 
 
+
+# drives around without any mapping, but has basic obstacle avoidance
+def roomba(speed = 10):
+
+    while True:
+        
+        # get scan by distance
+        scan_list = scanner.scan_step_dist()
+        if not scan_list:
+            continue
+
+        # preprocess scanlist
+        scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
+
+
+        ahead = scan_list[3:7]
+
+        # coast clear full speed ahead        
+        if min(ahead) > 35:
+            #print("Coast Clear")
+            blocked = False
+            fc.forward(speed)
+            continue
+
+        #print("need to stop")
+
+        fc.stop()
+
+        # cap at 200
+        left = scan_list[:5]
+        right = scan_list[5:]
+
+        # -1 = turn left, 0 forward, 1 turn right
+        direction = 0
+        print(left, right)
+        if(sum(left) > sum(right)):
+            direction = -1
+        elif(sum(left) < sum(right)):
+            direction = 1
+        else:
+            direction = 0
+
+        
+
+        if direction  == 1:
+            print("turning left")
+            fc.turn_left(10)
+            time.sleep(1)
+            
+        elif direction  == -1:
+            print("turning right")
+            fc.turn_right(10)
+            time.sleep(1)
+            
+        else:
+            while(fc.get_distance_at(0) < 40):
+                fc.backward(2)
+
+
 # drives toward a certain target on a grid
 def drive_target(target:tuple):
 
@@ -43,7 +102,7 @@ def drive_target(target:tuple):
         
 
 # drive according to instructions until blocked or finished
-def drive_instructions(picar: Car, nav:GPS, instructions:deque, obstacles : Queue):
+def drive_instructions(picar: Car, nav:GPS, instructions:deque):
 
     # while not at target
     while(len(instructions) > 0):
@@ -78,10 +137,14 @@ def drive_instructions(picar: Car, nav:GPS, instructions:deque, obstacles : Queu
     return True
 
     
+def drive_instructions2(picar: Car, nav:GPS, instructions:deque, obstacles: Queue):
+    pass
+
+
 if __name__ == "__main__":
     try: 
-        
-        drive_target((0, 10))
+        roomba()
+        #drive_target((0, 10))
         #turn_test()
     finally: 
         fc.get_distance_at(0)

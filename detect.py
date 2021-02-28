@@ -93,16 +93,18 @@ def annotate_objects( results, labels):
   turn_left = [""]
   turn_right = []
   slow = []
-  traffic_objects = [""]
   relevant = []
   for obj in results:
       
       if labels[obj['class_id']] in stop:
         relevant.append((labels[obj['class_id']], "stop"))
-      elif: labels[obj['class_id']] in turn_left:
-        relevant.append(())
-      elif: labels[obj['class_id']] in turn_left:
-      elif: labels[obj['class_id']] in turn_left:
+      elif labels[obj['class_id']] in turn_left:
+        relevant.append((labels[obj['class_id']], "turn_left"))
+      elif labels[obj['class_id']] in turn_right:
+        relevant.append((labels[obj['class_id']], "turn_right"))
+      elif labels[obj['class_id']] in slow:
+        relevant.append((labels[obj['class_id']], "slow"))
+
 
       """
       if labels[obj['class_id']] == "person":
