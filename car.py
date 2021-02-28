@@ -6,6 +6,8 @@ import utils
 from odometer import Duodometer
 import gps
 
+import scanner
+import detect
 
 class Car(object):
     """
@@ -139,7 +141,7 @@ class Car(object):
 
         return actually_traveled
     
-    def drive_forward2(self, distance: int, power: int = 5):
+    def drive_forward2(self, distance: int, obstacles: power: int = 5):
         self.trip_meter.reset()
         fc.forward(power)
         clear = True
@@ -175,26 +177,9 @@ def update_angle(angle1:int, angle2:int):
     return (angle1 + angle2 + 360) %360
     
 
+# the car class with picam model dection added
+class CamCar(Car):
 
-# turns towards its target
-# unused
-def turn_target(scanned_distances):
-    mid = len(scanned_distances) // 2
+    def __init__(self, model:str , label:str ):
+        super().__init__(self)
 
-    left = scanned_distances[:mid]
-    right = scanned_distances[mid:]
-
-    target = 40 # target for open space
-    direction = 0 #turn direction
-
-    if(sum(left) > sum(right)):
-        direction = -1
-        target = max(left)
-        
-    elif(sum(left) < sum(right)):
-        direction = 1
-        target = max(right)
-    else:
-        direction = 0
-    
-    return direction, target

@@ -1,16 +1,15 @@
 
 import threading
-import queue
+from queue import Queue
 import time
 import picar_4wd as fc
 
-obstacles = queue.Queue()
 
 
-def move():
+def move(q):
     fc.forward(1)
     while True:
-        x = obstacles.get()
+        x = q.get()
         if x != None:
             print("blocked", x)
             fc.stop()
@@ -20,17 +19,18 @@ def move():
             
         obstacles.task_done()
 
-def stopper():
+def stopper(q):
     time.sleep(1)
     for i in range(10):
-        obstacles.put(i)
+        q.put(i)
         time.sleep(3)
 
 
 if __name__ == "__main__":
     try:
-        threading.Thread(target=move, daemon=True).start()
-        stopper()
+        obstacles = Queue()
+        threading.Thread(target=move, args=(obstacles,), daemon=True).start()
+        stopper(obstacles)
         obstacles.join()
     finally:
         fc.stop()

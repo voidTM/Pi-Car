@@ -11,11 +11,12 @@ import time
 
 import detect_picamera as picam
 
-obstacles = queue.Queue()
+q = queue.Queue()
 
-def drive():
+def drive(obstacles: queue.Queue):
+#def drive():
     speed = 2
-    scan_dist = 35
+    scan_dist = 20
     
     blocked = False
 
@@ -49,10 +50,10 @@ def drive():
 
 if __name__ == "__main__":
     try: 
-        threading.Thread(target=picam.main_camera,args=(obstacles,), daemon=True).start()
-        #threading.Thread(target=drive, daemon=True).start()
-        drive()
+        #threading.Thread(target=picam.main_camera,args=(q,), daemon=True).start()
+        #threading.Thread(target=stopper, args=(obstacles,), daemon=True).start()
+        drive(q)
     finally: 
-        obstacles.join()
+        q.join()
         fc.get_distance_at(0)
         fc.stop()

@@ -31,7 +31,7 @@ def next_step():
         us_step = STEP
     return current_angle
 
-def scan_step_status(ref1 , ref2):
+def scan_step_status(ref1 = 35, ref2 = 10):
     global scan_status, current_angle, us_step
 
     current_angle += us_step
