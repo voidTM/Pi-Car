@@ -1,0 +1,38 @@
+0  person
+1  bicycle
+2  car
+3  motorcycle
+4  airplane
+5  bus
+6  train
+7  truck
+8  boat
+9  traffic light
+10  fire hydrant
+12  stop sign
+13  parking meter
+14  bench
+15  bird
+16  cat
+17  dog
+18  horse
+19  sheep
+20  cow
+21  elephant
+22  bear
+23  zebra
+24  giraffe
+26  backpack
+43  bottle
+45  wine glass
+46  cup
+47  fork
+48  knife
+49  spoon
+50  bowl
+51  banana
+52  apple
+54  orange
+72  laptop
+73  mouse
+76  cell phone
