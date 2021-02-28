@@ -46,35 +46,38 @@ def roomba(speed = 10):
         fc.stop()
 
         # cap at 200
-        left = scan_list[:5]
-        right = scan_list[5:]
+        # cap at 200
+        right = scan_list[:5]
+        left = scan_list[5:]
 
         # -1 = turn left, 0 forward, 1 turn right
         direction = 0
-        print(left, right)
-        if(sum(left) > sum(right)):
+        
+        # evaluates which direction turn
+        # turns in the direction with the most open space
+
+        if(sum(right) > sum(left)):
             direction = -1
-        elif(sum(left) < sum(right)):
+        elif(sum(right) < sum(left)):
             direction = 1
         else:
             direction = 0
 
         
+        print(sum(left), sum(right))
+        print ( direction)
 
         if direction  == 1:
-            print("turning left")
-            fc.turn_left(10)
-            time.sleep(1)
-            
-        elif direction  == -1:
-            print("turning right")
+            print("Turning right")
             fc.turn_right(10)
-            time.sleep(1)
-            
+        elif direction  == -1:
+            print("Turning Right")
+            fc.turn_left(10)
         else:
-            while(fc.get_distance_at(0) < 40):
-                fc.backward(2)
+            while(fc.get_distance_at(0) < 30):
+                logging.info("too close backing up")
 
+                fc.backward(2)
 
 # drives toward a certain target on a grid
 def drive_target(target:tuple):
