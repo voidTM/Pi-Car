@@ -33,8 +33,8 @@ from tflite_runtime.interpreter import Interpreter
 
 from queue import Queue
 
-CAMERA_WIDTH = 640
-CAMERA_HEIGHT = 480
+CAMERA_WIDTH = 1280 #640
+CAMERA_HEIGHT = 720 #480
 
 
 def load_labels(path):
@@ -92,16 +92,18 @@ def annotate_objects( results, labels):
   """Draws the bounding box and label for each object in the results."""
   relevant = []
   for obj in results:
-      #print(labels[obj['class_id']], obj['score'])
+      
+      print(labels[obj['class_id']], obj['score'])
+      """
       if labels[obj['class_id']] == "person":
         relevant.append("person")
       elif labels[obj['class_id']] == "stop sign":
         relevant.append("stop sign")
-  
+      """
   return relevant
 
 def main_camera(obstacle_queue: Queue):
-  """
+  
   parser = argparse.ArgumentParser(
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument(
@@ -118,9 +120,12 @@ def main_camera(obstacle_queue: Queue):
 
   labels = load_labels(args.labels)
   interpreter = Interpreter(args.model)
+  
   """
   labels = load_labels("/tmp/coco_labels.txt")
   interpreter = Interpreter("/tmp/detect.tflite")
+
+  """
   interpreter.allocate_tensors()
 
     # Get input and output tensors.
@@ -167,3 +172,69 @@ def main_camera(obstacle_queue: Queue):
 if __name__ == '__main__':
   main_camera()
 """
+
+def main():
+  """
+  parser = argparse.ArgumentParser(
+      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  parser.add_argument(
+      '--model', help='File path of .tflite file.', required=True)
+  parser.add_argument(
+      '--labels', help='File path of labels file.', required=True)
+  parser.add_argument(
+      '--threshold',
+      help='Score threshold for detected objects.',
+      required=False,
+      type=float,
+      default=0.5)
+  args = parser.parse_args()
+  
+  labels = load_labels(args.labels)
+  interpreter = Interpreter(args.model)
+  """
+  
+  labels = load_labels("picam/Object-detection/Model/coco_labels.txt")
+  interpreter = Interpreter("picam/Object-detection/Model/detect.tflite")
+
+  #labels = load_labels("./picam/Object-detection/Model/mobilenet2labels.txt")
+  #interpreter = Interpreter("./picam/Object-detection/Model/mobilenet_v3.tflite")
+  interpreter.allocate_tensors()
+
+    # Get input and output tensors.
+  input_details = interpreter.get_input_details()
+  output_details = interpreter.get_output_details()
+    # Test the model on random input data.
+  input_shape = input_details[0]['shape']
+
+
+
+  _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
+
+  with picamera.PiCamera(
+      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
+    camera.start_preview()
+    try:
+      stream = io.BytesIO()
+      for _ in camera.capture_continuous(
+          stream, format='jpeg', use_video_port=True):
+        stream.seek(0)
+        image = Image.open(stream).convert('RGB').resize(
+            (input_width, input_height), Image.ANTIALIAS)
+        start_time = time.monotonic()
+        # detects th objects
+
+        #results = detect_objects(interpreter, image, args.threshold)
+        results = detect_objects(interpreter, image, 0.5)
+
+        elapsed_ms = (time.monotonic() - start_time) * 1000
+        useful = annotate_objects(results, labels)
+        #[obstacle_queue.put(i) for i in useful]
+
+        stream.seek(0)
+        stream.truncate()
+
+    finally:
+      camera.stop_preview()
+
+
+main()

@@ -181,7 +181,7 @@ class GPS(object):
         path.appendleft(node)
 
         s_grid = np.array(self.grid)
-        while node in cameFrom
+        while node in cameFrom:
             node = cameFrom[node]
             path.appendleft(node)
             s_grid[node[0]][node[1]] = 7
