@@ -25,7 +25,7 @@ def obstacle_ahead():
 
 def drive():
     speed = 2
-    scan_dist = 20
+    scan_dist = 35
     
     blocked = False
 
@@ -34,14 +34,13 @@ def drive():
     while True:
         
         scan_list = fc.scan_step(scan_dist)
-                
-        x = obstacles.get()
-        if x != None:
+        if not obstacles.empty():
+            x = obstacles.get()
             print("blocked", x)
             fc.stop()
             time.sleep(1)
             print("moving on")
-            #fc.forward(2)
+            obstacles.task_done()
 
         if not scan_list:
             continue
@@ -60,9 +59,9 @@ def drive():
 
 if __name__ == "__main__":
     try: 
-        threading.Thread(target=drive, daemon=True).start()
-        stopper()
+        threading.Thread(target=stopper, daemon=True).start()
         drive()
+        obstacles.join()
     finally: 
         fc.get_distance_at(0)
         fc.stop()
