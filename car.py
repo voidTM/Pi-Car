@@ -214,9 +214,116 @@ class PiCar(Car):
         super().__init__(self)
         self.nav = nav
     
-    def set_target(target):
+
+
+    def drive_forward(self, angle: int, power: int = 10):
+        self.trip_meter.reset()
+        fc.forward(power)
+        clear = True
+        obstacle_queue = Queue()
+
+        while(self.trip_meter.distance < distance):
+
+            # handle obstacles
+            if not obstacle_queue.empty():
+                fc.stop()
+                o = obstacles.get()
+                
+                # need to reroute
+                if o[1] == "obstacle":
+                    # add obstacles assuming that it is 20cm away
+                    self.nav.add_relative_obstacle(orientation = self.orientation, distance = 20)
+                    break
+                else:
+                    time.sleep(2)
+
+                    o.task_done()
+                    fc.forward(power)
+
+            scan_list = scanner.scan_step_dist()
+            if not scan_list:
+                continue
+
+            # preprocess scanlist
+            scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
+
+
+            ahead = scan_list[2:8]
+            # coast clear full speed ahead        
+            if min(ahead) < 35:
+                blocked = True
+                break
+                
 
         
+        fc.stop()
+        if blocked:
+            self.drive_backward(10)
+        
+        actually_traveled = self.trip_meter.distance
+
+        return actually_traveled
+
+    # drives towards a target
+
+    def drive_target(self, target: tuple):
+
+        car_theta = 0
+        curr_distance = 0
+        picar = Car()
+        
+        at_destination = False
+
+        while(not at_destination):
+
+            # scan for obstacles
+            obstacles = scanner.mapping_scan()
+            print(obstacles)
+            
+            for obst in obstacles:
+                abs_orient = obst[0] + picar.orientation
+                nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
+                
+            instructions = self.nav.set_navigation_goal(target)
+            
+            at_destination = self.drive_instructions(picar, instructions)
+
+    # drive according to instructions until blocked or finished
+    def drive_instructions(self, instructions:deque):
+
+        # while not at target
+        while(len(instructions) > 0):
+            # convert instructions to polar
+            step = instructions.popleft()
+            print("directions: ", step)
+                    
+            direction = step[0] - self.orientation
+            direction = (direction + 180) % 360 - 180
+            #print("turning angle", direction)
+
+            
+            driven = 0
+            # change direction if needed
+            if direction > 0: 
+                self.turn_right(direction)
+            elif direction < 0:
+                self.turn_left(abs(direction))
+
+            if step[1] >= 0:
+                driven = self.drive_forward(distance = step[1])
+            else:
+                driven = self.drive_backward(distance = abs(step[1]))
+
+            nav.update_postion(distance = int(driven), orientation = picar.orientation)
+            print( "curr position", nav.position)
+
+            # if blocked rerout
+            if driven < step[1]:
+                return False
+
+        return True
+
+    
     
     
 
