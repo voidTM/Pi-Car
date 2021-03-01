@@ -206,7 +206,6 @@ class GPS(object):
         neighbors.append([curr_p[0], curr_p[1] - 1]) # below
 
         for neighbor in neighbors:
-            #print(neighbor, type(neighbor))
             if self.in_bounds(neighbor[0], neighbor[1]): # in bounds
                 if self.grid[int(neighbor[0])][int(neighbor[1])] != 1: # not an obstacle
                     yield tuple(neighbor)

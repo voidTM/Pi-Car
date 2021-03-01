@@ -78,6 +78,7 @@ def detect_objects(interpreter, image, threshold):
     dy = (boxes[i][2] - boxes[i][0])
     dx = (boxes[i][3] - boxes[i][1])
     size = dy * dx
+    # objects must be larger than a certain size
     if scores[i] >= threshold and size > 0.1:
       result = {
           'bounding_box': boxes[i],
@@ -92,17 +93,17 @@ def identify_objects(queue, results, labels):
   stop_list = ["person", "stop sign"]
   obstacle_list = ['tennis racket', "apple"]
   for obj in results:
-      print(labels[obj['class_id']], obj['score'])
       if labels[obj['class_id']] in obstacle_list:
-        #print("Detected ", labels[obj['class_id']], obj['score'])
+        print("Detected ", labels[obj['class_id']], obj['score'])
         queue.put("obstacle")
       elif labels[obj['class_id']] in stop_list:
+        print("Detected ", labels[obj['class_id']], obj['score'])
         queue.put("stop")
 
 
 #def look_for_objects(obstacle_queue: Queue):
 
-def look_for_objects(obstacle_queue: Queue):  
+def look_for_objects(shutoff: bool, obstacle_queue: Queue):  
   labels = load_labels("picam/Object-detection/Model/coco_labels.txt")
   interpreter = Interpreter("picam/Object-detection/Model/detect.tflite")
 
@@ -140,6 +141,8 @@ def look_for_objects(obstacle_queue: Queue):
 
         stream.seek(0)
         stream.truncate()
+        if shutoff:
+          break
 
     finally:
       camera.stop_preview()

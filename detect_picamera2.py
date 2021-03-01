@@ -19,7 +19,7 @@ import detect
 from threading import Thread
 from queue import Queue
 
-
+ender = False
 def handle_obstacles(obstacles:Queue):
 
     while True:
@@ -35,9 +35,10 @@ def handle_obstacles(obstacles:Queue):
 if __name__ == '__main__':
     try:
         obstacles = Queue()
-        x = Thread(target=detect.look_for_objects,args=(obstacles,), daemon=True)
+        x = Thread(target=detect.look_for_objects,args=(ender, obstacles,), daemon=True)
         x.start()
         handle_obstacles(obstacles)
     finally:
+        ender = True
         obstacles.join()
-        x.join()
+        x.join(2)

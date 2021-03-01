@@ -216,11 +216,12 @@ class PiCar(Car):
         super().__init__()
         self.nav = nav
         self.obstacle_queue = Queue()
-        self.cam = Thread(target=detect.look_for_objects,args=(self.obstacle_queue,), daemon=True)
-        cam.start()
+        self.shutoff = False
+        self.cam = Thread(target=detect.look_for_objects,args=(self.shutoff, self.obstacle_queue,), daemon=True)
+        self.cam.start()
 
 
-    def drive_forward(self, distance: int, power: int = 10):
+    def drive_forward(self, distance: int, power: int = 2):
         self.trip_meter.reset()
         fc.forward(power)
         obstacle = False
@@ -234,12 +235,14 @@ class PiCar(Car):
 
             # handle obstacles
             if not self.obstacle_queue.empty():
-                
+                print(self.obstacle_queue.qsize())
                 o = self.obstacle_queue.get()
+
+                fc.stop()
                 #print(o)
                 # need to reroute
                 if o == "obstacle":
-                    fc.stop()
+                    #fc.stop()
                     # add obstacles assuming that it is 20cm away
                     obstacle = True
                     traveled = self.trip_meter.distance
@@ -248,12 +251,7 @@ class PiCar(Car):
                     
                     break
                 else:
-                    if stopped:
-                        continue
-                    fc.stop()
-                    time.sleep(0.2)
-                    
-                    stopped = True
+                    time.sleep(0.5)
                     self.obstacle_queue.task_done()
             else:
                 fc.forward(power)
@@ -266,8 +264,9 @@ class PiCar(Car):
             scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
             ahead = scan_list[2:8]
             # coast clear full speed ahead        
-            if min(ahead) < 25:
+            if min(ahead) < 20:
                 blocked = True
+                fc.stop()
                 break
         
         with self.obstacle_queue.mutex:
@@ -279,7 +278,7 @@ class PiCar(Car):
 
 
         if blocked:
-            actually_traveled -= self.drive_backward(10)
+            actually_traveled -= self.drive_backward(15)
 
         return actually_traveled
 
@@ -293,7 +292,9 @@ class PiCar(Car):
 
             # scan for obstacles
             obstacles = scanner.mapping_scan()
+            print("Scan results")
             print(obstacles)
+            print(" ")
             
             for obst in obstacles:
                 abs_orient = obst[0] + self.orientation
@@ -342,8 +343,11 @@ class PiCar(Car):
     
     
     def __del__(self):
-        self.obstacle_queue.join()
+        self.shutoff = True
         self.cam.join()
+        with self.obstacle_queue.mutex:
+            self.obstacle_queue.queue.clear()
+        self.obstacle_queue.join()
 
     
 

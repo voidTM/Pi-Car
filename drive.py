@@ -30,7 +30,7 @@ def roomba(speed:int = 10):
         if not scan_list:
             continue
 
-        # preprocess scanlist
+        # cap scanlist at 200
         scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
 
 
@@ -46,8 +46,6 @@ def roomba(speed:int = 10):
 
         fc.stop()
 
-        # cap at 200
-        # cap at 200
         right = scan_list[:5]
         left = scan_list[5:]
 
@@ -63,7 +61,6 @@ def roomba(speed:int = 10):
             direction = -1
 
         print(left, right)
-        #print(sum(left), sum(right))
         #print ( direction)
 
         if direction  == 1:
@@ -77,6 +74,7 @@ def roomba(speed:int = 10):
                 logging.info("too close backing up")
 
                 fc.backward(2)
+
 
 # drives forward until blocked
 def drive_n_stop(speed: int = 10):
@@ -164,6 +162,9 @@ def drive_picar():
     c = PiCar(nav)
 
     c.drive_target(target)
+
+
+
 
 
 if __name__ == "__main__":

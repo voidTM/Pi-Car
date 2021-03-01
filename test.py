@@ -59,15 +59,6 @@ def move_test():
     picar.drive_backward(20)
 
 
-
-def atest():
-    grid = np.loadtxt("maps/minimap.out", dtype = int, delimiter = ',')
-    #print(grid)
-    t = GPS()
-    t.load_grid(grid, start_x = 0, start_y = 0)
-    #t.astar(start = (0,0), goal = (17,0))
-    t.set_navigation_goal((17,0))
-
 def atestempty():
     grid = np.zeros([20,20], dtype = int)
 
@@ -80,6 +71,15 @@ def atestempty():
         # convert instructions to polar
         step = instructions.pop()
         print(step)
+
+
+def map_test():
+    grid = np.zeros([20,20], dtype = int)
+
+    t = GPS()
+    t.load_grid(grid, start_x = 10, start_y = 0)
+
+
 
 if __name__ == "__main__":
     try: 
