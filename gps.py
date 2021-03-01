@@ -106,8 +106,8 @@ class GPS(object):
         # look for nearby points
         buffer = 20 // self.resolution
         # add buffer
-        for x in range(buffer):
-            for y in range(buffer):
+        for x in range(1, buffer):
+            for y in range(1, buffer):
                 self.add_point(obstacle_x + x, obstacle_y + y, 1)
 
 
@@ -131,9 +131,8 @@ class GPS(object):
         if len(path) == 9:
             return instructions
         # car orientation
-        #direction_map = {(0,1): 0, (-1,0): 90, (0, -1): 180, (1,0): -90}
         direction_map = {(0,1): 0, (-1,0): 270, (0, -1): 180, (1,0): 90}
-        print(path)
+        print("Full path",path)
         prev = path.popleft() # empty path?
         prev_direction = None
 

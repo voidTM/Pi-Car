@@ -77,7 +77,7 @@ def map_test():
     grid = np.zeros([20,20], dtype = int)
 
     t = GPS()
-    t.load_grid(grid, start_x = 10, start_y = 0)
+    t.load_grid(grid, start_x = 8, start_y = 0)
 
 
 

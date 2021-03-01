@@ -251,8 +251,11 @@ class PiCar(Car):
                     
                     break
                 else:
-                    time.sleep(0.5)
                     self.obstacle_queue.task_done()
+                    with self.obstacle_queue.mutex:
+                        self.obstacle_queue.queue.clear()
+                    time.sleep(2)
+                    
             else:
                 fc.forward(power)
 
@@ -262,10 +265,10 @@ class PiCar(Car):
 
             # preprocess scanlist
             scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
-            ahead = scan_list[2:8]
+            ahead = scan_list[3:7]
             # coast clear full speed ahead        
-            if min(ahead) < 20:
-                blocked = True
+            if min(ahead) < 25:
+                #blocked = True
                 fc.stop()
                 break
         
@@ -344,7 +347,7 @@ class PiCar(Car):
     
     def __del__(self):
         self.shutoff = True
-        self.cam.join()
+        self.cam.join(2)
         with self.obstacle_queue.mutex:
             self.obstacle_queue.queue.clear()
         self.obstacle_queue.join()
