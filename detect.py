@@ -92,11 +92,12 @@ def identify_objects(queue, results, labels):
   stop_list = ["person", "stop sign"]
   obstacle_list = ['tennis racket', "apple"]
   for obj in results:
+      print(labels[obj['class_id']])
       if labels[obj['class_id']] in obstacle_list:
         #print("Detected ", labels[obj['class_id']], obj['score'])
-        queue.put((labels[obj['class_id']], "obstacle"))
+        queue.put("obstacle")
       elif labels[obj['class_id']] in stop_list:
-        queue.put((labels[obj['class_id']], "stop"))
+        queue.put("stop")
 
 
 #def look_for_objects(obstacle_queue: Queue):

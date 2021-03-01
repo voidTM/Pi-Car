@@ -222,32 +222,40 @@ class PiCar(Car):
     def drive_forward(self, distance: int, power: int = 10):
         self.trip_meter.reset()
         fc.forward(power)
+        obstacle = False
         blocked = False
 
         # clear obstacles 
         with self.obstacle_queue.mutex:
             self.obstacle_queue.queue.clear()
-
+        stopped= False
         while(self.trip_meter.distance < distance):
 
             # handle obstacles
             if not self.obstacle_queue.empty():
-                fc.stop()
-                o = self.obstacle_queue.get()
                 
+                o = self.obstacle_queue.get()
+                #print(o)
                 # need to reroute
-                if o[1] == "obstacle":
+                if o == "obstacle":
+                    fc.stop()
                     # add obstacles assuming that it is 20cm away
+                    obstacle = True
                     traveled = self.trip_meter.distance
                     
                     self.nav.add_relative_obstacle(orientation = self.orientation, distance = 20 + traveled)
                     
                     break
                 else:
-                    time.sleep(2)
-
+                    if stopped:
+                        continue
+                    fc.stop()
+                    time.sleep(0.1)
+                    
+                    stopped = True
                     self.obstacle_queue.task_done()
-                    fc.forward(power)
+            else:
+                fc.forward(power)
 
             scan_list = scanner.scan_step_dist()
             if not scan_list:
@@ -257,18 +265,20 @@ class PiCar(Car):
             scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
             ahead = scan_list[2:8]
             # coast clear full speed ahead        
-            if min(ahead) < 20:
+            if min(ahead) < 25:
                 blocked = True
                 break
         
+        with self.obstacle_queue.mutex:
+            self.obstacle_queue.queue.clear()
+
+
         fc.stop()
         actually_traveled = self.trip_meter.distance
 
-        if blocked:
-            self.drive_backward(10)
-        
-        actually_traveled = self.trip_meter.distance
 
+        if blocked:
+            actually_traveled -= self.drive_backward(10)
 
         return actually_traveled
 
