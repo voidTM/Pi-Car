@@ -31,8 +31,8 @@ from queue import Queue
 
 import cv2
 
-CAMERA_WIDTH = 640 #640
-CAMERA_HEIGHT = 480 #480
+CAMERA_WIDTH = 1280 #640
+CAMERA_HEIGHT = 720 #480
 
 
 def load_labels(path):
@@ -98,8 +98,6 @@ def identify_objects(queue, results, labels):
       elif labels[obj['class_id']] in stop_list:
         queue.put((labels[obj['class_id']], "stop"))
 
-  if queue.qsize() > 0:
-    print(queue.qsize())
 
 #def look_for_objects(obstacle_queue: Queue):
 

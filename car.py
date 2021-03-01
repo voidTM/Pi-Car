@@ -4,11 +4,13 @@ import picar_4wd as fc
 
 
 from queue import Queue
+from collections import deque
+from threading import Thread
 
 from odometer import Duodometer
 from gps import GPS
 import gps, scanner, utils
-import detect as picam
+import detect
 
 
 
@@ -211,28 +213,27 @@ class Car(object):
 class PiCar(Car):
 
     def __init__(self, nav: GPS):
-        super().__init__(self)
+        super().__init__()
         self.nav = nav
-        obstacle_queue = Queue()
-        self.cam = Thread(target=detect.look_for_objects,args=(obstacle_queue,), daemon=True).start()
+        self.obstacle_queue = Queue()
+        self.cam = Thread(target=detect.look_for_objects,args=(self.obstacle_queue,), daemon=True).start()
 
 
-    def drive_forward(self, angle: int, power: int = 10):
+    def drive_forward(self, distance: int, power: int = 10):
         self.trip_meter.reset()
         fc.forward(power)
-        clear = True
-        
+        blocked = False
+
         # clear obstacles 
         with self.obstacle_queue.mutex:
             self.obstacle_queue.queue.clear()
 
-        cam = Thread(target=detect.look_for_objects,args=(obstacle_queue,), daemon=True).start()
         while(self.trip_meter.distance < distance):
 
             # handle obstacles
             if not self.obstacle_queue.empty():
                 fc.stop()
-                o = obstacles.get()
+                o = self.obstacle_queue.get()
                 
                 # need to reroute
                 if o[1] == "obstacle":
@@ -245,7 +246,7 @@ class PiCar(Car):
                 else:
                     time.sleep(2)
 
-                    o.task_done()
+                    self.obstacle_queue.task_done()
                     fc.forward(power)
 
             scan_list = scanner.scan_step_dist()
@@ -256,7 +257,7 @@ class PiCar(Car):
             scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
             ahead = scan_list[2:8]
             # coast clear full speed ahead        
-            if min(ahead) < 35:
+            if min(ahead) < 20:
                 blocked = True
                 break
         
@@ -268,17 +269,12 @@ class PiCar(Car):
         
         actually_traveled = self.trip_meter.distance
 
-        obstacle_queue.join()
 
         return actually_traveled
 
     # drives towards a target
 
     def drive_target(self, target: tuple):
-
-        car_theta = 0
-        curr_distance = 0
-        picar = Car()
         
         at_destination = False
 
@@ -289,12 +285,12 @@ class PiCar(Car):
             print(obstacles)
             
             for obst in obstacles:
-                abs_orient = obst[0] + picar.orientation
-                nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
+                abs_orient = obst[0] + self.orientation
+                self.nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
                 
             instructions = self.nav.set_navigation_goal(target)
             
-            at_destination = self.drive_instructions(picar, instructions)
+            at_destination = self.drive_instructions(instructions)
 
     # drive according to instructions until blocked or finished
     def drive_instructions(self, instructions:deque):
@@ -322,8 +318,8 @@ class PiCar(Car):
             else:
                 driven = self.drive_backward(distance = abs(step[1]))
 
-            nav.update_postion(distance = int(driven), orientation = picar.orientation)
-            print( "curr position", nav.position)
+            self.nav.update_postion(distance = int(driven), orientation = self.orientation)
+            print( "curr position", self.nav.position)
 
             # if blocked rerout
             if driven < step[1]:
@@ -335,9 +331,9 @@ class PiCar(Car):
     
     
     def __del__(self):
-        cam.join()
+        self.obstacle_queue.join()
 
-
+    
 
 # updates and normalizes the angle to be within 0-360
 def update_angle(angle1:int, angle2:int):

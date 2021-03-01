@@ -11,6 +11,8 @@ from queue import Queue
 import scanner
 import utils
 from car import Car
+from car import PiCar
+
 from odometer import Duodometer
 from gps import GPS
 
@@ -155,16 +157,18 @@ def drive_instructions(picar: Car, nav:GPS, instructions:deque):
 
 
 
+def drive_picar():
+    nav = GPS(map_width = 50, map_length = 50, resolution = 10, start_x = 25, start_y = 0)
+    target = (35,25)
+
+    c = PiCar(nav)
+
+    c.drive_target(target)
+
+
 if __name__ == "__main__":
     try: 
-        nav = GPS(map_width = 50, map_length = 50, resolution = 10, start_x = 25, start_y = 0)
-        #nav3 = GPS(map_width = 30, map_length = 50, resolution = 5, start_x = 15, start_y = 0)
-        #
-        target = (30, 25)
-        #target3 = (10, 40)
-        c = Picar(nav)
-        #drive_target_cam(nav2, target)
-        #turn_test()
+        drive_picar()
     finally: 
         fc.get_distance_at(0)
         fc.stop()
