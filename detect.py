@@ -88,19 +88,9 @@ def detect_objects(interpreter, image, threshold):
   return results
 
 
-def annotate_objects( results, labels):
-  """Draws the bounding box and label for each object in the results."""
-  
-  stop = ["person", "stop sign","bus", "train", "truck"]
-  turn_left = ["bottle", "wine glass", "cup"]
-  turn_right = ["orange", "apple", "banana"]
-  rerout = ["bicycle", "car", "motorcycle" ]
-  for obj in results:
-      print(labels[obj['class_id']], obj['score'])
-
 def identify_objects(queue, results, labels):
   stop_list = ["person", "stop sign"]
-  obstacle_list = [ 'cow', 'tennis racket', "apple", "bicycle", "car"]
+  obstacle_list = ['tennis racket', "apple"]
   for obj in results:
       if labels[obj['class_id']] in obstacle_list:
         #print("Detected ", labels[obj['class_id']], obj['score'])

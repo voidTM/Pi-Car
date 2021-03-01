@@ -213,26 +213,34 @@ class PiCar(Car):
     def __init__(self, nav: GPS):
         super().__init__(self)
         self.nav = nav
-    
+        obstacle_queue = Queue()
+        self.cam = Thread(target=detect.look_for_objects,args=(obstacle_queue,), daemon=True).start()
 
 
     def drive_forward(self, angle: int, power: int = 10):
         self.trip_meter.reset()
         fc.forward(power)
         clear = True
-        obstacle_queue = Queue()
+        
+        # clear obstacles 
+        with self.obstacle_queue.mutex:
+            self.obstacle_queue.queue.clear()
 
+        cam = Thread(target=detect.look_for_objects,args=(obstacle_queue,), daemon=True).start()
         while(self.trip_meter.distance < distance):
 
             # handle obstacles
-            if not obstacle_queue.empty():
+            if not self.obstacle_queue.empty():
                 fc.stop()
                 o = obstacles.get()
                 
                 # need to reroute
                 if o[1] == "obstacle":
                     # add obstacles assuming that it is 20cm away
-                    self.nav.add_relative_obstacle(orientation = self.orientation, distance = 20)
+                    traveled = self.trip_meter.distance
+                    
+                    self.nav.add_relative_obstacle(orientation = self.orientation, distance = 20 + traveled)
+                    
                     break
                 else:
                     time.sleep(2)
@@ -246,21 +254,21 @@ class PiCar(Car):
 
             # preprocess scanlist
             scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
-
-
             ahead = scan_list[2:8]
             # coast clear full speed ahead        
             if min(ahead) < 35:
                 blocked = True
                 break
-                
-
         
         fc.stop()
+        actually_traveled = self.trip_meter.distance
+
         if blocked:
             self.drive_backward(10)
         
         actually_traveled = self.trip_meter.distance
+
+        obstacle_queue.join()
 
         return actually_traveled
 
@@ -326,6 +334,8 @@ class PiCar(Car):
     
     
     
+    def __del__(self):
+        cam.join()
 
 
 

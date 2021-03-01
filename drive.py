@@ -117,27 +117,6 @@ def drive_target(nav: GPS,  target: tuple):
         
         at_destination = drive_instructions(picar, nav, instructions)
         
-def drive_target_cam(nav: GPS,  target: tuple):
-    car_theta = 0
-    curr_distance = 0
-    picar = Car()
-    
-    at_destination = False
-
-    while(not at_destination):
-
-        # scan for obstacles
-        obstacles = scanner.mapping_scan()
-        print(obstacles)
-        
-        for obst in obstacles:
-            abs_orient = obst[0] + picar.orientation
-            nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
-            
-        instructions = nav.set_navigation_goal(target)
-        
-        at_destination = drive_instructions(picar, nav, instructions)
-
 
 # drive according to instructions until blocked or finished
 def drive_instructions(picar: Car, nav:GPS, instructions:deque):
@@ -174,50 +153,17 @@ def drive_instructions(picar: Car, nav:GPS, instructions:deque):
 
     return True
 
-    
-def drive_instructions_cam(picar: Car, nav:GPS, instructions:deque, obstacles: Queue):
-    while(len(instructions) > 0):
-        # convert instructions to polar
-        step = instructions.popleft()
-        print("directions: ", step)
-                
-        direction = step[0] - picar.orientation
-        direction = (direction + 180) % 360 - 180
-        #print("turning angle", direction)
-
-        
-        driven = 0
-        # change direction if needed
-        if direction > 0: 
-            picar.turn_right(direction)
-        elif direction < 0:
-            picar.turn_left(abs(direction))
-
-        if step[1] >= 0:
-            driven = picar.drive_forward_cam(distance = step[1], obstacles = obstacles)
-        else:
-            driven = picar.drive_backward(distance = abs(step[1]))
-
-        nav.update_postion(distance = int(driven), orientation = picar.orientation)
-        print( "curr position", nav.position)
-
-        # if blocked rerout
-        if driven < step[1]:
-            return False
-
-    return True
 
 
 if __name__ == "__main__":
     try: 
-        #roomba()
-        #nav1 = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
-        nav2 = GPS(map_width = 50, map_length = 50, resolution = 10, start_x = 25, start_y = 0)
-        nav3 = GPS(map_width = 30, map_length = 50, resolution = 5, start_x = 15, start_y = 0)
+        nav = GPS(map_width = 50, map_length = 50, resolution = 10, start_x = 25, start_y = 0)
+        #nav3 = GPS(map_width = 30, map_length = 50, resolution = 5, start_x = 15, start_y = 0)
         #
         target = (30, 25)
-        target3 = (10, 40)
-        drive_target_cam(nav2, target)
+        #target3 = (10, 40)
+        c = Picar(nav)
+        #drive_target_cam(nav2, target)
         #turn_test()
     finally: 
         fc.get_distance_at(0)
