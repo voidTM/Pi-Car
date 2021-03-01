@@ -6,7 +6,10 @@ import picar_4wd as fc
 from queue import Queue
 
 from odometer import Duodometer
-import gps, scanner, utils, detect
+from gps import GPS
+import gps, scanner, utils
+import detect as picam
+
 
 
 
@@ -148,21 +151,36 @@ class Car(object):
         fc.forward(power)
         clear = True
         while(self.trip_meter.distance < distance):
-            scan_list = fc.scan_step(20)
-
 
             # handle obstacles
             if not obstacles.empty():
                 fc.stop()
+                o = obstacles.get()
+                
+                # need to reroute
+                if o[1] == "obstacle":
+                    break
+                else:
+                    time.sleep(1)
+
+                    obstacles.task_done()
 
 
+            scan_list = scanner.scan_step_dist()
             if not scan_list:
                 continue
 
-            tmp = scan_list[3:7]
-            if tmp != [2,2,2,2]:
+            # preprocess scanlist
+            scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
+
+
+            ahead = scan_list[2:8]
+            # coast clear full speed ahead        
+            if min(ahead) < 35:
                 blocked = True
                 break
+                
+
         
         fc.stop()
         if blocked:
@@ -192,8 +210,13 @@ class Car(object):
 
 class PiCar(Car):
 
-    def __init__(self):
-        super().__init__(self):
+    def __init__(self, nav: GPS):
+        super().__init__(self)
+        self.nav = nav
+    
+    def set_target(target):
+
+        
     
     
 

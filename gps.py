@@ -199,10 +199,10 @@ class GPS(object):
         #print(curr_p, type(curr_p))
 
         neighbors = []
-        
+
+        neighbors.append([curr_p[0], curr_p[1] + 1]) # above
         neighbors.append([curr_p[0] + 1, curr_p[1]]) #right
         neighbors.append([curr_p[0] - 1, curr_p[1]]) #left
-        neighbors.append([curr_p[0], curr_p[1] + 1]) # above
         neighbors.append([curr_p[0], curr_p[1] - 1]) # below
 
         for neighbor in neighbors:

@@ -192,7 +192,7 @@ def main():
         # detects th objects
 
         #results = detect_objects(interpreter, image, args.threshold)
-        results = detect_objects(interpreter, image, 0.5)
+        results = detect_objects(interpreter, image, 0.4)
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
         useful = annotate_objects(results, labels)

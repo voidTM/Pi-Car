@@ -32,9 +32,10 @@ def handle_obstacles(obstacles:Queue):
 
 
 
-def main():
-    obstacles = Queue()
-    Thread(target=detect.look_for_objects,args=(obstacles,), daemon=True).start()
-    handle_obstacles(obstacles)
 if __name__ == '__main__':
-    main()
+    try:
+        obstacles = Queue()
+        Thread(target=detect.look_for_objects,args=(obstacles,), daemon=True).start()
+        handle_obstacles(obstacles)
+    finally:
+        obstacles.join()

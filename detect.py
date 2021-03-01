@@ -31,8 +31,8 @@ from queue import Queue
 
 import cv2
 
-CAMERA_WIDTH = 1280 #640
-CAMERA_HEIGHT = 720 #480
+CAMERA_WIDTH = 640 #640
+CAMERA_HEIGHT = 480 #480
 
 
 def load_labels(path):
@@ -75,7 +75,10 @@ def detect_objects(interpreter, image, threshold):
   count = int(get_output_tensor(interpreter, 3))
   results = []
   for i in range(count):
-    if scores[i] >= threshold:
+    dy = (boxes[i][2] - boxes[i][0])
+    dx = (boxes[i][3] - boxes[i][1])
+    size = dy * dx
+    if scores[i] >= threshold and size > 0.1:
       result = {
           'bounding_box': boxes[i],
           'class_id': classes[i],
@@ -92,35 +95,39 @@ def annotate_objects( results, labels):
   turn_left = ["bottle", "wine glass", "cup"]
   turn_right = ["orange", "apple", "banana"]
   rerout = ["bicycle", "car", "motorcycle" ]
-  relevant = []
   for obj in results:
-      ymin, xmin, ymax, xmax = obj['bounding_box']
-      size = (ymax - ymin) * (xmax - xmin)
-      print(size)
-      if labels[obj['class_id']] in stop:
-        relevant.append((labels[obj['class_id']], "stop"))
-      elif labels[obj['class_id']] in turn_left:
-        relevant.append((labels[obj['class_id']], "turn_left"))
-      elif labels[obj['class_id']] in turn_right:
-        relevant.append((labels[obj['class_id']], "turn_right"))
+      print(labels[obj['class_id']], obj['score'])
 
+def identify_objects(queue, results, labels):
+  stop_list = ["person", "stop sign"]
+  obstacle_list = [ 'cow', 'tennis racket', "apple", "bicycle", "car"]
+  for obj in results:
+      if labels[obj['class_id']] in obstacle_list:
+        #print("Detected ", labels[obj['class_id']], obj['score'])
+        queue.put((labels[obj['class_id']], "obstacle"))
+      elif labels[obj['class_id']] in stop_list:
+        queue.put((labels[obj['class_id']], "stop"))
 
-  return relevant
+  if queue.qsize() > 0:
+    print(queue.qsize())
 
-def look_for_objects(obstacle_queue: Queue):
+#def look_for_objects(obstacle_queue: Queue):
 
+def look_for_objects(obstacle_queue: Queue):  
   labels = load_labels("picam/Object-detection/Model/coco_labels.txt")
   interpreter = Interpreter("picam/Object-detection/Model/detect.tflite")
-  
+
+  #labels = load_labels("./picam/Object-detection/Model/mobilenet2labels.txt")
+  #interpreter = Interpreter("./picam/Object-detection/Model/mobilenet_v3.tflite")
   interpreter.allocate_tensors()
 
     # Get input and output tensors.
   input_details = interpreter.get_input_details()
   output_details = interpreter.get_output_details()
-  print(input_details)
-  print(output_details)
     # Test the model on random input data.
   input_shape = input_details[0]['shape']
+
+
 
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
@@ -130,8 +137,7 @@ def look_for_objects(obstacle_queue: Queue):
     try:
       stream = io.BytesIO()
       for _ in camera.capture_continuous(
-          #stream, format='jpeg', use_video_port=True):
-          stream, format='png', use_video_port=True):
+          stream, format='jpeg', use_video_port=True):
         stream.seek(0)
         image = Image.open(stream).convert('RGB').resize(
             (input_width, input_height), Image.ANTIALIAS)
@@ -142,16 +148,12 @@ def look_for_objects(obstacle_queue: Queue):
         results = detect_objects(interpreter, image, 0.5)
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
-
-        useful = annotate_objects(results, labels)
-        [obstacle_queue.put(i) for i in useful]
+        #useful = annotate_objects(results, labels)
+        identify_objects(obstacle_queue, results, labels)
+        #[obstacle_queue.put(i) for i in useful]
 
         stream.seek(0)
         stream.truncate()
 
     finally:
       camera.stop_preview()
-
-    def is_close_by(obj, frame_height, min_height_pct=0.1):
-      obj_height = obj.bounding_box[1][1]-obj.bounding_box[0][1]
-      return obj_height / frame_height > min_height_pct
