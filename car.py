@@ -216,7 +216,8 @@ class PiCar(Car):
         super().__init__()
         self.nav = nav
         self.obstacle_queue = Queue()
-        self.cam = Thread(target=detect.look_for_objects,args=(self.obstacle_queue,), daemon=True).start()
+        self.cam = Thread(target=detect.look_for_objects,args=(self.obstacle_queue,), daemon=True)
+        cam.start()
 
 
     def drive_forward(self, distance: int, power: int = 10):
@@ -250,7 +251,7 @@ class PiCar(Car):
                     if stopped:
                         continue
                     fc.stop()
-                    time.sleep(0.1)
+                    time.sleep(0.2)
                     
                     stopped = True
                     self.obstacle_queue.task_done()
@@ -342,6 +343,7 @@ class PiCar(Car):
     
     def __del__(self):
         self.obstacle_queue.join()
+        self.cam.join()
 
     
 

@@ -92,7 +92,7 @@ def identify_objects(queue, results, labels):
   stop_list = ["person", "stop sign"]
   obstacle_list = ['tennis racket', "apple"]
   for obj in results:
-      print(labels[obj['class_id']])
+      print(labels[obj['class_id']], obj['score'])
       if labels[obj['class_id']] in obstacle_list:
         #print("Detected ", labels[obj['class_id']], obj['score'])
         queue.put("obstacle")
@@ -115,8 +115,7 @@ def look_for_objects(obstacle_queue: Queue):
   output_details = interpreter.get_output_details()
     # Test the model on random input data.
   input_shape = input_details[0]['shape']
-
-
+  threshold = 0.6
 
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
@@ -133,13 +132,11 @@ def look_for_objects(obstacle_queue: Queue):
         start_time = time.monotonic()
         # detects th objects
 
-        #results = detect_objects(interpreter, image, args.threshold)
-        results = detect_objects(interpreter, image, 0.5)
+        results = detect_objects(interpreter, image, threshold)
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
-        #useful = annotate_objects(results, labels)
+
         identify_objects(obstacle_queue, results, labels)
-        #[obstacle_queue.put(i) for i in useful]
 
         stream.seek(0)
         stream.truncate()

@@ -35,7 +35,9 @@ def handle_obstacles(obstacles:Queue):
 if __name__ == '__main__':
     try:
         obstacles = Queue()
-        Thread(target=detect.look_for_objects,args=(obstacles,), daemon=True).start()
+        x = Thread(target=detect.look_for_objects,args=(obstacles,), daemon=True)
+        x.start()
         handle_obstacles(obstacles)
     finally:
         obstacles.join()
+        x.join()
