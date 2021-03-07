@@ -10,7 +10,8 @@ import picar_4wd as fc
 
 import utils
 from odometer import Duodometer
-import gps
+import scanner
+from gps import GPS
 from car import Car
 
 
@@ -66,7 +67,7 @@ def stationary_scan_test():
     grid = np.zeros([50,50], dtype = int)
 
     t = GPS()
-    t.load_grid(grid, resolution: int = 1, start_x = 10, start_y = 0)
+    t.load_grid(grid, resolution = 1, start_x = 25, start_y = 0)
 
 
     # performs a full 180 deg scan at 5 deg intervals
@@ -79,7 +80,7 @@ def stationary_scan_test():
         # actual orientation = picar_orientation + obstacle_scan angle
         orientation = obst[0] + picar_orientation
 
-        nav.add_relative_obstacle(orientation = obst[0], distance = obst[1])
+        t.add_relative_obstacle(orientation = obst[0], distance = obst[1])
 
     # save the scan results to file
     t.save_grid('maps/scan_result.out')
