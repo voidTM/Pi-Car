@@ -68,11 +68,12 @@ def stationary_scan_test():
 
     t = GPS()
     t.load_grid(grid, resolution = 1, start_x = 25, start_y = 0)
-    
+
 
     # performs a full 180 deg scan at 5 deg intervals
     obstacles = scanner.mapping_scan()
     print(obstacles)
+    obstacles[:,0] *= -1
 
     # populate map with obstacles
     for obst in obstacles:
