@@ -47,7 +47,7 @@ class GPS(object):
         self.target_x = None
         self.target_y = None
 
-    def save_grid(self, filepath: str = 'maps/testmap.out'):
+    def save_grid(self, filepath: str = 'maps/obstacle_map.out'):
         np.savetxt(filepath, self.grid, fmt='%i', delimiter=',')
 
     @property
@@ -100,14 +100,14 @@ class GPS(object):
 
     def add_obstacle(self, obstacle_x: int, obstacle_y: int):
 
-        # add point
-        self.add_point(obstacle_x, obstacle_y, 1)
 
         # look for nearby points
-        buffer = 20 // self.resolution
-        # add buffer
-        for x in range(1, buffer):
-            for y in range(1, buffer):
+        #buffer = 20 // self.resolution
+        buffer = 1
+        
+        # adds a simple buffer and points
+        for x in range(-buffer, buffer + 1):
+            for y in range(-buffer, buffer + 1):
                 self.add_point(obstacle_x + x, obstacle_y + y, 1)
 
 
