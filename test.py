@@ -68,10 +68,11 @@ def stationary_scan_test():
 
     t = GPS()
     t.load_grid(grid, resolution = 1, start_x = 25, start_y = 0)
-
+    
 
     # performs a full 180 deg scan at 5 deg intervals
     obstacles = scanner.mapping_scan()
+    print(obstacles)
 
     # populate map with obstacles
     for obst in obstacles:
@@ -83,7 +84,7 @@ def stationary_scan_test():
         t.add_relative_obstacle(orientation = obst[0], distance = obst[1])
 
     # save the scan results to file
-    t.save_grid('maps/scan_result.out')
+    t.save_grid('maps/corner_scan_result.out')
 
 
 if __name__ == "__main__":
