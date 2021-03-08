@@ -73,11 +73,12 @@ def stationary_scan_test():
     # performs a full 180 deg scan at 5 deg intervals
     obstacles = scanner.mapping_scan()
     print(obstacles)
-    obstacles[:,0] *= -1
+    #obstacles[:,0] *= -1
+    #print(obstacles)
 
     # populate map with obstacles
     for obst in obstacles:
-        picar_orientation = 0
+        picar_orientation = 90
         
         # actual orientation = picar_orientation + obstacle_scan angle
         orientation = obst[0] + picar_orientation
@@ -88,10 +89,16 @@ def stationary_scan_test():
     t.save_grid('maps/corner_scan_result.out')
 
 
+
+def sensor_test():
+    print(fc.utils.cpu_temperature())
+    print(fc.utils.cpu_usage())
+    print(fc.utils.gpu_temperature())
+
 if __name__ == "__main__":
     try: 
-        stationary_scan_test()
-        
+        #stationary_scan_test()
+        sensor_test()
 
     finally: 
         fc.stop()

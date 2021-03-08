@@ -90,7 +90,7 @@ def mapping_scan(min_angle = MIN_ANGLE, max_angle = MAX_ANGLE, step = 5):
         time.sleep(0.2)
         dist = fc.get_distance_at(angle)
         if dist != -2:
-            scan_dist.append([angle, dist])
+            scan_dist.append([angle * -1, dist])
  
     return np.array(scan_dist)
 
