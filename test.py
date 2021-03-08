@@ -91,9 +91,8 @@ def stationary_scan_test():
 
 
 def sensor_test():
-    print(fc.utils.cpu_temperature())
-    print(fc.utils.cpu_usage())
-    print(fc.utils.gpu_temperature())
+    print("CPU Temperature", fc.utils.cpu_temperature())
+    print("GPU Temperature", fc.utils.gpu_temperature())
 
 if __name__ == "__main__":
     try: 

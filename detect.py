@@ -116,7 +116,7 @@ def look_for_objects(shutoff: bool, obstacle_queue: Queue):
   output_details = interpreter.get_output_details()
     # Test the model on random input data.
   input_shape = input_details[0]['shape']
-  threshold = 0.6
+  threshold = 0.5
 
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
