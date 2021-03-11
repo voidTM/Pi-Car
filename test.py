@@ -47,13 +47,13 @@ def atestempty():
 
 
 # drives forward until blocked
-def drive_n_stop(speed: int = 10):
+def drive_n_stop(speed: int = 5):
     clear = True
     fc.forward(speed)
 
     while clear:
         # scan list returns false until a full 180 deg scan is performed.
-        scan_list = fc.scan_step(20)
+        scan_list = fc.scan_step(35)
         if not scan_list:
             continue
 
@@ -86,7 +86,7 @@ def stationary_scan_test():
         t.add_relative_obstacle(orientation = obst[0], distance = obst[1])
 
     # save the scan results to file
-    t.save_grid('maps/corner_scan_result.out')
+    t.save_grid('maps/1object_scan_result.out')
 
 
 
@@ -96,9 +96,10 @@ def sensor_test():
 
 if __name__ == "__main__":
     try: 
-        #stationary_scan_test()
-        sensor_test()
-
+        stationary_scan_test()
+        #drive_n_stop()
+        #sensor_test()
+        #move_test()
     finally: 
         fc.stop()
         # resets ultrasonic scanner to 0.

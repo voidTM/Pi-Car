@@ -33,8 +33,8 @@ from tflite_runtime.interpreter import Interpreter
 
 from queue import Queue
 
-CAMERA_WIDTH = 1280 #640
-CAMERA_HEIGHT = 720 #480
+CAMERA_WIDTH = 640 #640
+CAMERA_HEIGHT = 480 #480
 
 
 def load_labels(path):
@@ -127,7 +127,7 @@ def main_camera(obstacle_queue: Queue):
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
   with picamera.PiCamera(
-      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
+      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=10) as camera:
     camera.start_preview()
     try:
       stream = io.BytesIO()
@@ -179,12 +179,12 @@ def main():
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
   with picamera.PiCamera(
-      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
+      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=10) as camera:
     camera.start_preview()
     try:
       stream = io.BytesIO()
       for _ in camera.capture_continuous(
-          stream, format='jpeg', use_video_port=True):
+          stream, format='jpeg', use_video_port=False):
         stream.seek(0)
         image = Image.open(stream).convert('RGB').resize(
             (input_width, input_height), Image.ANTIALIAS)

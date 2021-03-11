@@ -121,7 +121,7 @@ def look_for_objects(shutoff: bool, obstacle_queue: Queue):
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
   with picamera.PiCamera(
-      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
+      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=15) as camera:
     camera.start_preview()
     try:
       stream = io.BytesIO()
@@ -136,9 +136,9 @@ def look_for_objects(shutoff: bool, obstacle_queue: Queue):
         results = detect_objects(interpreter, image, threshold)
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
-
+        print(elapsed_ms)
         identify_objects(obstacle_queue, results, labels)
-
+        
         stream.seek(0)
         stream.truncate()
         if shutoff:
