@@ -64,10 +64,17 @@ def drive_n_stop(speed: int = 5):
 
 # scans the surroundings and saves the results to file
 def stationary_scan_test():
+    scan_list = scanner.scan_step_dist()
+
+    while not scan_list:
+        scan_list = scanner.scan_step_dist()
+
+    print(scan_list)
+
     grid = np.zeros([50,50], dtype = int)
 
     t = GPS()
-    t.load_grid(grid, resolution = 1, start_x = 25, start_y = 0)
+    t.load_grid(grid, resolution = 2, start_x = 25, start_y = 0)
 
 
     # performs a full 180 deg scan at 5 deg intervals
@@ -88,6 +95,19 @@ def stationary_scan_test():
     # save the scan results to file
     t.save_grid('maps/1object_scan_result.out')
 
+    return t
+
+def astest():
+    
+    t = stationary_scan_test()
+
+    instructions = t.set_navigation_goal((19, 10))
+
+    # while not at target
+    while(len(instructions) > 0):
+        # convert instructions to polar
+        step = instructions.pop()
+        print(step)
 
 
 def sensor_test():
@@ -96,7 +116,10 @@ def sensor_test():
 
 if __name__ == "__main__":
     try: 
-        stationary_scan_test()
+        #stationary_scan_test()
+
+        astest()
+
         #drive_n_stop()
         #sensor_test()
         #move_test()

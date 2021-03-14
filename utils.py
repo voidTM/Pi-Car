@@ -71,3 +71,17 @@ def interpolate(x1, y1, x2, y2):
     yRange = yRange.astype(int)
 
     return np.array([xRange,yRange]).T
+
+
+def fill_between(grid, x1, y1, x2, y2, value):
+    
+    interpolated_values = interpolate(x1, y1, x2, y2)
+    
+    if interpolated_values.size == 0:
+        print("failed interpolation", x2,y2)
+
+    for v in interpolated_values:
+        if in_map_bounds(grid, v[0], v[1]):
+            grid[v[1]][v[0]] = value
+
+    return grid

@@ -17,7 +17,7 @@ class GPS(object):
     """
 
     # starts with an empty grid
-    def __init__(self, map_width: int = 200, map_length: int = 200, resolution: int = 5, start_x: int = 100, start_y: int = 100):
+    def __init__(self, map_width: int = 50, map_length: int = 50, resolution: int = 10, start_x: int = 100, start_y: int = 100):
 
         self.grid = np.full((map_width, map_length), 0, dtype = int)
         
@@ -30,7 +30,7 @@ class GPS(object):
         self.target_y = None
 
     # loads a grid
-    def load_grid(self, grid: np.array, resolution: int = 5, start_x: int = None, start_y: int = None):
+    def load_grid(self, grid: np.array, resolution: int = 10, start_x: int = None, start_y: int = None):
         self.grid = grid
         self.resolution = resolution
         self.grid_size = [len(grid), len(grid[0])]
@@ -134,6 +134,7 @@ class GPS(object):
         direction_map = {(0,1): 0, (-1,0): 270, (0, -1): 180, (1,0): 90}
         print("Full path",path)
         prev = path.popleft() # empty path?
+        print(prev)
         prev_direction = None
 
 
@@ -145,9 +146,7 @@ class GPS(object):
         
             # get new direction
             new_direction = direction_map[(dx, dy)]
-            #print(new_direction, (dx, dy))
-            if prev_direction == None:
-                print(prev_direction, new_direction, (dx, dy))
+
             
             if prev_direction == new_direction:
                 prev_instruction = instructions.pop()
