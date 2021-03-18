@@ -258,7 +258,8 @@ class PiCar(Car):
     def drive_instructions(self, instructions:deque):
 
         # while not at target
-        while(len(instructions) > 0):
+        steps_taken = 0
+        while(len(instructions) > 0 and steps_taken < 3):
             # convert instructions to polar
             step = instructions.popleft()
             print("directions: ", step)
@@ -283,6 +284,9 @@ class PiCar(Car):
 
             self.nav.update_postion(distance = int(driven), orientation = self.orientation)
             print( "curr position", self.nav.position)
+
+            steps_taken += 1
+
 
             # if blocked rerout
             if driven < step[1]:
