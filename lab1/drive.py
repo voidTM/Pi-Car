@@ -20,60 +20,21 @@ import detect as picam
 
 
 
-# drives around without any mapping, but has basic obstacle avoidance
-def roomba(speed:int = 10):
+# check to see the picar is moving properly
+def move_test():
 
-    while True:
-        
-        # get scan by distance
-        scan_list = scanner.scan_step_dist()
-        if not scan_list:
-            continue
-
-        # cap scanlist at 200
-        scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
-
-
-        ahead = scan_list[2:8]
-        # coast clear full speed ahead        
-        if min(ahead) > 35:
-            #print("Coast Clear")
-            blocked = False
-            fc.forward(speed)
-            continue
-
-        #print("need to stop")
-
-        fc.stop()
-
-        right = scan_list[:5]
-        left = scan_list[5:]
-
-        # -1 = turn left, 0 forward, 1 turn right
-        direction = 0
-        
-        # evaluates which direction turn
-        # turns in the direction with the most open space
-
-        if(sum(right) > sum(left)):
-            direction = 1
-        elif(sum(right) < sum(left)):
-            direction = -1
-
-        print(left, right)
-        #print ( direction)
-
-        if direction  == 1:
-            print("Turning right")
-            fc.turn_right(10)
-        elif direction  == -1:
-            print("Turning left")
-            fc.turn_left(10)
-        else:
-            while(fc.get_distance_at(0) < 30):
-                logging.info("too close backing up")
-
-                fc.backward(2)
+    picar = Car()
+    print("turning left")
+    picar.turn_left(90)
+    time.sleep(1)
+    print("turning right")
+    picar.turn_right(90)
+    time.sleep(1)
+    print("driving forward")
+    picar.drive_forward(20)
+    time.sleep(1)
+    print("driving backward")
+    picar.drive_backward(20)
 
 
 # drives forward until blocked

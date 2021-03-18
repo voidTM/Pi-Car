@@ -15,23 +15,6 @@ from gps import GPS
 from car import Car
 
 
-# check to see the picar is moving properly
-def move_test():
-
-    picar = Car()
-    print("turning left")
-    picar.turn_left(90)
-    time.sleep(1)
-    print("turning right")
-    picar.turn_right(90)
-    time.sleep(1)
-    print("driving forward")
-    picar.drive_forward(20)
-    time.sleep(1)
-    print("driving backward")
-    picar.drive_backward(20)
-
-
 def atestempty():
     grid = np.zeros([20,20], dtype = int)
 
@@ -46,21 +29,6 @@ def atestempty():
         print(step)
 
 
-# drives forward until blocked
-def drive_n_stop(speed: int = 5):
-    clear = True
-    fc.forward(speed)
-
-    while clear:
-        # scan list returns false until a full 180 deg scan is performed.
-        scan_list = fc.scan_step(35)
-        if not scan_list:
-            continue
-
-        ahead = scan_list[2:8]
-        if min(ahead) < 2:
-            clear = False
-            fc.stop()
 
 # scans the surroundings and saves the results to file
 def stationary_scan_test():
