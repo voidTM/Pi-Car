@@ -55,7 +55,7 @@ def stationary_scan_test():
 
     # populate map with obstacles
     for obst in obstacles:
-        picar_orientation = 90
+        picar_orientation = 0
         
         # actual orientation = picar_orientation + obstacle_scan angle
         orientation = obst[0] + picar_orientation
@@ -98,9 +98,9 @@ def astest():
 
 if __name__ == "__main__":
     try: 
-        #stationary_scan_test()
+        stationary_scan_test()
 
-        astest()
+        #astest()
 
         #drive_n_stop()
         #sensor_test()

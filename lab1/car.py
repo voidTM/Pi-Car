@@ -76,7 +76,7 @@ class Car(object):
     def turn_left(self, angle: int, power: int = 5):
         # need to adjust slippage for turning
 
-        slippage = 1.95 #1.74
+        slippage = 2.05 #1.74
         #siippage = 1.95
         dist = utils.angle_to_dist(angle) * slippage
         self.trip_meter.reset()
@@ -276,7 +276,8 @@ class PiCar(Car):
                 self.turn_left(abs(direction))
 
             if step[1] >= 0:
-                driven = self.drive_forward_cam(distance = step[1])
+                #driven = self.drive_forward_cam(distance = step[1])
+                driven = self.drive_forward(distance = step[1])
             else:
                 driven = self.drive_backward(distance = abs(step[1]))
 

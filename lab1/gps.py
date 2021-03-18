@@ -108,6 +108,8 @@ class GPS(object):
             for y in range(-buffer, buffer + 1):
                 self.add_point(obstacle_x + x, obstacle_y + y, 1)
 
+    def clear_grid(self):
+        self.grid = np.zeros(self.grid.shape)
 
 
     # astar navigation

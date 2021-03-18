@@ -24,12 +24,17 @@ import detect as picam
 def move_test():
 
     picar = Car()
+
     print("turning left")
     picar.turn_left(90)
     time.sleep(1)
     print("turning right")
-    picar.turn_right(90)
+    picar.turn_right(180)
     time.sleep(1)
+    print("turning left")
+    picar.turn_left(90)
+    time.sleep(1)
+
     print("driving forward")
     picar.drive_forward(20)
     time.sleep(1)
@@ -120,7 +125,7 @@ def drive_instructions(picar: Car, nav:GPS, instructions:deque):
 def drive_picar():
     #nav = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
     nav = GPS()
-    target = (30, 20)
+    target = (50, 50)
 
     c = PiCar(nav)
 
@@ -147,7 +152,10 @@ def drive_n_stop(speed: int = 5):
 
 
 if __name__ == "__main__":
-    try: 
+    try:
+
+        #
+        # move_test()
         drive_picar()
     finally: 
         fc.get_distance_at(0)
