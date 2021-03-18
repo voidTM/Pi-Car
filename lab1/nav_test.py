@@ -15,6 +15,8 @@ from gps import GPS
 from car import Car
 
 
+
+
 def atestempty():
     grid = np.zeros([20,20], dtype = int)
 
@@ -67,7 +69,21 @@ def stationary_scan_test():
 
 def astest():
     
-    t = stationary_scan_test()
+    t = GPS()
+    
+    obstacles = scanner.mapping_scan()
+    print(obstacles)
+    #obstacles[:,0] *= -1
+    #print(obstacles)
+
+    # populate map with obstacles
+    for obst in obstacles:
+        picar_orientation = 90
+        
+        # actual orientation = picar_orientation + obstacle_scan angle
+        orientation = obst[0] + picar_orientation
+
+        t.add_relative_obstacle(orientation = obst[0], distance = obst[1])
 
     instructions = t.set_navigation_goal((19, 10))
 
