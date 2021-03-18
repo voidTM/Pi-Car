@@ -70,7 +70,7 @@ def stationary_scan_test():
 def astest():
     
     t = GPS()
-    
+
     obstacles = scanner.mapping_scan()
     print(obstacles)
     #obstacles[:,0] *= -1
@@ -78,14 +78,16 @@ def astest():
 
     # populate map with obstacles
     for obst in obstacles:
-        picar_orientation = 90
+        picar_orientation = 0
         
         # actual orientation = picar_orientation + obstacle_scan angle
         orientation = obst[0] + picar_orientation
 
         t.add_relative_obstacle(orientation = obst[0], distance = obst[1])
 
-    instructions = t.set_navigation_goal((19, 10))
+    t.save_grid('maps/1object_scan_result.out')
+
+    instructions = t.set_navigation_goal((30, 20))
 
     # while not at target
     while(len(instructions) > 0):

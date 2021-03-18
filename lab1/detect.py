@@ -136,7 +136,7 @@ def look_for_objects(shutoff: bool, obstacle_queue: Queue):
         results = detect_objects(interpreter, image, threshold)
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
-        print(elapsed_ms)
+        #print(elapsed_ms)
         identify_objects(obstacle_queue, results, labels)
         
         stream.seek(0)

@@ -17,7 +17,7 @@ class GPS(object):
     """
 
     # starts with an empty grid
-    def __init__(self, map_width: int = 50, map_length: int = 50, resolution: int = 10, start_x: int = 100, start_y: int = 100):
+    def __init__(self, map_width: int = 100, map_length: int = 100, resolution: int = 5, start_x: int = 50, start_y: int = 0):
 
         self.grid = np.full((map_width, map_length), 0, dtype = int)
         
@@ -30,7 +30,7 @@ class GPS(object):
         self.target_y = None
 
     # loads a grid
-    def load_grid(self, grid: np.array, resolution: int = 10, start_x: int = None, start_y: int = None):
+    def load_grid(self, grid: np.array, resolution: int = 10, start_x: int = None, start_y: int = 0):
         self.grid = grid
         self.resolution = resolution
         self.grid_size = [len(grid), len(grid[0])]
@@ -39,10 +39,8 @@ class GPS(object):
             self.pos_x = len(grid) // 2
         else:
             self.pos_x = start_x
-        if start_x is None:
-            self.pos_y = len(grid[0]) // 2
-        else: 
-            self.pos_y = start_y
+
+        self.pos_y = start_y
 
         self.target_x = None
         self.target_y = None
@@ -102,8 +100,8 @@ class GPS(object):
 
 
         # look for nearby points
-        #buffer = 20 // self.resolution
-        buffer = 1
+        buffer = 20 // (self.resolution * 2)
+        #buffer = 1
         
         # adds a simple buffer and points
         for x in range(-buffer, buffer + 1):
@@ -180,7 +178,7 @@ class GPS(object):
             path.appendleft(node)
             s_grid[node[0]][node[1]] = 7
 
-        s_grid[self.pos_x][self.pos_y] = 9
+        #s_grid[self.pos_x][self.pos_y] = 9
         np.savetxt("maps/obstacles.out", self.grid, fmt='%i', delimiter=',')
         np.savetxt("maps/solution.out", s_grid, fmt='%i', delimiter=',')
         return path

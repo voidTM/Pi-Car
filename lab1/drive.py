@@ -118,12 +118,14 @@ def drive_instructions(picar: Car, nav:GPS, instructions:deque):
 
 # drives to a destination 
 def drive_picar():
-    nav = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
-    target = (3,10)
+    #nav = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
+    nav = GPS()
+    target = (30, 20)
 
     c = PiCar(nav)
 
     c.drive_target(target)
+
 
 # drives forward until blocked
 def drive_n_stop(speed: int = 5):

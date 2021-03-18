@@ -131,9 +131,10 @@ class Car(object):
         fc.forward(power)
         coast_clear = True
         while(self.trip_meter.distance < distance and coast_clear):
-            if (fc.get_status_at(0, 20) != 2):
-                coast_clear = False
-                break
+            #if (fc.get_status_at(0, 20) != 2):
+            #    coast_clear = False
+            #    break
+            continue
         
         fc.stop()
         print(self.trip_meter.distance, distance)
@@ -275,7 +276,7 @@ class PiCar(Car):
                 self.turn_left(abs(direction))
 
             if step[1] >= 0:
-                driven = self.drive_forward(distance = step[1])
+                driven = self.drive_forward_cam(distance = step[1])
             else:
                 driven = self.drive_backward(distance = abs(step[1]))
 
