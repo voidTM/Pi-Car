@@ -131,17 +131,17 @@ class Car(object):
         fc.forward(power)
         coast_clear = True
         while(self.trip_meter.distance < distance and coast_clear):
-            #if (fc.get_status_at(0, 20) != 2):
-            #    coast_clear = False
-            #    break
+            if (fc.get_status_at(0, 20) != 2):
+                coast_clear = False
+                break
             continue
         
         fc.stop()
         print(self.trip_meter.distance, distance)
 
-        actually_traveled = self.trip_meter.distance
 
-        return actually_traveled
+
+        return coast_clear
     
 
     def drive_backward(self, distance = 10, power = 5):
@@ -152,6 +152,7 @@ class Car(object):
             continue
         
         fc.stop()
+
         actually_traveled = self.trip_meter.distance
 
         return actually_traveled
@@ -173,15 +174,13 @@ class PiCar(Car):
     def drive_forward_cam(self, distance: int, power: int = 2):
         self.trip_meter.reset()
         fc.forward(power)
-        obstacle = False
         blocked = False
 
         # clear obstacles 
         with self.obstacle_queue.mutex:
             self.obstacle_queue.queue.clear()
-        stopped= False
         
-        while(self.trip_meter.distance < distance):
+        while(self.trip_meter.distance < distance and not blocked):
 
             # handle obstacles
             if not self.obstacle_queue.empty():
@@ -196,28 +195,16 @@ class PiCar(Car):
                     self.nav.add_relative_obstacle(orientation = self.orientation, distance = 20 + traveled)
                     
                     break
-                else:
+                else: # a person or 
                     self.obstacle_queue.task_done()
                     with self.obstacle_queue.mutex:
                         self.obstacle_queue.queue.clear()
-                    time.sleep(2)
+                    time.sleep(1)
                     
             else:
                 fc.forward(power)
 
-            scan_list = scanner.scan_step_dist()
-            if not scan_list:
-                continue
-
-            # preprocess scanlist
-            scan_list = [200 if d == -2 else 200 if d > 200 else d for d in  scan_list] 
-            ahead = scan_list[3:7]
-            # coast clear full speed ahead        
-            if min(ahead) < 25:
-                #blocked = True
-                fc.stop()
-                break
-        
+        # switch to something else?
         with self.obstacle_queue.mutex:
             self.obstacle_queue.queue.clear()
 
@@ -225,13 +212,16 @@ class PiCar(Car):
         fc.stop()
         actually_traveled = self.trip_meter.distance
 
+        
 
         if blocked:
-            actually_traveled -= self.drive_backward(15)
+            self.drive_backward(15)
 
-        return actually_traveled
+        return blocked
 
     
+    def drive_backward(self):
+
     
     # drives towards a target
     def drive_target(self, target: tuple):
