@@ -110,10 +110,6 @@ def astest():
         print(step)
 
 
-def sensor_test():
-    print("CPU Temperature", fc.utils.cpu_temperature())
-    print("GPU Temperature", fc.utils.gpu_temperature())
-
 if __name__ == "__main__":
     try: 
         #stationary_scan_test()

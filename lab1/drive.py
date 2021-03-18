@@ -155,14 +155,30 @@ def drive_instructions(picar: Car, nav:GPS, instructions:deque):
 
 
 
+# drives to a destination 
 def drive_picar():
-    nav = GPS(map_width = 20, map_length = 20, resolution = 10, start_x = 15, start_y = 0)
+    nav = GPS(map_width = 30, map_length = 30, resolution = 10, start_x = 15, start_y = 0)
     target = (3,10)
 
     c = PiCar(nav)
 
     c.drive_target(target)
 
+# drives forward until blocked
+def drive_n_stop(speed: int = 5):
+    clear = True
+    fc.forward(speed)
+
+    while clear:
+        # scan list returns false until a full 180 deg scan is performed.
+        scan_list = fc.scan_step(35)
+        if not scan_list:
+            continue
+
+        ahead = scan_list[2:8]
+        if min(ahead) < 2:
+            clear = False
+            fc.stop()
 
 
 
