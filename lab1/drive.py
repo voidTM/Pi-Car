@@ -130,6 +130,8 @@ def drive_picar():
 
     c.drive_target(target)
 
+    del c
+
 
 # drives forward until blocked
 def drive_n_stop(speed: int = 5):

@@ -233,6 +233,8 @@ class PiCar(Car):
             print("Scan results")
             print(obstacles)
             print(" ")
+
+            # resets the grid for more up to date results.
             self.nav.clear_grid()
             for obst in obstacles:
                 abs_orient = obst[0] + self.orientation
@@ -258,7 +260,6 @@ class PiCar(Car):
             #print("turning angle", direction)
 
             
-            driven = 0
             # change direction if needed
             if direction > 0: 
                 self.turn_right(direction)
