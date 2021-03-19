@@ -276,7 +276,7 @@ class PiCar(Car):
             steps_taken += 1
 
             # need to recalibrate
-            if not coast_clear or steps_taken > 2:
+            if not coast_clear or steps_taken == 3:
                 return False
 
     

@@ -44,12 +44,12 @@ def stationary_scan_test():
     grid = np.zeros([50,50], dtype = int)
 
     t = GPS()
-    t.load_grid(grid, resolution = 2, start_x = 25, start_y = 0)
+    t.load_grid(grid, resolution = 2, start_x = 0, start_y = 0)
 
 
     # performs a full 180 deg scan at 5 deg intervals
     obstacles = scanner.mapping_scan()
-
+    print(obstacles)
     # populate map with obstacles
     for obst in obstacles:
         picar_orientation = 0
@@ -57,7 +57,7 @@ def stationary_scan_test():
         # actual orientation = picar_orientation + obstacle_scan angle
         orientation = obst[0] + picar_orientation
 
-        t.add_relative_obstacle(orientation = obst[0], distance = obst[1])
+        t.add_relative_obstacle(orientation = orientation, distance = obst[1])
 
     # save the scan results to file
     t.save_grid('maps/1object_scan_result.out')
