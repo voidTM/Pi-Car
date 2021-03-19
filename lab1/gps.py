@@ -94,6 +94,9 @@ class GPS(object):
         obs_x = int(obs_x // self.resolution) + self.pos_x
         obs_y = int(obs_y // self.resolution) + self.pos_y
 
+        print("polar: ", orientation, distance)
+        print("cartesian:", obs_x, obs_y)
+
         self.add_obstacle(int(obs_x), int(obs_y))
 
     def add_obstacle(self, obstacle_x: int, obstacle_y: int):
@@ -101,8 +104,9 @@ class GPS(object):
 
         # look for nearby points
         buffer = 20 // (self.resolution * 2)
-        #buffer = 1
-        
+        #print(self.resolution * 2)
+        buffer = 1
+        #print(buffer)
         # adds a simple buffer and points
         for x in range(-buffer, buffer + 1):
             for y in range(-buffer, buffer + 1):
@@ -199,9 +203,9 @@ class GPS(object):
         neighbors = []
 
         neighbors.append([curr_p[0], curr_p[1] + 1]) # above
+        neighbors.append([curr_p[0], curr_p[1] - 1]) # below
         neighbors.append([curr_p[0] + 1, curr_p[1]]) #right
         neighbors.append([curr_p[0] - 1, curr_p[1]]) #left
-        neighbors.append([curr_p[0], curr_p[1] - 1]) # below
 
         for neighbor in neighbors:
             if self.in_bounds(neighbor[0], neighbor[1]): # in bounds

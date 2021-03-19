@@ -49,9 +49,6 @@ def stationary_scan_test():
 
     # performs a full 180 deg scan at 5 deg intervals
     obstacles = scanner.mapping_scan()
-    print(obstacles)
-    #obstacles[:,0] *= -1
-    #print(obstacles)
 
     # populate map with obstacles
     for obst in obstacles:
@@ -69,8 +66,9 @@ def stationary_scan_test():
 
 def astest():
     
-    t = GPS()
-
+    t = GPS(map_width = 100, map_length = 100, resolution = 5, start_x = 50, start_y = 0)
+    target = (50, 50)
+    
     obstacles = scanner.mapping_scan()
     print(obstacles)
     #obstacles[:,0] *= -1
@@ -87,7 +85,7 @@ def astest():
 
     t.save_grid('maps/1object_scan_result.out')
 
-    instructions = t.set_navigation_goal((30, 20))
+    instructions = t.set_navigation_goal(target)
 
     # while not at target
     while(len(instructions) > 0):

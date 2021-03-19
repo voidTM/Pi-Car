@@ -230,9 +230,9 @@ class PiCar(Car):
 
             # scan for obstacles
             obstacles = scanner.mapping_scan()
-            print("Scan results")
-            print(obstacles)
-            print(" ")
+            #print("Scan results")
+            #print(obstacles)
+            #print(" ")
 
             # resets the grid for more up to date results.
             self.nav.clear_grid()

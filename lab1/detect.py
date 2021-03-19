@@ -79,7 +79,7 @@ def detect_objects(interpreter, image, threshold):
     dx = (boxes[i][3] - boxes[i][1])
     size = dy * dx
     # objects must be larger than a certain size
-    if scores[i] >= threshold and size > 0.1:
+    if scores[i] >= threshold and size > 0.2:
       result = {
           'bounding_box': boxes[i],
           'class_id': classes[i],
@@ -94,10 +94,10 @@ def identify_objects(queue, results, labels):
   obstacle_list = ['tennis racket', "apple"]
   for obj in results:
       if labels[obj['class_id']] in obstacle_list:
-        print("Detected ", labels[obj['class_id']], obj['score'])
+        #print("Detected ", labels[obj['class_id']], obj['score'])
         queue.put("obstacle")
       elif labels[obj['class_id']] in stop_list:
-        print("Detected ", labels[obj['class_id']], obj['score'])
+        #print("Detected ", labels[obj['class_id']], obj['score'])
         queue.put("stop")
 
 
