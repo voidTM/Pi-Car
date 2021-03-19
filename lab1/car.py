@@ -76,8 +76,8 @@ class Car(object):
     def turn_left(self, angle: int, power: int = 5):
         # need to adjust slippage for turning
 
-        slippage = 2.05 #1.74
-        #siippage = 1.95
+        #slippage = 2.05 #1.74
+        siippage = 1.95
         dist = utils.angle_to_dist(angle) * slippage
         self.trip_meter.reset()
 

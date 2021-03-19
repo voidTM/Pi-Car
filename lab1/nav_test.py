@@ -66,8 +66,8 @@ def stationary_scan_test():
 
 def astest():
     
-    t = GPS(map_width = 100, map_length = 100, resolution = 5, start_x = 50, start_y = 0)
-    target = (50, 50)
+    t = GPS(map_width = 100, map_length = 100, resolution = 10, start_x = 50, start_y = 0)
+    target = (50, 20)
     
     obstacles = scanner.mapping_scan()
     print(obstacles)
@@ -96,9 +96,9 @@ def astest():
 
 if __name__ == "__main__":
     try: 
-        stationary_scan_test()
+        #stationary_scan_test()
 
-        #astest()
+        astest()
 
         #drive_n_stop()
         #sensor_test()

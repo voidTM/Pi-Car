@@ -17,7 +17,7 @@ class GPS(object):
     """
 
     # starts with an empty grid
-    def __init__(self, map_width: int = 100, map_length: int = 100, resolution: int = 5, start_x: int = 50, start_y: int = 0):
+    def __init__(self, map_width: int = 100, map_length: int = 100, resolution: int = 10, start_x: int = 50, start_y: int = 0):
 
         self.grid = np.full((map_width, map_length), 0, dtype = int)
         
@@ -103,9 +103,9 @@ class GPS(object):
 
 
         # look for nearby points
-        buffer = 20 // (self.resolution * 2)
+        buffer = 20 // (self.resolution * 2) 
         #print(self.resolution * 2)
-        buffer = 1
+        #buffer = 1
         #print(buffer)
         # adds a simple buffer and points
         for x in range(-buffer, buffer + 1):
@@ -179,6 +179,7 @@ class GPS(object):
         path.appendleft(node)
 
         s_grid = np.array(self.grid)
+        print(cameFrom)
         while node in cameFrom:
             node = cameFrom[node]
             path.appendleft(node)
@@ -201,16 +202,14 @@ class GPS(object):
         #print(curr_p, type(curr_p))
 
         neighbors = []
-
-        neighbors.append([curr_p[0], curr_p[1] + 1]) # above
-        neighbors.append([curr_p[0], curr_p[1] - 1]) # below
         neighbors.append([curr_p[0] + 1, curr_p[1]]) #right
         neighbors.append([curr_p[0] - 1, curr_p[1]]) #left
+        neighbors.append([curr_p[0], curr_p[1] + 1]) # above
+        neighbors.append([curr_p[0], curr_p[1] - 1]) # below
 
         for neighbor in neighbors:
-            if self.in_bounds(neighbor[0], neighbor[1]): # in bounds
-                if self.grid[int(neighbor[0])][int(neighbor[1])] != 1: # not an obstacle
-                    yield tuple(neighbor)
+            if self.in_bounds(neighbor[0], neighbor[1]) and self.grid[int(neighbor[0])][int(neighbor[1])] != 1: # in bounds
+                yield tuple(neighbor)
 
 
     # coordinates need to be stored and recieved as tuples
