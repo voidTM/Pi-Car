@@ -216,7 +216,7 @@ class PiCar(Car):
         
         self.nav.update_postion(actually_traveled, self.orientation)
 
-        return blocked
+        return coast_clear
 
     
         
@@ -236,6 +236,8 @@ class PiCar(Car):
 
             # resets the grid for more up to date results.
             self.nav.clear_grid()
+
+            # adds in new obstacles
             for obst in obstacles:
                 abs_orient = obst[0] + self.orientation
                 self.nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
@@ -243,6 +245,8 @@ class PiCar(Car):
             instructions = self.nav.set_navigation_goal(target)
             
             at_destination = self.drive_instructions(instructions)
+
+        print("arrived at destination")
 
     # drive according to instructions until blocked or finished
     def drive_instructions(self, instructions:deque):
