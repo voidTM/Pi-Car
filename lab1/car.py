@@ -174,28 +174,25 @@ class PiCar(Car):
     def drive_forward_cam(self, distance: int, power: int = 2):
         self.trip_meter.reset()
         fc.forward(power)
-        blocked = False
+        coast_clear = True
 
         # clear obstacles 
         with self.obstacle_queue.mutex:
             self.obstacle_queue.queue.clear()
         
-        while(self.trip_meter.distance < distance and not blocked):
+        while(self.trip_meter.distance < distance and coast_clear):
 
             # handle obstacles
             if not self.obstacle_queue.empty():
+                fc.stop()
+
                 print(self.obstacle_queue.qsize())
                 o = self.obstacle_queue.get()
 
-                fc.stop()
                 if o == "obstacle":
-                    obstacle = True
-                    traveled = self.trip_meter.distance
-                    
-                    self.nav.add_relative_obstacle(orientation = self.orientation, distance = 20 + traveled)
-                    
+                    coast_clear = False                    
                     break
-                else: # a person or 
+                else: # must stop
                     self.obstacle_queue.task_done()
                     with self.obstacle_queue.mutex:
                         self.obstacle_queue.queue.clear()
@@ -212,16 +209,17 @@ class PiCar(Car):
         fc.stop()
         actually_traveled = self.trip_meter.distance
 
-        
-
-        if blocked:
+        # encountered an obstacle.
+        if not coast_clear:
             self.drive_backward(15)
+            actually_traveled -= 15
+        
+        self.nav.update_postion(actually_traveled, self.orientation)
 
         return blocked
 
     
-    def drive_backward(self):
-
+        
     
     # drives towards a target
     def drive_target(self, target: tuple):
@@ -235,7 +233,7 @@ class PiCar(Car):
             print("Scan results")
             print(obstacles)
             print(" ")
-            
+            self.nav.clear_grid()
             for obst in obstacles:
                 abs_orient = obst[0] + self.orientation
                 self.nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
@@ -249,11 +247,12 @@ class PiCar(Car):
 
         # while not at target
         steps_taken = 0
-        while(len(instructions) > 0 and steps_taken < 3):
+        while(len(instructions) > 0):
             # convert instructions to polar
             step = instructions.popleft()
             print("directions: ", step)
                     
+            # calculate the shortest angle to turn
             direction = step[0] - self.orientation
             direction = (direction + 180) % 360 - 180
             #print("turning angle", direction)
@@ -266,22 +265,16 @@ class PiCar(Car):
             elif direction < 0:
                 self.turn_left(abs(direction))
 
-            if step[1] >= 0:
-                #driven = self.drive_forward_cam(distance = step[1])
-                driven = self.drive_forward(distance = step[1])
-            else:
-                driven = self.drive_backward(distance = abs(step[1]))
-
-            self.nav.update_postion(distance = int(driven), orientation = self.orientation)
-            print( "curr position", self.nav.position)
+            
+            coast_clear = self.drive_forward_cam(distance = step[1])
 
             steps_taken += 1
 
-
-            # if blocked rerout
-            if driven < step[1]:
+            # need to recalibrate
+            if not coast_clear or steps_taken > 2:
                 return False
 
+    
         return True
 
     
