@@ -77,7 +77,7 @@ class Car(object):
         # need to adjust slippage for turning
 
         #slippage = 2.05 #1.74
-        siippage = 1.95
+        slippage = 1.95
         dist = utils.angle_to_dist(angle) * slippage
         self.trip_meter.reset()
 
@@ -235,7 +235,8 @@ class PiCar(Car):
             #print(" ")
 
             # resets the grid for more up to date results.
-            self.nav.clear_grid()
+            # should only reset half the grid?
+            #self.nav.clear_grid()
 
             # adds in new obstacles
             for obst in obstacles:

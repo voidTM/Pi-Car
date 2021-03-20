@@ -8,8 +8,17 @@ import utils
 from queue import PriorityQueue
 from collections import deque
 
+from dataclasses import dataclass, field
+from typing import Any
+
+@dataclass(order=True)
+class fscore:
+    score: int
+    item: Any=field(compare=False)
+
 
 # goal is to track the car's position on a map
+
 
 class GPS(object):
     """
@@ -218,13 +227,12 @@ class GPS(object):
         # path/dict of path and objects
         cameFrom = {} # likely store this as part of the class?
 
-        openNodes = PriorityQueue()
-        openNodes.put((0, start))
+        openNodes = PriorityQueue(fscore)
+        openNodes.put(fscore(0, start))
         gScore = {}
-        fScore = {}
 
         gScore[start] = 0
-        fScore[start] = gScore[start] + self.heuristicEstimate(start,goal)
+        #fScore[start] = gScore[start] + self.heuristicEstimate(start,goal)
 
         while not openNodes.empty():
             curr_score, curr_pos = openNodes.get() # priority queue should pop the lowest
@@ -236,7 +244,7 @@ class GPS(object):
                 # since no diagonals just use a flat number?
                 tentative_gScore = gScore[curr_pos] + self.distBetween(curr_pos, neighbor)
 
-                # already been calculated before and score is higher
+                # ignore already been calculated before and score is higher
                 if neighbor not in gScore or tentative_gScore < gScore[tuple(neighbor)]:
                     # adds to current set if not in
                     cameFrom[neighbor] = curr_pos
