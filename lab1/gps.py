@@ -145,9 +145,9 @@ class GPS(object):
             return instructions
         # car orientation
         direction_map = {(0,1): 0, (-1,0): 270, (0, -1): 180, (1,0): 90}
-        print("Full path",path)
+        #print("Full path",path)
         prev = path.popleft() # empty path?
-        print(prev)
+        #print(prev)
         prev_direction = None
 
 
@@ -160,7 +160,7 @@ class GPS(object):
             # get new direction
             new_direction = direction_map[(dx, dy)]
 
-            
+            """
             if prev_direction == new_direction:
                 prev_instruction = instructions.pop()
                 merge = (new_direction, prev_instruction[1] + self.resolution)
@@ -169,13 +169,15 @@ class GPS(object):
             else:
                 # need buffer?
                 instructions.append((new_direction, self.resolution))
-            
+            """
+
+            instructions.append((new_direction, self.resolution))
 
             prev = curr
 
             prev_direction = new_direction
 
-        print(instructions)
+        #print(instructions)
         return instructions
  
 
@@ -227,12 +229,13 @@ class GPS(object):
         # path/dict of path and objects
         cameFrom = {} # likely store this as part of the class?
 
-        openNodes = PriorityQueue(fscore)
-        openNodes.put(fscore(0, start))
+        openNodes = PriorityQueue()
+        openNodes.put((0, start))
         gScore = {}
+        fScore = {}
 
         gScore[start] = 0
-        #fScore[start] = gScore[start] + self.heuristicEstimate(start,goal)
+        fScore[start] = gScore[start] + self.heuristicEstimate(start,goal)
 
         while not openNodes.empty():
             curr_score, curr_pos = openNodes.get() # priority queue should pop the lowest

@@ -52,24 +52,6 @@ class Car(object):
 
         return self.orientation
         
-    def turn_right_target(self, target: float, power: int = 5):
-        slippage = 2.2
-        self.trip_meter.start()
-        fc.turn_right(power)
-        while(fc.get_distance_at(0) < target):
-            continue
-        fc.stop()
-        self.trip_meter.stop()
-
-        distance_turned = self.trip_meter.distance * 0.65
-        # netagive angle for right turn
-        angle = dist_to_angle(distance_turned)
-
-        self.orientation = update_angle(self.orientation, angle)
-        print("angle turned", angle)
-        print("new car orientation", self.orientation)
-
-        return self.orientation
 
 
     # left turns
@@ -93,25 +75,6 @@ class Car(object):
 
         return self.orientation
     
-    def turn_left_target(self, target: float, power: int = 5):
-        # need to adjust slippage for turning
-        slippage = 2
-
-        self.trip_meter.reset()
-        fc.turn_left(power)
-        while(fc.get_distance_at(0) < target):
-            continue
-        fc.stop()
-
-        distance_turned = self.trip_meter.distance
-        # netagive angle for right turn
-        angle = dist_to_angle(distance_turned)
-
-        self.orientation = update_angle(self.orientation, -angle)
-        print("new car orientation", self.orientation)
-
-        return self.orientation
-
 
 
     # turning
@@ -157,8 +120,6 @@ class Car(object):
 
         return actually_traveled
 
-    def handle_obstacle(self, obstacle: tuple):
-        pass
 
 
 class PiCar(Car):
@@ -245,6 +206,7 @@ class PiCar(Car):
                 
             instructions = self.nav.set_navigation_goal(target)
             
+            
             at_destination = self.drive_instructions(instructions)
 
         print("arrived at destination")
@@ -277,7 +239,7 @@ class PiCar(Car):
             steps_taken += 1
 
             # need to recalibrate
-            if not coast_clear or steps_taken == 3:
+            if not coast_clear or steps_taken == 10:
                 return False
 
     

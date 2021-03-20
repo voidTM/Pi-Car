@@ -124,7 +124,7 @@ def drive_instructions(picar: Car, nav:GPS, instructions:deque):
 # drives to a destination 
 def drive_picar():
     nav = GPS(map_width = 100, map_length = 100, resolution = 10, start_x = 50, start_y = 0)
-    target = (50, 20)
+    target = (50, 15)
 
     c = PiCar(nav)
 
