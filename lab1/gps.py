@@ -190,7 +190,6 @@ class GPS(object):
         path.appendleft(node)
 
         s_grid = np.array(self.grid)
-        print(cameFrom)
         while node in cameFrom:
             node = cameFrom[node]
             path.appendleft(node)

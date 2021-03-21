@@ -35,7 +35,7 @@ def roomba(speed = 20):
         ahead = scan_list[2:8]
 
         # coast clear full speed ahead        
-        if min(ahead) > 20:
+        if min(ahead) > 30:
             fc.forward(speed)
             continue
 
@@ -43,8 +43,8 @@ def roomba(speed = 20):
         fc.stop()
 
 
-        right = scan_list[:5]
-        left = scan_list[5:]
+        left = scan_list[:5]
+        right = scan_list[5:]
 
         # -1 = turn left, 0 forward, 1 turn right
         direction = 0
@@ -53,30 +53,19 @@ def roomba(speed = 20):
 
         if(sum(right) > sum(left)):
             direction = 1
-        elif(sum(right) < sum(left)):
+        else:
             direction = -1
 
         
-        print(sum(left), sum(right))
-        print ( direction)
+        #print(sum(left), sum(right))
+        #print( direction)
 
         if direction  == 1:
             logging.info("Turning right")
-            fc.turn_right(10)
-            time.sleep(1)
-            fc.stop()
+            fc.turn_right(speed)
         elif direction  == -1:
             logging.info("Turning left")
-            fc.turn_left(10)
-            time.sleep(1)
-            fc.stop()
-        else:
-            while(fc.get_distance_at(0) < 30):
-                logging.info("too close backing up")
-
-                fc.backward(2)
-            fc.stop()
-
+            fc.turn_left(speed)
         
 
 
