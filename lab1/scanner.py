@@ -19,7 +19,7 @@ scan_status = []
 scan_dist = []
 
 # holds all the scanning info
-
+"""
 def next_step():
     global current_angle, us_step, MAX_ANGLE, MIN_ANGLE
     current_angle += us_step
@@ -30,7 +30,9 @@ def next_step():
         current_angle = MIN_ANGLE
         us_step = STEP
     return current_angle
+"""
 
+"""
 def scan_step_status(ref1 = 35, ref2 = 10):
     global scan_status, current_angle, us_step
 
@@ -55,7 +57,9 @@ def scan_step_status(ref1 = 35, ref2 = 10):
         return tmp
     else:
         return False
+"""
 
+# performs a step scan and returns the distance at a particular angle
 def scan_step_dist():
     global scan_dist, current_angle, us_step
     current_angle += us_step

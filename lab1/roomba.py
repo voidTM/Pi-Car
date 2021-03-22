@@ -18,8 +18,8 @@ from odometer import Duodometer
 
 
 # picar drives around like a roomba without any  
-def roomba(speed = 20):
-    blocked = True
+def roomba(speed = 10):
+
     while True:
         
         # get scan by distance
@@ -71,7 +71,7 @@ def roomba(speed = 20):
 
 if __name__ == "__main__":
     try: 
-        #logging.basicConfig(filename='roomba_drive.log', level=logging.INFO)
+
         roomba()
     finally: 
         fc.get_distance_at(0)
