@@ -10,12 +10,10 @@ import logging
 import scanner
 from odometer import Duodometer
 
-"""
-    The basic driving and avoiding obstacles should be good for steps 1-3
-"""
-# 60 degree is about the closest servos
-#scanning
 
+"""
+    The basic driving and avoiding obstacles for Part 1 of lab
+"""
 
 # picar drives around like a roomba without any  
 def roomba(speed = 10):
@@ -32,10 +30,11 @@ def roomba(speed = 10):
         scan_list = [200 if d == -2 else d for d in  scan_list] 
 
         # readings that are infront on the Picar
-        ahead = scan_list[2:8]
+        # -54 degrees to 54 degrees
+        ahead = scan_list[2:7]
 
         # coast clear full speed ahead        
-        if min(ahead) > 30:
+        if min(ahead) > 35:
             fc.forward(speed)
             continue
 

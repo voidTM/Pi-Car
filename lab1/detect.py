@@ -101,14 +101,11 @@ def identify_objects(queue, results, labels):
         queue.put("stop")
 
 
-#def look_for_objects(obstacle_queue: Queue):
 
 def look_for_objects(shutoff: bool, obstacle_queue: Queue):  
   labels = load_labels("Object-detection/Model/coco_labels.txt")
   interpreter = Interpreter("Object-detection/Model/detect.tflite")
 
-  #labels = load_labels("./picam/Object-detection/Model/mobilenet2labels.txt")
-  #interpreter = Interpreter("./picam/Object-detection/Model/mobilenet_v3.tflite")
   interpreter.allocate_tensors()
 
     # Get input and output tensors.
@@ -138,6 +135,63 @@ def look_for_objects(shutoff: bool, obstacle_queue: Queue):
         elapsed_ms = (time.monotonic() - start_time) * 1000
         #print(elapsed_ms)
         identify_objects(obstacle_queue, results, labels)
+        
+        stream.seek(0)
+        stream.truncate()
+        if shutoff:
+          break
+
+    finally:
+      camera.stop_preview()
+
+
+
+def found_obstacle(results, labels):
+
+  obstacle_list = ['tennis racket', "apple", "person", "stop sign"]
+  for obj in results:
+      if labels[obj['class_id']] in obstacle_list:        
+        return True
+
+  # nothing in list
+  return False
+
+
+def detect_traffic(shutoff: bool, obstacle: bool):
+  labels = load_labels("Object-detection/Model/coco_labels.txt")
+  interpreter = Interpreter("Object-detection/Model/detect.tflite")
+
+
+  interpreter.allocate_tensors()
+
+    # Get input and output tensors.
+  input_details = interpreter.get_input_details()
+  output_details = interpreter.get_output_details()
+    # Test the model on random input data.
+  input_shape = input_details[0]['shape']
+  threshold = 0.6
+
+  _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
+
+  with picamera.PiCamera(
+      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=15) as camera:
+    camera.start_preview()
+    try:
+      stream = io.BytesIO()
+      # loop occurs here
+      for _ in camera.capture_continuous(
+          stream, format='jpeg', use_video_port=True):
+        stream.seek(0)
+        image = Image.open(stream).convert('RGB').resize(
+            (input_width, input_height), Image.ANTIALIAS)
+        start_time = time.monotonic()
+        # detects th objects
+
+        results = detect_objects(interpreter, image, threshold)
+
+        elapsed_ms = (time.monotonic() - start_time) * 1000
+        #print(elapsed_ms)
+        obstacle = found_obstacle(results, labels)
         
         stream.seek(0)
         stream.truncate()
