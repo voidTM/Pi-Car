@@ -275,7 +275,7 @@ class SimplePiCar(Car):
         self.obstacle_queue = Queue()
         #self.labels = detect.load_labels("Object-detection/Model/coco_labels.txt")
         #self.interpreter = Interpreter("Object-detection/Model/detect.tflite")
-        #self.cam = picamera.PiCamera(resolution=(640, 480), framerate=15)
+        self.cam = detect.TrafficCam()
 
     """
     def check_traffic(self):
@@ -310,7 +310,7 @@ class SimplePiCar(Car):
         
         while(self.trip_meter.distance < distance):
 
-            while(detect.detect_traffic() == True):
+            while(self.cam.detect_traffic() == True):
                 fc.stop()
                 print("Obstacle detected")
                 time.sleep(2)

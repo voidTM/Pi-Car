@@ -158,8 +158,6 @@ def found_obstacle(results, labels):
 
 
 def detect_traffic():
-  labels = load_labels("Object-detection/Model/coco_labels.txt")
-  interpreter = Interpreter("Object-detection/Model/detect.tflite")
 
   obstacle = False
   interpreter.allocate_tensors()
@@ -190,7 +188,7 @@ def detect_traffic():
         elapsed_ms = (time.monotonic() - start_time) * 1000
         #print(elapsed_ms)
         obstacle = found_obstacle(results, labels)
-        
+        print(elapsed_ms)
         stream.seek(0)
         stream.truncate()
 
@@ -202,3 +200,45 @@ def detect_traffic():
 def evaluate(interpreter, image):
 
   results = detect_objects(interpreter, image, threshold)
+
+
+
+class TrafficCam(Object):
+  def __init__():
+    self.labels = load_labels("Object-detection/Model/coco_labels.txt")
+    self.interpreter = Interpreter("Object-detection/Model/detect.tflite")
+    self.interpreter.allocate_tensors()
+    _, self.input_height, self.input_width, _ = interpreter.get_input_details()[0]['shape']
+
+  def detect_traffic(self):
+
+    obstacle = False
+
+    threshold = 0.6
+
+
+    with picamera.PiCamera(
+        resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
+      camera.start_preview()
+      try:
+          stream = io.BytesIO()
+          camera.capture(stream, format = "jpeg")
+          stream.seek(0)
+          image = Image.open(stream).convert('RGB').resize(
+              (self.input_width, self.input_height), Image.ANTIALIAS)
+          start_time = time.monotonic()
+          # detects th objects
+
+          results = detect_objects(interpreter, image, threshold)
+
+          obstacle = found_obstacle(results, labels)
+          stream.seek(0)
+          stream.truncate()
+
+      finally:
+        camera.stop_preview()
+    
+    elapsed_ms = (time.monotonic() - start_time) * 1000
+    print(elapsed_ms)
+
+    return obstacle
