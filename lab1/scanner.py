@@ -91,7 +91,7 @@ def mapping_scan(min_angle = MIN_ANGLE, max_angle = MAX_ANGLE + 1, step = 5):
     scan_dist = []
     for angle in range(min_angle, max_angle, 5):
         # give time for settling
-        time.sleep(0.2)
+        time.sleep(0.1)
         dist = fc.get_distance_at(angle)
         # ignore values that are -2 likely too far away
         if dist != -2:

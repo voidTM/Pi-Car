@@ -157,11 +157,11 @@ def found_obstacle(results, labels):
   return False
 
 
-def detect_traffic(shutoff: bool, obstacle: bool):
+def detect_traffic():
   labels = load_labels("Object-detection/Model/coco_labels.txt")
   interpreter = Interpreter("Object-detection/Model/detect.tflite")
 
-
+  obstacle = False
   interpreter.allocate_tensors()
 
     # Get input and output tensors.
@@ -174,13 +174,11 @@ def detect_traffic(shutoff: bool, obstacle: bool):
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
   with picamera.PiCamera(
-      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=15) as camera:
+      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
     camera.start_preview()
     try:
-      stream = io.BytesIO()
-      # loop occurs here
-      for _ in camera.capture_continuous(
-          stream, format='jpeg', use_video_port=True):
+        stream = io.BytesIO()
+        camera.capture(stream, format = "jpeg")
         stream.seek(0)
         image = Image.open(stream).convert('RGB').resize(
             (input_width, input_height), Image.ANTIALIAS)
@@ -195,8 +193,12 @@ def detect_traffic(shutoff: bool, obstacle: bool):
         
         stream.seek(0)
         stream.truncate()
-        if shutoff:
-          break
 
     finally:
       camera.stop_preview()
+
+  return obstacle
+
+def evaluate(interpreter, image):
+
+  results = detect_objects(interpreter, image, threshold)

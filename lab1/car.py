@@ -11,7 +11,18 @@ from odometer import Duodometer
 from gps import GPS
 import gps, scanner, utils
 import detect
+from tflite_runtime.interpreter import Interpreter
 
+
+import numpy as np
+import picamera
+
+from PIL import Image
+
+import argparse
+import io
+import re
+import time
 
 
 
@@ -262,20 +273,20 @@ class SimplePiCar(Car):
         super().__init__()
         self.nav = GPS(map_width = 100, map_length = 100, resolution = 10, start_x = 50, start_y = 0)
         self.obstacle_queue = Queue()
-        self.labels = load_labels("Object-detection/Model/coco_labels.txt")
-        self.interpreter = Interpreter("Object-detection/Model/detect.tflite")
-        self.cam = picamera.PiCamera(resolution=(640, 480), framerate=15)
+        #self.labels = detect.load_labels("Object-detection/Model/coco_labels.txt")
+        #self.interpreter = Interpreter("Object-detection/Model/detect.tflite")
+        #self.cam = picamera.PiCamera(resolution=(640, 480), framerate=15)
 
-
+    """
     def check_traffic(self):
 
         traffic = False
 
-        with cam:
-            cam.start_preview()
+        with self.cam:
+            self.cam.start_preview()
             try:
                 stream = io.BytesIO()
-                camera.capture(stream, format = "jpeg")
+                self.cam.capture(stream, format = "jpeg")
                 stream.seek(0)
                 image = Image.open(stream).convert('RGB').resize(
                     (self.input_width, self.input_height), Image.ANTIALIAS)
@@ -288,33 +299,33 @@ class SimplePiCar(Car):
                 stream.truncate()
 
             finally:
-                camera.stop_preview()
+                self.cam.stop_preview()
 
         return traffic
+    """
 
     def drive_forward_cam(self, distance: int, power: int = 2):
         self.trip_meter.reset()
-        fc.forward(10)
 
-
+        
         while(self.trip_meter.distance < distance):
 
-            while(self.check_traffic() == True):
+            while(detect.detect_traffic() == True):
                 fc.stop()
                 print("Obstacle detected")
                 time.sleep(2)
 
-            fc.forward(10)
+            fc.forward(2)
 
         fc.stop()
-            
-        
+        print(self.trip_meter.distance, distance)
+
     # drives towards a target
     def drive_target(self, target: tuple):
         
         at_destination = False
 
-        while(target != nav.position):
+        while(target != self.nav.position):
 
             # scan for obstacles
             obstacles = scanner.mapping_scan()
@@ -326,10 +337,9 @@ class SimplePiCar(Car):
             instructions = self.nav.set_navigation_goal(target)
             
             # take the first 3 instructions
-
-            instructions = instructions[:3]
             
-            self.drive_instructions(instructions)
+            print(target, self.nav.position)
+            self.execute_instructions(instructions)
 
         print("arrived at destination")
 
@@ -338,7 +348,7 @@ class SimplePiCar(Car):
 
         # while not at target
         steps_taken = 0
-        while(len(instructions) > 0):
+        while(len(instructions) > 0 and steps_taken< 3):
             # convert instructions to polar
             step = instructions.popleft()
             print("directions: ", step)
@@ -355,9 +365,11 @@ class SimplePiCar(Car):
             elif direction < 0:
                 self.turn_left(abs(direction))
 
-            
+            steps_taken += 1
             self.drive_forward_cam(distance = step[1])
 
+            # update position
+            self.nav.update_postion(step[1], self.orientation)
 
 
 

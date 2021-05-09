@@ -103,8 +103,8 @@ class GPS(object):
         obs_x = int(obs_x // self.resolution) + self.pos_x
         obs_y = int(obs_y // self.resolution) + self.pos_y
 
-        print("polar: ", orientation, distance)
-        print("cartesian:", obs_x, obs_y)
+        #print("polar: ", orientation, distance)
+        #print("cartesian:", obs_x, obs_y)
 
         self.add_obstacle(int(obs_x), int(obs_y))
 
