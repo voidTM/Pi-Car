@@ -257,6 +257,112 @@ class PiCar(Car):
 
     
 
+class SimplePiCar(Car):
+    def __init__(self, nav: GPS):
+        super().__init__()
+        self.nav = nav #navigator /gps
+        self.obstacle_queue = Queue()
+        self.labels = load_labels("Object-detection/Model/coco_labels.txt")
+        self.interpreter = Interpreter("Object-detection/Model/detect.tflite")
+        self.cam = picamera.PiCamera(resolution=(640, 480), framerate=15)
+
+
+    def check_traffic(self):
+
+        traffic = False
+
+        with cam:
+            cam.start_preview()
+            try:
+                stream = io.BytesIO()
+                camera.capture(stream, format = "jpeg")
+                stream.seek(0)
+                image = Image.open(stream).convert('RGB').resize(
+                    (self.input_width, self.input_height), Image.ANTIALIAS)
+                start_time = time.monotonic()
+                results = detect.detect_objects(self.interpreter, image, threshold)
+
+                traffic = detect.found_obstacle(results, self.labels)
+                elapsed_ms = (time.monotonic() - start_time) * 1000
+                stream.seek(0)
+                stream.truncate()
+
+            finally:
+                camera.stop_preview()
+
+        return traffic
+
+    def drive_forward_cam(self, distance: int, power: int = 2):
+        self.trip_meter.reset()
+        fc.forward(10)
+
+
+        while(self.trip_meter.distance < distance):
+
+            while(self.check_traffic() == True):
+                fc.stop()
+                print("Obstacle detected")
+                time.sleep(2)
+
+            fc.forward(10)
+
+        fc.stop()
+            
+        
+    # drives towards a target
+    def drive_target(self, target: tuple):
+        
+        at_destination = False
+
+        while(target != nav.position):
+
+            # scan for obstacles
+            obstacles = scanner.mapping_scan()
+
+            for obst in obstacles:
+                abs_orient = obst[0] + self.orientation
+                self.nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
+                
+            instructions = self.nav.set_navigation_goal(target)
+            
+            # take the first 3 instructions
+
+            instructions = instructions[:3]
+            
+            self.drive_instructions(instructions)
+
+        print("arrived at destination")
+
+    # drive according to instructions until blocked or finished
+    def execute_instructions(self, instructions:deque):
+
+        # while not at target
+        steps_taken = 0
+        while(len(instructions) > 0):
+            # convert instructions to polar
+            step = instructions.popleft()
+            print("directions: ", step)
+                    
+            # calculate the shortest angle to turn
+            direction = step[0] - self.orientation
+            direction = (direction + 180) % 360 - 180
+            #print("turning angle", direction)
+
+            
+            # change direction if needed
+            if direction > 0: 
+                self.turn_right(direction)
+            elif direction < 0:
+                self.turn_left(abs(direction))
+
+            
+            self.drive_forward_cam(distance = step[1])
+
+
+
+
+
+
 # updates and normalizes the angle to be within 0-360
 def update_angle(angle1:int, angle2:int):
     return (angle1 + angle2 + 360) %360
