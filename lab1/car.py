@@ -258,9 +258,9 @@ class PiCar(Car):
     
 
 class SimplePiCar(Car):
-    def __init__(self, nav: GPS):
+    def __init__(self):
         super().__init__()
-        self.nav = nav #navigator /gps
+        self.nav = GPS(map_width = 100, map_length = 100, resolution = 10, start_x = 50, start_y = 0)
         self.obstacle_queue = Queue()
         self.labels = load_labels("Object-detection/Model/coco_labels.txt")
         self.interpreter = Interpreter("Object-detection/Model/detect.tflite")

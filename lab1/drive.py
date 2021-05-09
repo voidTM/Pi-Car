@@ -126,7 +126,7 @@ def drive_picar():
     nav = GPS(map_width = 100, map_length = 100, resolution = 10, start_x = 50, start_y = 0)
     target = (50, 15)
 
-    c = PiCar(nav)
+    c = PiCarSimple()
 
     c.drive_target(target)
 
