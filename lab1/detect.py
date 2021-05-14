@@ -146,56 +146,6 @@ def look_for_objects(shutoff: bool, obstacle_queue: Queue):
 
 
 
-def found_obstacle(results, labels):
-
-  obstacle_list = ['tennis racket', "apple", "person", "stop sign"]
-  for obj in results:
-      if labels[obj['class_id']] in obstacle_list:        
-        return True
-
-  # nothing in list
-  return False
-
-
-def detect_traffic():
-
-  obstacle = False
-  interpreter.allocate_tensors()
-
-    # Get input and output tensors.
-  input_details = interpreter.get_input_details()
-  output_details = interpreter.get_output_details()
-    # Test the model on random input data.
-  input_shape = input_details[0]['shape']
-  threshold = 0.6
-
-  _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
-
-  with picamera.PiCamera(
-      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
-    camera.start_preview()
-    try:
-        stream = io.BytesIO()
-        camera.capture(stream, format = "jpeg")
-        stream.seek(0)
-        image = Image.open(stream).convert('RGB').resize(
-            (input_width, input_height), Image.ANTIALIAS)
-        start_time = time.monotonic()
-        # detects th objects
-
-        results = detect_objects(interpreter, image, threshold)
-
-        elapsed_ms = (time.monotonic() - start_time) * 1000
-        #print(elapsed_ms)
-        obstacle = found_obstacle(results, labels)
-        print(elapsed_ms)
-        stream.seek(0)
-        stream.truncate()
-
-    finally:
-      camera.stop_preview()
-
-  return obstacle
 
 def evaluate(interpreter, image):
 
@@ -203,12 +153,24 @@ def evaluate(interpreter, image):
 
 
 
-class TrafficCam(Object):
-  def __init__():
+class TrafficCam(object):
+  def __init__(self, fast = False):
     self.labels = load_labels("Object-detection/Model/coco_labels.txt")
     self.interpreter = Interpreter("Object-detection/Model/detect.tflite")
     self.interpreter.allocate_tensors()
-    _, self.input_height, self.input_width, _ = interpreter.get_input_details()[0]['shape']
+    self.fast = fast
+    _, self.input_height, self.input_width, _ = self.interpreter.get_input_details()[0]['shape']
+    
+  def found_obstacle(results, labels):
+
+    obstacle_list = ['tennis racket', "apple", "person", "stop sign"]
+    for obj in results:
+        if labels[obj['class_id']] in obstacle_list:        
+          return True
+
+    # nothing in list
+    return False
+
 
   def detect_traffic(self):
 
@@ -216,22 +178,23 @@ class TrafficCam(Object):
 
     threshold = 0.6
 
+    start_time = time.monotonic()
 
     with picamera.PiCamera(
         resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
       camera.start_preview()
       try:
           stream = io.BytesIO()
-          camera.capture(stream, format = "jpeg")
+          camera.capture(stream, format = "jpeg", use_video_port=self.fast)
           stream.seek(0)
           image = Image.open(stream).convert('RGB').resize(
               (self.input_width, self.input_height), Image.ANTIALIAS)
-          start_time = time.monotonic()
           # detects th objects
-
-          results = detect_objects(interpreter, image, threshold)
-
-          obstacle = found_obstacle(results, labels)
+          elapsed_ms = (time.monotonic() - start_time) * 1000
+          print("captured image", elapsed_ms)
+          results = detect_objects(self.interpreter, image, threshold)
+          print("got results", elapsed_ms)
+          obstacle = self.found_obstacle(results, self.labels)
           stream.seek(0)
           stream.truncate()
 
@@ -239,6 +202,6 @@ class TrafficCam(Object):
         camera.stop_preview()
     
     elapsed_ms = (time.monotonic() - start_time) * 1000
-    print(elapsed_ms)
+    print("finish", elapsed_ms)
 
     return obstacle

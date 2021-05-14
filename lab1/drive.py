@@ -126,7 +126,7 @@ def drive_picar():
     nav = GPS(map_width = 100, map_length = 100, resolution = 10, start_x = 50, start_y = 0)
     target = (50, 15)
 
-    c = PiCarSimple(nav)
+    c = PiCar(nav)
 
     c.drive_target(target)
 
@@ -167,7 +167,9 @@ if __name__ == "__main__":
 
         #
         # move_test()
+        #drive_picar()
         drive_simplecar()
+        
     finally: 
         fc.get_distance_at(0)
         fc.stop()

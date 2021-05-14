@@ -145,12 +145,8 @@ class PiCar(Car):
 
     def drive_forward_cam(self, distance: int, power: int = 2):
         self.trip_meter.reset()
-        fc.forward(power)
         coast_clear = True
 
-        # clear obstacles 
-        with self.obstacle_queue.mutex:
-            self.obstacle_queue.queue.clear()
         
         while(self.trip_meter.distance < distance and coast_clear):
 
@@ -160,6 +156,7 @@ class PiCar(Car):
 
                 print(self.obstacle_queue.qsize())
                 o = self.obstacle_queue.get()
+                print(self.obstacle_queue)
 
                 if o == "obstacle":
                     coast_clear = False                    
@@ -200,15 +197,16 @@ class PiCar(Car):
 
         while(not at_destination):
 
+
+            self.nav.clear_grid()
             # scan for obstacles
             obstacles = scanner.mapping_scan()
-            #print("Scan results")
-            #print(obstacles)
+            print("Scan results")
+            print(obstacles)
             #print(" ")
 
             # resets the grid for more up to date results.
             # should only reset half the grid?
-            #self.nav.clear_grid()
 
             # adds in new obstacles
             for obst in obstacles:
@@ -228,6 +226,7 @@ class PiCar(Car):
         # while not at target
         steps_taken = 0
         while(len(instructions) > 0):
+
             # convert instructions to polar
             step = instructions.popleft()
             print("directions: ", step)
@@ -273,47 +272,18 @@ class SimplePiCar(Car):
         super().__init__()
         self.nav = GPS(map_width = 100, map_length = 100, resolution = 10, start_x = 50, start_y = 0)
         self.obstacle_queue = Queue()
-        #self.labels = detect.load_labels("Object-detection/Model/coco_labels.txt")
-        #self.interpreter = Interpreter("Object-detection/Model/detect.tflite")
         self.cam = detect.TrafficCam()
 
-    """
-    def check_traffic(self):
 
-        traffic = False
-
-        with self.cam:
-            self.cam.start_preview()
-            try:
-                stream = io.BytesIO()
-                self.cam.capture(stream, format = "jpeg")
-                stream.seek(0)
-                image = Image.open(stream).convert('RGB').resize(
-                    (self.input_width, self.input_height), Image.ANTIALIAS)
-                start_time = time.monotonic()
-                results = detect.detect_objects(self.interpreter, image, threshold)
-
-                traffic = detect.found_obstacle(results, self.labels)
-                elapsed_ms = (time.monotonic() - start_time) * 1000
-                stream.seek(0)
-                stream.truncate()
-
-            finally:
-                self.cam.stop_preview()
-
-        return traffic
-    """
-
-    def drive_forward_cam(self, distance: int, power: int = 2):
+    def drive_step(self, distance: int, power: int = 2):
         self.trip_meter.reset()
 
+        while(self.cam.detect_traffic() == True):
+            fc.stop()
+            print("Obstacle detected")
+            time.sleep(2)
         
         while(self.trip_meter.distance < distance):
-
-            while(self.cam.detect_traffic() == True):
-                fc.stop()
-                print("Obstacle detected")
-                time.sleep(2)
 
             fc.forward(2)
 
@@ -327,15 +297,22 @@ class SimplePiCar(Car):
 
         while(target != self.nav.position):
 
+            self.nav.clear_grid()
             # scan for obstacles
             obstacles = scanner.mapping_scan()
+            print(self.orientation)
+            print(obstacles)
 
             for obst in obstacles:
                 abs_orient = obst[0] + self.orientation
                 self.nav.add_relative_obstacle(orientation = abs_orient, distance = obst[1])
-                
+            
+
             instructions = self.nav.set_navigation_goal(target)
             
+            if len(instructions) == 0:
+                print("unable to find path")
+                return
             # take the first 3 instructions
             
             print(target, self.nav.position)
@@ -358,7 +335,6 @@ class SimplePiCar(Car):
             direction = (direction + 180) % 360 - 180
             #print("turning angle", direction)
 
-            
             # change direction if needed
             if direction > 0: 
                 self.turn_right(direction)
@@ -366,11 +342,10 @@ class SimplePiCar(Car):
                 self.turn_left(abs(direction))
 
             steps_taken += 1
-            self.drive_forward_cam(distance = step[1])
+            self.drive_step(distance = step[1])
 
             # update position
             self.nav.update_postion(step[1], self.orientation)
-
 
 
 
