@@ -79,7 +79,7 @@ def detect_objects(interpreter, image, threshold):
     dx = (boxes[i][3] - boxes[i][1])
     size = dy * dx
     # objects must be larger than a certain size
-    if scores[i] >= threshold and size > 0.2:
+    if scores[i] >= threshold and size > 0.1:
       result = {
           'bounding_box': boxes[i],
           'class_id': classes[i],
@@ -90,14 +90,11 @@ def detect_objects(interpreter, image, threshold):
 
 
 def identify_objects(queue, results, labels):
-  stop_list = ["person", "stop sign"]
-  obstacle_list = ['tennis racket', "apple"]
+  stop_list = ['tennis racket', "apple", "person", "stop sign"]
+
   for obj in results:
-      if labels[obj['class_id']] in obstacle_list:
-        #print("Detected ", labels[obj['class_id']], obj['score'])
-        queue.put("obstacle")
-      elif labels[obj['class_id']] in stop_list:
-        #print("Detected ", labels[obj['class_id']], obj['score'])
+      if labels[obj['class_id']] in stop_list:
+        print("Detected ", labels[obj['class_id']], obj['score'])
         queue.put("stop")
 
 
@@ -118,23 +115,27 @@ def look_for_objects(shutoff: bool, obstacle_queue: Queue):
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
   with picamera.PiCamera(
-      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=15) as camera:
+      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
     camera.start_preview()
     try:
       stream = io.BytesIO()
       for _ in camera.capture_continuous(
-          stream, format='jpeg', use_video_port=True):
+          stream, format='jpeg', use_video_port=False):
+        #start_time = time.monotonic()
+        
         stream.seek(0)
         image = Image.open(stream).convert('RGB').resize(
             (input_width, input_height), Image.ANTIALIAS)
-        start_time = time.monotonic()
-        # detects th objects
+        
+        #elapsed_ms = (time.monotonic() - start_time) 
+        #print("captured image", elapsed_ms)
 
+        # detects the objects
         results = detect_objects(interpreter, image, threshold)
 
-        elapsed_ms = (time.monotonic() - start_time) * 1000
-        #print(elapsed_ms)
         identify_objects(obstacle_queue, results, labels)
+        #elapsed_ms = (time.monotonic() - start_time)
+        #print("got results", elapsed_ms)
         
         stream.seek(0)
         stream.truncate()
@@ -161,8 +162,8 @@ class TrafficCam(object):
     self.fast = fast
     _, self.input_height, self.input_width, _ = self.interpreter.get_input_details()[0]['shape']
     
-    self.camera = picamera.PiCamera(
-        resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
+    #self.camera = picamera.PiCamera(
+    #    resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30)
 
 
   def found_obstacle(self, results, labels):
@@ -191,10 +192,7 @@ class TrafficCam(object):
     image = Image.open(stream).convert('RGB').resize(
         (self.input_width, self.input_height), Image.ANTIALIAS)
       # detects th objects
-    elapsed_ms = (time.monotonic() - start_time) * 1000
-    print("captured image", elapsed_ms)
     results = detect_objects(self.interpreter, image, threshold)
-    print("got results", elapsed_ms)
     obstacle = self.found_obstacle(results, self.labels)
     stream.seek(0)
     stream.truncate()
@@ -213,24 +211,28 @@ class TrafficCam(object):
         resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
       camera.start_preview()
       try:
+          elapsed_ms = (time.monotonic() - start_time)
+          print("finish setup", elapsed_ms)
           stream = io.BytesIO()
           camera.capture(stream, format = "jpeg", use_video_port=self.fast)
           stream.seek(0)
           image = Image.open(stream).convert('RGB').resize(
               (self.input_width, self.input_height), Image.ANTIALIAS)
           # detects th objects
-          elapsed_ms = (time.monotonic() - start_time) * 1000
+          elapsed_ms = (time.monotonic() - start_time)
           print("captured image", elapsed_ms)
           results = detect_objects(self.interpreter, image, threshold)
-          print("got results", elapsed_ms)
           obstacle = self.found_obstacle(results, self.labels)
+          elapsed_ms = (time.monotonic() - start_time)
+          print("got results", elapsed_ms)
+
           stream.seek(0)
           stream.truncate()
 
       finally:
         camera.stop_preview()
     
-    elapsed_ms = (time.monotonic() - start_time) * 1000
+    elapsed_ms = (time.monotonic() - start_time)
     print("finish", elapsed_ms)
 
     return obstacle

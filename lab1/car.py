@@ -154,18 +154,9 @@ class PiCar(Car):
             if not self.obstacle_queue.empty():
                 fc.stop()
 
-                print(self.obstacle_queue.qsize())
-                o = self.obstacle_queue.get()
-                print(self.obstacle_queue)
-
-                if o == "obstacle":
-                    coast_clear = False                    
-                    break
-                else: # must stop
-                    self.obstacle_queue.task_done()
-                    with self.obstacle_queue.mutex:
-                        self.obstacle_queue.queue.clear()
-                    time.sleep(1)
+                with self.obstacle_queue.mutex:
+                    self.obstacle_queue.queue.clear()
+                time.sleep(1)
                     
             else:
                 fc.forward(power)

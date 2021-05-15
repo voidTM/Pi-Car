@@ -167,8 +167,8 @@ if __name__ == "__main__":
 
         #
         # move_test()
-        #drive_picar()
-        drive_simplecar()
+        drive_picar()
+        #drive_simplecar()
         
     finally: 
         fc.get_distance_at(0)
