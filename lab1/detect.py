@@ -161,25 +161,45 @@ class TrafficCam(object):
     self.fast = fast
     _, self.input_height, self.input_width, _ = self.interpreter.get_input_details()[0]['shape']
     
-<<<<<<< HEAD
-  def found_obstacle(results, labels):
+    self.camera = picamera.PiCamera(
+        resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
 
-    obstacle_list = ['tennis racket', "apple", "person", "stop sign"]
-    for obj in results:
-        if labels[obj['class_id']] in obstacle_list:        
-=======
+
   def found_obstacle(self, results, labels):
 
     obstacle_list = ['tennis racket', "apple", "person", "stop sign"]
     for obj in results:
         if labels[obj['class_id']] in obstacle_list:
           print(labels[obj['class_id']])        
->>>>>>> 2ae9913874a72921343ba08e31602a9125b49606
           return True
 
     # nothing in list
     return False
 
+
+  def check_traffic(self):
+    obstacle = False
+
+    threshold = 0.6
+
+    start_time = time.monotonic()
+
+    stream = io.BytesIO()
+    self.camera.capture(stream, format = "jpeg", use_video_port=self.fast)
+
+    stream.seek(0)
+    image = Image.open(stream).convert('RGB').resize(
+        (self.input_width, self.input_height), Image.ANTIALIAS)
+      # detects th objects
+    elapsed_ms = (time.monotonic() - start_time) * 1000
+    print("captured image", elapsed_ms)
+    results = detect_objects(self.interpreter, image, threshold)
+    print("got results", elapsed_ms)
+    obstacle = self.found_obstacle(results, self.labels)
+    stream.seek(0)
+    stream.truncate()
+    
+    return obstacle
 
   def detect_traffic(self):
 

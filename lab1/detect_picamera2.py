@@ -48,7 +48,7 @@ def loop_cam(shutoff: bool):
     traffic = detect.TrafficCam(fast = True)
 
     while(shutoff == False):
-        print(traffic.detect_traffic())
+        print(traffic.check_traffic())
 
 
 if __name__ == '__main__':
