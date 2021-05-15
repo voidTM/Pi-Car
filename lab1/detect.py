@@ -161,11 +161,12 @@ class TrafficCam(object):
     self.fast = fast
     _, self.input_height, self.input_width, _ = self.interpreter.get_input_details()[0]['shape']
     
-  def found_obstacle(results, labels):
+  def found_obstacle(self, results, labels):
 
     obstacle_list = ['tennis racket', "apple", "person", "stop sign"]
     for obj in results:
-        if labels[obj['class_id']] in obstacle_list:        
+        if labels[obj['class_id']] in obstacle_list:
+          print(labels[obj['class_id']])        
           return True
 
     # nothing in list

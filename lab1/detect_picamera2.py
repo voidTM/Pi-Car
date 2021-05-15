@@ -30,9 +30,7 @@ def handle_obstacles(obstacles:Queue):
         print(o)
         obstacles.task_done()
 
-
-
-if __name__ == '__main__':
+def multithread_cam():
     try:
         obstacles = Queue()
         x = Thread(target=detect.look_for_objects,args=(ender, obstacles,), daemon=True)
@@ -42,3 +40,17 @@ if __name__ == '__main__':
         ender = True
         obstacles.join()
         x.join(2)
+
+
+
+def loop_cam(shutoff: bool):  
+
+    traffic = detect.TrafficCam(fast = True)
+
+    while(shutoff == False):
+        print(traffic.detect_traffic())
+
+
+if __name__ == '__main__':
+    # multithread_cam()
+    loop_cam(False )
