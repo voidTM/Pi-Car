@@ -148,33 +148,26 @@ class PiCar(Car):
         coast_clear = True
 
         
-        while(self.trip_meter.distance < distance and coast_clear):
-
-            # handle obstacles
+        while(self.trip_meter.distance < distance):
+            # wait for obstacles to clear
             if not self.obstacle_queue.empty():
                 fc.stop()
 
                 with self.obstacle_queue.mutex:
                     self.obstacle_queue.queue.clear()
-                time.sleep(1)
+                time.sleep(2)
                     
             else:
                 fc.forward(power)
 
-        # switch to something else?
-        with self.obstacle_queue.mutex:
-            self.obstacle_queue.queue.clear()
 
 
         fc.stop()
         actually_traveled = self.trip_meter.distance
 
-        # encountered an obstacle.
-        if not coast_clear:
-            self.drive_backward(15)
-            actually_traveled -= 15
+        print(self.orientation, distance, actually_traveled)
         
-        self.nav.update_postion(actually_traveled, self.orientation)
+        self.nav.update_postion(distance, self.orientation)
 
         return coast_clear
 
@@ -227,7 +220,14 @@ class PiCar(Car):
             direction = (direction + 180) % 360 - 180
             #print("turning angle", direction)
 
-            
+            # check for block before turning
+            while( not self.obstacle_queue.empty()):
+                fc.stop()
+
+                with self.obstacle_queue.mutex:
+                    self.obstacle_queue.queue.clear()
+                time.sleep(2)
+
             # change direction if needed
             if direction > 0: 
                 self.turn_right(direction)
@@ -240,7 +240,7 @@ class PiCar(Car):
             steps_taken += 1
 
             # need to recalibrate
-            if not coast_clear or steps_taken == 10:
+            if not coast_clear or steps_taken == 3:
                 return False
 
     
